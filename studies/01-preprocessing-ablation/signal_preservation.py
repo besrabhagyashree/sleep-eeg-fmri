@@ -17,7 +17,7 @@ import numpy as np
 from scipy import signal
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
-from preprocessing.mr_artifacts import TARGET_SFREQ, r_peaks, remove_bcg, remove_gradient, volume_onsets  # noqa: E402
+from preprocessing.mr_artifacts import TARGET_SFREQ, remove_bcg, remove_gradient, volume_onsets  # noqa: E402
 
 BANDS = {"delta": (0.5, 4), "theta": (4, 8), "alpha": (8, 12), "sigma": (12, 16), "beta": (16, 30)}
 HERE = Path(__file__).resolve().parent
