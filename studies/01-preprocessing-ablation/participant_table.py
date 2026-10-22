@@ -1,5 +1,7 @@
 """One table, one row per participant: data quality and sleep-staging scores in every arm.
 
+Kappa cells are coloured by the Landis & Koch (1977) agreement bands. Full citations: REFERENCES.md.
+
 Columns per participant:
   quality      recordings, epochs kept / flagged by Autoreject / marked unscorable by the expert,
                worst bad-channel count, median INPS for each heartbeat detector, double-counted beats

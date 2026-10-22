@@ -1,5 +1,9 @@
 """Per-epoch EEG features, identical for every arm of the comparison.
 
+Band powers from Welch spectra (Welch, 1967); Hjorth mobility and complexity (Hjorth, 1970);
+feature design follows common sleep-staging practice (e.g. Vallat & Walker, 2021). Full
+citations: REFERENCES.md.
+
 One 30-second epoch (n_channels x n_samples, volts) -> one feature row. Works at any sampling
 rate, so raw 5 kHz data and cleaned 250 Hz data go through exactly the same code.
 """

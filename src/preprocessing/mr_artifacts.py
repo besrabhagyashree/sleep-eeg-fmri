@@ -9,6 +9,9 @@ Two artefacts dominate EEG recorded during fMRI:
 2. Ballistocardiogram (BCG): every heartbeat moves the head and electrodes in the static
    field. Removed with the same idea locked to ECG R-peaks (Allen et al., 1998).
 
+Heartbeat detection: MNE-Python (Gramfort et al., 2013); see r_peaks_mne / r_peaks. Full
+citations: REFERENCES.md.
+
 Usage:
     python src/preprocessing/mr_artifacts.py data/raw/sub-01/eeg/sub-01_task-sleep_run-1_eeg.vhdr
 Writes a cleaned 250 Hz recording to data/clean/ and diagnostic figures to figures/.

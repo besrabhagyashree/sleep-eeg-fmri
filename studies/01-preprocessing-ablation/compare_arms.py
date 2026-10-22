@@ -6,8 +6,10 @@ context, models and leave-one-person-out testing. Only the EEG the features came
 Pre-set analysis plan (fixed 22 Oct 2026, before results):
   tasks   3-class (wake / N1 / N2) and wake vs N2
   models  logistic regression (standardised features) and gradient-boosted trees
-  test    leave-one-person-out; per-person Cohen's kappa; paired Wilcoxon signed-rank tests between
-          arms + bootstrap 95% CI of the mean difference; stratified-chance baseline
+  test    leave-one-person-out; per-person Cohen's kappa (Cohen, 1960); paired Wilcoxon signed-rank
+          tests (Wilcoxon, 1945) between arms + bootstrap 95% CI (Efron, 1979) of the mean
+          difference; stratified-chance baseline. Models from scikit-learn (Pedregosa et al., 2011);
+          gradient boosting (Friedman, 2001). Full citations: REFERENCES.md
   quality exclusions (judged on the standard-cleaned recording, applied identically to all arms):
           epochs the dataset's expert marked uncertain/unscorable (removed when building);
           epochs flagged by Autoreject; recordings with > 3 PREP bad channels (10%);

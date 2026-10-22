@@ -88,7 +88,7 @@ flowchart TB
 
 ## 🗂️ Data
 
-[OpenNeuro ds003768](https://openneuro.org/datasets/ds003768/versions/1.0.13): simultaneous EEG and fMRI from 33 healthy adults resting and napping in a 3T scanner, with expert sleep-stage labels for every 30 seconds (Gu et al., Penn State; CC0 licence).
+[OpenNeuro ds003768](https://openneuro.org/datasets/ds003768/versions/1.0.13): simultaneous EEG and fMRI from 33 healthy adults resting and napping in a 3T scanner, with expert sleep-stage labels for every 30 seconds (Gu et al., 2022, *NeuroImage*; Penn State; CC0 licence).
 
 | Wake | N1 (drowsy) | N2 (light sleep) | N3 (deep sleep) |
 |:---:|:---:|:---:|:---:|
@@ -132,4 +132,6 @@ Each study's README gives the commands for that study.
 
 ## 📚 Citation
 
-Gu, Y., Han, F., Sainburg, L. E., Schade, M. M., Buxton, O. M., Duyn, J. H., & Liu, X. (2021). *An orderly sequence of autonomic and neural events at transient arousal changes.* bioRxiv. Dataset: OpenNeuro ds003768, doi:10.18112/openneuro.ds003768.v1.0.0.
+Gu, Y., Han, F., Sainburg, L. E., Schade, M. M., Buxton, O. M., Duyn, J. H., & Liu, X. (2022). An orderly sequence of autonomic and neural events at transient arousal changes. *NeuroImage*, 264, 119720. [doi:10.1016/j.neuroimage.2022.119720](https://doi.org/10.1016/j.neuroimage.2022.119720). Dataset: OpenNeuro ds003768, [doi:10.18112/openneuro.ds003768.v1.0.0](https://doi.org/10.18112/openneuro.ds003768.v1.0.0).
+
+**Every method, metric, standard and software package used in this project is cited in full, with DOIs, in [REFERENCES.md](REFERENCES.md).**
