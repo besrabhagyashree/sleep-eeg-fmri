@@ -229,6 +229,8 @@ These use this study's own tests rather than established metrics, so they inform
 
 - [`data_accounting.py`](data_accounting.py): share of signal each step removes on participant 1: gradient subtraction 99.68% of raw power; the 0.3–40 Hz filter 12.8% of the rest (10.5% below 0.3 Hz, 2.3% above 40 Hz); heartbeat subtraction 19.9% (sigma band 57%); cropping 3.5% of recording time.
 - [`overcorrection_check.py`](overcorrection_check.py): the same heartbeat subtraction at heartbeat-like times not locked to the heart removes 3.3–5.1% of band power, close to the method's theoretical 1/21 (4.8%), against 22–57% at real heartbeats.
+- [`validate_obs.py`](validate_obs.py): optimal basis sets (4 components) raise heartbeat removal (INPS 6.79 vs 1.69 dB) but remove 69.6% of 0.5–30 Hz power; at times not locked to the heart they still remove 75% of delta and 32% of theta, against 4–5% for average subtraction. Sleep slow waves last about one heartbeat and are absorbed into the basis, so OBS is not used.
+- [`validate_stages.py`](validate_stages.py): notch, spline interpolation and re-reference steps on participant 1 (pre-registration amendment 1).
 - [`signal_preservation.py`](signal_preservation.py): the cleaned spectrum keeps the shape of the 24 s recorded before scanning between 0.5 and 15 Hz. That stretch already contains unmarked scanner warm-up (16.7 Hz), so it is an imperfect reference. A 38.5 Hz peak is present before scanning too (scanner-room equipment), and 3 and 6 Hz peaks appear only during scanning.
 
 ![Pre-scan vs cleaned scanning spectrum](results/signal_preservation_sub-01.png)
@@ -250,7 +252,7 @@ These use this study's own tests rather than established metrics, so they inform
 
 ## 📚 References
 
-Full citations with DOIs for every method, metric, dataset and software package: **[REFERENCES.md](../../REFERENCES.md)**. Planned next cleaning step: optimal basis sets (Niazy et al., 2005).
+Full citations with DOIs for every method, metric, dataset and software package: **[REFERENCES.md](../../REFERENCES.md)**. Optimal basis sets (Niazy et al., 2005) were tested and not adopted: on participant 1 they removed 75% of delta power even at times not locked to the heart ([`validate_obs.py`](validate_obs.py); pre-registration amendment 2).
 
 ## ⚠️ Limitations
 
