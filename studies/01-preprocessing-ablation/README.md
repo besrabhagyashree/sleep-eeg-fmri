@@ -85,7 +85,7 @@ Only the EEG differs between arms. Epochs, people, quality exclusions, features,
 Updated each time a participant finishes processing, by [`participant_table.py`](participant_table.py). Click a heading to open its table.
 
 <!-- participants-table:start -->
-<img alt="progress" src="https://img.shields.io/badge/participants%20built-21%20of%2033-d97706?style=for-the-badge"> <img alt="percent" src="https://img.shields.io/badge/progress-64%25-33318a?style=for-the-badge">
+<img alt="progress" src="https://img.shields.io/badge/participants%20built-22%20of%2033-d97706?style=for-the-badge"> <img alt="percent" src="https://img.shields.io/badge/progress-67%25-33318a?style=for-the-badge">
 
 **Kappa colours** follow the Landis & Koch (1977) agreement bands: ⬛ ≤ 0 none · 🟥 0.01–0.20 slight · 🟧 0.21–0.40 fair · 🟨 0.41–0.60 moderate · 🟩 0.61–0.80 substantial · 💚 0.81–1.00 almost perfect
 
@@ -125,7 +125,8 @@ Logistic regression · Cohen's kappa vs the expert · – = not scored (fewer th
 | 19 | 🟥 0.13 | 🟥 0.07 | ⬛ -0.09 | ⬛ -0.01 | 🟥 0.11 | 🟥 0.16 | ⬛ -0.13 | ⬛ -0.10 |
 | 20 | 🟥 0.15 | 🟧 0.22 | 🟥 0.06 | 🟥 0.06 | – | – | – | – |
 | 21 | – | – | – | – | – | – | – | – |
-| **median** | **🟥 0.15** | **🟥 0.19** | **🟥 0.10** | **🟥 0.09** | **⬛ -0.02** | **⬛ -0.02** | **🟥 0.03** | **🟥 0.11** |
+| 22 | 🟧 0.21 | 🟧 0.40 | 🟥 0.20 | 🟧 0.25 | 💚 0.96 | 💚 0.91 | 💚 0.92 | 💚 0.96 |
+| **median** | **🟥 0.15** | **🟧 0.21** | **🟥 0.11** | **🟥 0.11** | **🟥 0.03** | **🟥 0.03** | **🟥 0.16** | **🟥 0.20** |
 
 </details>
 
@@ -157,7 +158,7 @@ Logistic regression · Cohen's kappa vs the expert · – = not scored (fewer th
 | 19 | ✅ ok | 7 | 144 (31 / 56 / 57) | ✅ 24.2% | 0 | ✅ 2 | 1.14 / 1.17 | 434 / 0 |
 | 20 | ✅ ok | 7 | 155 (101 / 54 / 0) | ✅ 17.6% | 2 | ✅ 2 | 3.06 / 3.17 | 19 / 0 |
 | 21 | ✅ ok | 2 | 36 (22 / 14 / 0) | ✅ 10.0% | 0 | ✅ 1 | 1.69 / 1.84 | 114 / 0 |
-| 22 | ⏳ processing | | | | | | | |
+| 22 | ✅ ok | 10 | 263 (144 / 106 / 13) | ✅ 6.1% | 0 | ✅ 1 | 1.25 / 2.61 | 805 / 0 |
 | 23 | ⏳ processing | | | | | | | |
 | 24 | ⏳ processing | | | | | | | |
 | 25 | ⏳ processing | | | | | | | |
