@@ -103,3 +103,11 @@ The reference with the higher **median score across participants** is used for t
 ## Amendment 2: optimal basis sets tested, not adopted (22 October 2026, before full results)
 
 OBS heartbeat removal (Niazy et al., 2005; 4 principal components, the FMRIB toolbox default) was implemented ([`remove_bcg_obs`](../../src/preprocessing/mr_artifacts.py)) and validated on participant 1, sleep run 1 ([`validate_obs.py`](validate_obs.py)). It removed more heartbeat artefact than average subtraction by INPS (6.79 vs 1.69 dB with the refined detector; 2.63 vs 0.99 dB with MNE's), but also 69.6% of all 0.5–30 Hz power. The exploratory random-timing diagnostic showed why: applied at times not locked to the heart, OBS still removed 75% of delta and 32% of theta power (average subtraction: 4–5%). In sleep EEG, slow waves last about as long as one heartbeat and are absorbed into the OBS basis. Because this fails signal preservation in the frequency bands that define sleep stages, **OBS is not added as an arm**. The result is reported as a methods finding, with the caveat that it is this study's implementation of the published method.
+
+## Amendment 3: clarifications to amendment 1 (22 October 2026, before full results)
+
+Following an automated code review:
+
+- The reference-selection score uses only epochs **not** flagged by Autoreject, leaves out recordings with more than 3 bad channels, and leaves out people excluded under the 25% rule.
+- **Only the chosen reference** is evaluated as the exploratory arm; the other is reported by its selection score only. Neither is evaluated before the rule has been applied, so the choice cannot be influenced by classification results.
+- **Disclosed limitation:** the reference is chosen once using the expert labels of all included participants, including each person later held out in leave-one-person-out testing (non-nested selection). It is a single binary choice made without the classifier and only for the exploratory arm, so the optimistic bias is expected to be small, but it is not zero.

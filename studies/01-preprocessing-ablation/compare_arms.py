@@ -48,6 +48,11 @@ META = ["subject", "session", "t", "stage", "arm", "qc_epoch_bad"]
 ARMS = ["raw", "filtered", "cleaned_mne", "cleaned_refined"]
 PAIRS = [("raw", "cleaned_mne"), ("raw", "cleaned_refined"), ("filtered", "cleaned_mne"),
          ("cleaned_mne", "cleaned_refined"), ("raw", "filtered")]
+# exploratory "fully cleaned" arms (pre-registration amendment 1); only the one in results/reference_choice.json is evaluated
+FEAT_FULL = ROOT / "data" / "features_full"
+EXPLORATORY = ["full_mastoid", "full_average"]
+EXPLORATORY_PAIRS = [("cleaned_mne", "full_mastoid"), ("cleaned_mne", "full_average"),
+                     ("raw", "full_mastoid"), ("raw", "full_average")]
 TASKS = {"3class": ["W", "N1", "N2"], "w_vs_n2": ["W", "N2"]}
 MODELS = ["logreg", "gbm"]
 MAX_BAD_CHANNELS, MAX_BAD_EPOCH_PCT = 3, 25.0
@@ -66,6 +71,10 @@ def make_model(name):
 def load():
     d = pd.concat([pd.read_csv(f, dtype={"subject": str}) for f in sorted(FEAT.glob("sub-*.csv"))
                    if f.stat().st_size > 10], ignore_index=True)
+    full = [pd.read_csv(f, dtype={"subject": str}) for f in sorted(FEAT_FULL.glob("sub-*.csv"))] if FEAT_FULL.exists() else []
+    if full:   # exploratory arms; same epochs, labels and quality flags as the main arms
+        full = pd.concat(full, ignore_index=True)
+        d = pd.concat([d, full[full.subject.isin(d.subject.unique())]], ignore_index=True)
     q = pd.concat([pd.read_csv(f, dtype={"subject": str}) for f in sorted(QC.glob("sub-*.csv"))], ignore_index=True)
     excl = []
     bad_rec = q[q.n_bad_channels.fillna(0) > MAX_BAD_CHANNELS][["subject", "session"]]
@@ -141,9 +150,14 @@ def main():
     OUT.mkdir(exist_ok=True)
     excl.to_csv(OUT / "exclusions.csv", index=False)
     per, pooled, cms, tests = [], {}, {}, {}
+    # only the reference chosen by the amendment-1 rule is evaluated, and none before the rule is applied
+    choice_file = OUT / "reference_choice.json"
+    chosen = json.loads(choice_file.read_text())["choice"] if choice_file.exists() else None
+    exploratory = [chosen] if chosen in set(d.arm) else []
+    d = d[~d.arm.isin([x for x in EXPLORATORY if x != chosen])]
     for task, classes in TASKS.items():
         for model in MODELS + ["chance"]:
-            for arm in (ARMS if model != "chance" else ["cleaned_mne"]):
+            for arm in (ARMS + exploratory if model != "chance" else ["cleaned_mne"]):
                 r, p, cm = evaluate(d[d.arm == arm], feats, classes, model, args.norm, not args.no_context)
                 r["arm"], r["model"], r["task"] = (arm if model != "chance" else "chance"), model, task
                 per.append(r); pooled[f"{task}/{model}/{arm}"] = p; cms[(task, model, arm)] = cm
@@ -155,11 +169,14 @@ def main():
             wide = sub[(sub.task == task) & (sub.model == model)].pivot(index="subject", columns="arm", values="kappa")
             for a, b in PAIRS:
                 tests[f"{task}/{model}/{b}_vs_{a}"] = paired(wide[a], wide[b])
+            for a, b in EXPLORATORY_PAIRS:
+                if a in wide and b in wide:
+                    tests[f"exploratory/{task}/{model}/{b}_vs_{a}"] = paired(wide[a], wide[b])
     per = pd.concat(per, ignore_index=True)
     per.to_csv(OUT / "per_subject.csv", index=False)
     clean = d[d.arm == "cleaned_mne"]
     preservation = {}
-    for arm in ARMS:
+    for arm in ARMS + exploratory:
         a = d[(d.arm == arm) & d.stage.isin(["W", "N2"])]
         m = a.pivot_table(index="subject", columns="stage", values="posterior_rel_alpha").dropna()
         preservation[arm] = {"people_with_wake_and_n2": int(len(m)),
