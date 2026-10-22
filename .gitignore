@@ -23,3 +23,4 @@ studies/*/results/*
 !studies/*/results/per_subject.csv
 !studies/*/results/*.png
 !studies/*/results/preview_*.csv
+!studies/*/results/participants_table.*
