@@ -1,6 +1,6 @@
 # Pre-registration: Study 01, Does preprocessing matter?
 
-**Author:** Bhagyashree Besra, Independent Researcher, Odisha, India
+**Author:** Bhagyashree Besra, Independent Researcher, Odisha, India · ORCID [0009-0008-6118-7602](https://orcid.org/0009-0008-6118-7602)
 **Written:** 22 October 2026, before the full 33-participant classification results exist
 **Format:** follows the OSF template *Preregistration for secondary data analysis* (existing, publicly available data)
 **Repository:** https://github.com/besrabhagyashree/sleep-eeg-fmri (study folder `studies/01-preprocessing-ablation`)

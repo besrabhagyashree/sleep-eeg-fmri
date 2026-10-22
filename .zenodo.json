@@ -2,11 +2,33 @@
   "title": "Sleep EEG-fMRI: preprocessing, quality control and sleep staging of EEG recorded inside an MRI scanner",
   "upload_type": "software",
   "description": "Code, quality reports and results for a study of sleep EEG recorded simultaneously with fMRI (OpenNeuro ds003768). Study 01 is an ablation comparing sleep-staging performance on raw, filtered-only and artefact-cleaned EEG, with two heartbeat detectors, using established quality-control methods (PREP, Autoreject, INPS). Data are not included; scripts download them from OpenNeuro.",
-  "creators": [{"name": "Besra, Bhagyashree", "affiliation": "Independent Researcher, Odisha, India"}],
-  "keywords": ["EEG", "EEG-fMRI", "sleep staging", "ballistocardiogram", "gradient artefact", "data quality", "MNE-Python"],
+  "creators": [
+    {
+      "name": "Besra, Bhagyashree",
+      "affiliation": "Independent Researcher, Odisha, India",
+      "orcid": "0009-0008-6118-7602"
+    }
+  ],
+  "keywords": [
+    "EEG",
+    "EEG-fMRI",
+    "sleep staging",
+    "ballistocardiogram",
+    "gradient artefact",
+    "data quality",
+    "MNE-Python"
+  ],
   "license": "MIT",
   "related_identifiers": [
-    {"identifier": "10.1016/j.neuroimage.2022.119720", "relation": "references", "scheme": "doi"},
-    {"identifier": "10.18112/openneuro.ds003768.v1.0.0", "relation": "isDerivedFrom", "scheme": "doi"}
+    {
+      "identifier": "10.1016/j.neuroimage.2022.119720",
+      "relation": "references",
+      "scheme": "doi"
+    },
+    {
+      "identifier": "10.18112/openneuro.ds003768.v1.0.0",
+      "relation": "isDerivedFrom",
+      "scheme": "doi"
+    }
   ]
 }
