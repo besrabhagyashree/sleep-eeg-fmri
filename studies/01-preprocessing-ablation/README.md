@@ -242,6 +242,9 @@ These use this study's own tests rather than established metrics, so they inform
 - **Analysis plan revised before results.** After a code test on 4–5 people, logistic regression and the wake-vs-N2 task were added and per-person feature scaling moved to a sensitivity analysis (`--norm`), because people's stage mixes differ hugely (one is 96% wake, another 76% N2).
 </details>
 
+> [!TIP]
+> The analysis plan, exclusions and tests are fixed in [PREREGISTRATION.md](PREREGISTRATION.md), written before the full results.
+
 ## 📚 References
 
 Full citations with DOIs for every method, metric, dataset and software package: **[REFERENCES.md](../../REFERENCES.md)**. Planned next cleaning step: optimal basis sets (Niazy et al., 2005).
