@@ -29,29 +29,25 @@ Research on sleep and wakefulness using **EEG recorded simultaneously with fMRI*
 ## 🧭 Pipeline
 
 ```mermaid
-flowchart LR
+flowchart TB
     RAW["🧠 Raw EEG<br/>32 channels · 5 kHz"]:::data
-    LAB["📋 Expert sleep labels<br/>every 30 s"]:::data
 
     subgraph S1 ["1 · Preprocessing"]
-        direction TB
-        P1["Scanner artefact"]:::done --> P2["Heartbeat artefact"]:::done --> P3["Filter · 250 Hz"]:::done
-        P3 --> P4["Residual peaks"]:::todo --> P5["Bad channels"]:::todo --> P6["Re-reference"]:::todo --> P7["Movement"]:::todo
+        direction LR
+        P1["Scanner<br/>artefact"]:::done --> P2["Heartbeat<br/>artefact"]:::done --> P3["Filter<br/>250 Hz"]:::done --> P4["Residual<br/>peaks"]:::todo --> P5["Bad<br/>channels"]:::todo --> P6["Re-<br/>reference"]:::todo --> P7["Movement<br/>bursts"]:::todo
     end
     subgraph S2 ["2 · Features"]
-        direction TB
-        F1["Band power · spectra"]:::done
-        F2["Spindles · alpha peak"]:::todo
+        direction LR
+        F1["Band power · spectra"]:::done ~~~ F2["Spindles · alpha peak"]:::todo
     end
     subgraph S3 ["3 · Research methods"]
-        direction TB
-        M1["Sleep-stage classifier"]:::wip
-        M2["Alpha analysis"]:::todo
+        direction LR
+        M1["Sleep-stage classifier"]:::wip ~~~ M2["Alpha analysis"]:::todo
     end
+    LAB["📋 Expert sleep labels<br/>every 30 seconds"]:::data
     subgraph S4 ["4 · Post-processing"]
-        direction TB
-        Q1["Figures"]:::done
-        Q2["Statistics"]:::wip
+        direction LR
+        Q1["Figures"]:::done ~~~ Q2["Statistics"]:::wip
     end
 
     RAW --> S1 --> S2 --> S3 --> S4
@@ -61,6 +57,10 @@ flowchart LR
     classDef wip fill:#fef3c7,stroke:#d97706,color:#78350f
     classDef todo fill:#f1f5f9,stroke:#94a3b8,color:#334155,stroke-dasharray: 4 3
     classDef data fill:#ede9fe,stroke:#6d28d9,color:#2e1065
+    style S1 fill:#f8fafc,stroke:#cbd5e1,color:#0f172a
+    style S2 fill:#f8fafc,stroke:#cbd5e1,color:#0f172a
+    style S3 fill:#f8fafc,stroke:#cbd5e1,color:#0f172a
+    style S4 fill:#f8fafc,stroke:#cbd5e1,color:#0f172a
 ```
 
 <p align="center">
