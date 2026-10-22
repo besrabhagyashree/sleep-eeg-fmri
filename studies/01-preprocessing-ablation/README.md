@@ -85,7 +85,7 @@ Only the EEG differs between arms. Epochs, people, quality exclusions, features,
 Updated each time a participant finishes processing, by [`participant_table.py`](participant_table.py). Click a heading to open its table.
 
 <!-- participants-table:start -->
-<img alt="progress" src="https://img.shields.io/badge/participants%20built-8%20of%2033-d97706?style=for-the-badge"> <img alt="percent" src="https://img.shields.io/badge/progress-24%25-33318a?style=for-the-badge">
+<img alt="progress" src="https://img.shields.io/badge/participants%20built-9%20of%2033-d97706?style=for-the-badge"> <img alt="percent" src="https://img.shields.io/badge/progress-27%25-33318a?style=for-the-badge">
 
 **Kappa colours** follow the Landis & Koch (1977) agreement bands: ⬛ ≤ 0 none · 🟥 0.01–0.20 slight · 🟧 0.21–0.40 fair · 🟨 0.41–0.60 moderate · 🟩 0.61–0.80 substantial · 💚 0.81–1.00 almost perfect
 
@@ -112,7 +112,8 @@ Logistic regression · Cohen's kappa vs the expert · – = not scored (fewer th
 | 06 | ⬛ -0.10 | 🟥 0.10 | 🟥 0.18 | 🟥 0.09 | ⬛ -0.12 | ⬛ -0.11 | ⬛ -0.11 | ⬛ -0.11 |
 | 07 | 🟥 0.16 | 🟥 0.09 | 🟥 0.10 | 🟥 0.09 | ⬛ -0.04 | ⬛ -0.03 | ⬛ -0.04 | ⬛ -0.03 |
 | 08 | ⬛ -0.01 | ⬛ -0.01 | ⬛ -0.01 | ⬛ -0.01 | – | – | – | – |
-| **median** | **⬛ -0.01** | **🟥 0.09** | **⬛ -0.01** | **⬛ -0.01** | **⬛ -0.04** | **⬛ -0.03** | **⬛ -0.01** | **⬛ -0.03** |
+| 09 | 🟧 0.37 | 🟧 0.39 | 🟨 0.48 | 🟨 0.49 | 🟩 0.65 | 🟩 0.67 | 💚 0.89 | 💚 0.91 |
+| **median** | **🟥 0.07** | **🟥 0.10** | **🟥 0.05** | **🟥 0.04** | **⬛ -0.03** | **⬛ -0.02** | **🟥 0.03** | **⬛ -0.03** |
 
 </details>
 
@@ -131,7 +132,7 @@ Logistic regression · Cohen's kappa vs the expert · – = not scored (fewer th
 | 06 | ✅ ok | 6 | 131 (108 / 13 / 10) | ✅ 18.1% | 0 | ✅ 2 | 2.44 / 2.75 | 16 / 0 |
 | 07 | ✅ ok | 7 | 120 (2 / 58 / 60) | ✅ 14.9% | 22 | ❌ 4 | 0.69 / 0.73 | 197 / 0 |
 | 08 | ✅ ok | 9 | 210 (208 / 2 / 0) | ✅ 15.0% | 3 | ✅ 1 | 1.33 / 1.52 | 383 / 0 |
-| 09 | ⏳ processing | | | | | | | |
+| 09 | ✅ ok | 8 | 180 (54 / 72 / 54) | ✅ 17.4% | 2 | ✅ 1 | 3.58 / 3.95 | 144 / 0 |
 | 10 | ⏳ processing | | | | | | | |
 | 11 | ⏳ processing | | | | | | | |
 | 12 | ⏳ processing | | | | | | | |
