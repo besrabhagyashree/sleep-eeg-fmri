@@ -129,6 +129,9 @@ def process_run(vhdr: Path, labels: pd.DataFrame, sub: str, session: str, eeg_ke
     n_span = span.stop - span.start
     lab = labels[(labels.session == session) & labels.stage.notna()]
     lab = lab[(lab.t + EPOCH_S) * sf <= n_span]                # epochs fully inside the scan
+    if lab.empty:                                              # e.g. every epoch marked uncertain by the expert
+        qc["status"] = "skipped: no expert-scored epochs (all uncertain or unscorable)"
+        return [], qc
     rows = []
 
     def add(arm, arr, rate):
