@@ -10,6 +10,7 @@
   <img alt="scikit-learn" src="https://img.shields.io/badge/scikit--learn-1.9-F7931E?style=for-the-badge&logo=scikitlearn&logoColor=white">
   <img alt="Data: OpenNeuro ds003768" src="https://img.shields.io/badge/data-OpenNeuro%20ds003768-33318a?style=for-the-badge">
   <img alt="33 participants" src="https://img.shields.io/badge/participants-33-b53b6d?style=for-the-badge">
+  <a href="LICENSE"><img alt="MIT licence" src="https://img.shields.io/badge/licence-MIT-0f766e?style=for-the-badge"></a>
 </p>
 
 Research on sleep and wakefulness using **EEG recorded simultaneously with fMRI**. Inside a working MRI scanner, the EEG is buried under artefacts hundreds of times larger than brain activity (top trace above). This project builds a pipeline that cleans it, measures it and models it, then uses that pipeline to answer research questions as separate studies.

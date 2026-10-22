@@ -1,0 +1,41 @@
+cff-version: 1.2.0
+message: "If you use this software or its results, please cite it as below, and cite the dataset it analyses (Gu et al., 2022)."
+title: "Sleep EEG-fMRI: preprocessing, quality control and sleep staging of EEG recorded inside an MRI scanner"
+type: software
+authors:
+  - family-names: Besra
+    given-names: Bhagyashree
+    affiliation: "Independent Researcher, Odisha, India"
+    email: bhagyashreebesra@gmail.com
+repository-code: "https://github.com/besrabhagyashree/sleep-eeg-fmri"
+url: "https://besrabhagyashree.github.io"
+license: MIT
+keywords:
+  - EEG
+  - EEG-fMRI
+  - sleep staging
+  - ballistocardiogram
+  - gradient artefact
+  - data quality
+  - MNE-Python
+references:
+  - type: article
+    title: "An orderly sequence of autonomic and neural events at transient arousal changes"
+    authors:
+      - {family-names: Gu, given-names: Yameng}
+      - {family-names: Han, given-names: Feng}
+      - {family-names: Sainburg, given-names: Lucas E.}
+      - {family-names: Schade, given-names: Margeaux M.}
+      - {family-names: Buxton, given-names: Orfeu M.}
+      - {family-names: Duyn, given-names: Jeff H.}
+      - {family-names: Liu, given-names: Xiao}
+    journal: NeuroImage
+    volume: 264
+    start: 119720
+    year: 2022
+    doi: 10.1016/j.neuroimage.2022.119720
+  - type: data
+    title: "Simultaneous EEG and fMRI signals during sleep from humans (OpenNeuro ds003768)"
+    authors:
+      - {family-names: Gu, given-names: Yameng}
+    doi: 10.18112/openneuro.ds003768.v1.0.0
