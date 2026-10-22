@@ -37,9 +37,24 @@ Effect of cleaning on participant 1 (sleep run 1, 15 minutes; [`cleaning_effect.
 
 Classifier comparison across all 33 people: **running**.
 
+## Is brain signal preserved?
+
+[`signal_preservation.py`](signal_preservation.py) compares the cleaned scanning period with the 24 seconds recorded before the first scanner volume. Between 0.5 and 15 Hz both have the same shape, including the alpha peak near 10 Hz and a spindle-range peak near 13 Hz, so cleaning keeps the brain rhythms sleep staging relies on.
+
+![Pre-scan vs cleaned scanning spectrum](results/signal_preservation_sub-01.png)
+
+The check also showed:
+
+- The pre-scan stretch already contains the 16.7 Hz slice rhythm, so the scanner was running unmarked warm-up volumes. It is a useful but imperfect reference.
+- The 38.5 Hz peak is present before scanning too: it comes from other scanner-room equipment, not from incomplete gradient removal, and needs a targeted notch filter.
+- Peaks at about 3 and 6 Hz appear only during scanning and may be residual artefact; to investigate.
+- The percentile-based R-peak detector under-detects on short stretches (7 of 32 beats in 24 s); MNE's detector finds all 32. To be replaced with a more robust detector.
+
 ## Limitations
 
 - Narrow residual artefact peaks between 20 and 48 Hz remain after cleaning (visible in the spectrum above).
+- The artefact templates include the current volume or heartbeat, which subtracts about 1/21 (5%) of that segment's own brain signal; excluding it is a planned refinement.
+- Cleaning removes any brain response genuinely locked to the heartbeat (heartbeat-evoked potentials, a few µV). This doesn't affect sleep staging but would matter for research on body–brain signals.
 - Naps in a scanner contain almost no deep sleep, and only 16 of 33 people have 10 or more minutes of N2.
 - 33 people is a small sample; results are reported per person with confidence intervals, not only as one pooled number.
 
