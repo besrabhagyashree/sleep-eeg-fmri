@@ -26,16 +26,23 @@ ROOT = HERE.parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(HERE))
 from build_dataset import CLEAN_DIR, DS, download, s3_list, to_250  # noqa: E402
-from features.events import event_features  # noqa: E402
+from features.events import ALPHA_CH, MASTOID, SPINDLE_CH, SW_CH, event_features  # noqa: E402
 from preprocessing.mr_artifacts import TARGET_SFREQ, volume_onsets  # noqa: E402
 
 FEAT, OUT = ROOT / "data" / "features", ROOT / "data" / "features_events"
+NEEDED = SPINDLE_CH + SW_CH + ALPHA_CH + list(MASTOID.values())   # only these channels feed the detectors
 
 
 def raw_and_filtered(vhdr):
-    """The raw (native rate) and filtered (0.3-40 Hz, 250 Hz) arms over the scan span, as in build_dataset.py."""
+    """The raw (native rate) and filtered (0.3-40 Hz, 250 Hz) arms over the scan span, as in build_dataset.py.
+
+    Only the channels the detectors use are kept (filtering is per channel, so the result is the same as
+    filtering all channels); the full 5 kHz recording does not fit in memory twice next to the main build.
+    """
     raw = mne.io.read_raw_brainvision(vhdr, preload=True, verbose="error")
-    data, onsets = raw.get_data(), volume_onsets(raw)
+    onsets = volume_onsets(raw)
+    raw.pick([c for c in NEEDED if c in raw.ch_names])
+    data = raw.get_data()
     span = slice(int(onsets[0]), int(onsets[-1] + int(np.min(np.diff(onsets)))))
     return raw.ch_names, {"raw": (data[:, span], raw.info["sfreq"]),
                           "filtered": (to_250(data, raw.info, span), TARGET_SFREQ)}
@@ -56,8 +63,7 @@ def process_participant(sub):
         names, arms = raw_and_filtered(files[0])
         for tag in ("mne", "refined"):
             r = mne.io.read_raw_fif(CLEAN_DIR / f"sub-{sub}_{session}_clean-{tag}_raw.fif", preload=True, verbose="error")
-            arms[f"cleaned_{tag}"] = (r.get_data(), r.info["sfreq"])
-            assert r.ch_names == names, "cleaned recording channels differ from the raw file"
+            arms[f"cleaned_{tag}"] = (r.get_data(picks=names), r.info["sfreq"])
         for arm, (x, sf) in arms.items():
             rows.append(pd.concat([ep, event_features(x, sf, names, ep.t).assign(arm=arm)], axis=1))
         files[2].unlink(missing_ok=True)

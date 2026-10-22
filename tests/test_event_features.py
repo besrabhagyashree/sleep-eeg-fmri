@@ -52,3 +52,14 @@ def test_derivations_use_the_opposite_mastoid():
 def test_one_row_per_epoch_and_missing_channels_are_safe():
     df = event_features(_background(60)[:2], SF, NAMES[:2], [0, 30])   # frontal channels, no mastoids
     assert len(df) == 2 and df.sp_density.eq(0).all() and df.alpha_peak_freq.isna().all()
+
+
+def test_filtering_a_channel_subset_matches_filtering_all():
+    import mne
+    from build_dataset import to_250
+    names = ["C3", "C4", "ECG", "EOG"]
+    x = np.random.default_rng(1).normal(0, 1e-5, (4, 5000 * 20))
+    info = mne.create_info(names, 5000.0, "eeg")
+    full = to_250(x, info, slice(0, x.shape[1]))
+    sub = to_250(x[:2], mne.create_info(names[:2], 5000.0, "eeg"), slice(0, x.shape[1]))
+    assert np.allclose(full[:2], sub, atol=1e-12)

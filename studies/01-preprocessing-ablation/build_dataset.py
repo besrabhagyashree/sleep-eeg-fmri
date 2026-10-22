@@ -82,7 +82,7 @@ def load_labels(sub: str) -> pd.DataFrame:
 
 def to_250(data, info, span):
     r = mne.io.RawArray(data[:, span].copy(), info.copy(), verbose="error")   # copy: RawArray does not copy, and filter() is in place
-    r.set_channel_types({"ECG": "ecg", "EOG": "eog"})
+    r.set_channel_types({c: t for c, t in {"ECG": "ecg", "EOG": "eog"}.items() if c in r.ch_names})
     r.filter(0.3, 40.0, picks="all", verbose="error")
     r.resample(TARGET_SFREQ, verbose="error")
     return r.get_data()
