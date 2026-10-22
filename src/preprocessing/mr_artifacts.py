@@ -116,6 +116,35 @@ def remove_bcg(data: np.ndarray, peaks: np.ndarray, sfreq: float, window: int = 
     return starts, pre, seg_len
 
 
+OBS_N_COMPONENTS = 4   # principal components in the basis (the FMRIB toolbox default for OBS)
+
+
+def remove_bcg_obs(data: np.ndarray, peaks: np.ndarray, sfreq: float, n_components: int = OBS_N_COMPONENTS):
+    """Optimal-basis-set pulse-artefact correction (Niazy et al., 2005, NeuroImage), in place.
+
+    Per channel: cut one beat-length segment around every R-peak (same window as remove_bcg), remove
+    each segment's mean, and take the first `n_components` principal components of the segment
+    matrix. Together with the average artefact they form the basis; each segment's artefact is the
+    least-squares fit of that basis, and is subtracted. Unlike average subtraction, the fit adapts to
+    beat-to-beat changes in artefact shape and amplitude.
+    """
+    rr = int(np.median(np.diff(peaks)))
+    pre = int(0.25 * rr)
+    seg_len = rr
+    starts = peaks - pre
+    starts = starts[(starts >= 0) & (starts + seg_len <= data.shape[1])]
+    take = starts[:, None] + np.arange(seg_len)[None, :]
+    for ch in range(data.shape[0]):
+        segs = data[ch, take]                                    # (n_beats, seg_len)
+        centred = segs - segs.mean(axis=1, keepdims=True)
+        mean_artefact = centred.mean(axis=0)
+        _, _, vt = np.linalg.svd(centred - mean_artefact, full_matrices=False)
+        basis = np.vstack([mean_artefact, vt[:n_components]]).T  # (seg_len, 1 + n_components)
+        coef, *_ = np.linalg.lstsq(basis, centred.T, rcond=None)
+        data[ch, take] = segs - (basis @ coef).T
+    return starts, pre, seg_len
+
+
 def psd(x: np.ndarray, sfreq: float):
     f, p = signal.welch(x, fs=sfreq, nperseg=int(4 * sfreq))
     return f, p

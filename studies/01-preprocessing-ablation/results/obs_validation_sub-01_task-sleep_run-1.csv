@@ -1,0 +1,5 @@
+detector,method,INPS dB,0.5-30 Hz power removed %,"alpha W/N2 (O1,O2,Pz)","sigma N2/W (C3,C4,Cz)"
+MNE,AAS (current),0.99,14.5,0.99,0.88
+MNE,OBS,2.63,36.7,0.72,1.12
+refined,AAS (current),1.69,26.7,0.7,1.41
+refined,OBS,6.79,69.6,0.71,1.12
