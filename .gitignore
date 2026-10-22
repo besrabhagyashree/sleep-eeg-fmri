@@ -1,0 +1,24 @@
+# --- never uploaded: data, environment, intermediate files ---
+.venv/
+data/
+*.fif
+*.eeg
+*.vhdr
+*.vmrk
+*.nii
+*.nii.gz
+*.log
+*.err
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# --- private working material (study notes, application drafts) ---
+notes/
+private/
+
+# results: share the summary and figures, not per-epoch tables
+results/*
+!results/summary.json
+!results/per_subject.csv
+!results/*.png
