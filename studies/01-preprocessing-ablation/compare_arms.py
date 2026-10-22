@@ -21,6 +21,7 @@ Pre-set analysis plan (fixed 22 Oct 2026, before results):
   it as a sensitivity analysis.
 
 Usage: python studies/01-preprocessing-ablation/compare_arms.py [--norm] [--no-context] [--save-predictions]
+                                                              [--feature-set spectral|events]
 Writes results/: per_subject.csv, summary.json, exclusions.csv, kappa_by_arm.png, confusion_matrices.png
 """
 import argparse
@@ -50,6 +51,7 @@ PAIRS = [("raw", "cleaned_mne"), ("raw", "cleaned_refined"), ("filtered", "clean
          ("cleaned_mne", "cleaned_refined"), ("raw", "filtered")]
 # exploratory "fully cleaned" arms (pre-registration amendment 1); only the one in results/reference_choice.json is evaluated
 FEAT_FULL = ROOT / "data" / "features_full"
+FEAT_EVENTS = ROOT / "data" / "features_events"          # amendment 6: spectral + sleep-event feature set
 EXPLORATORY = ["full_mastoid", "full_average"]
 EXPLORATORY_PAIRS = [("cleaned_mne", "full_mastoid"), ("cleaned_mne", "full_average"),
                      ("raw", "full_mastoid"), ("raw", "full_average")]
@@ -68,13 +70,17 @@ def make_model(name):
     return DummyClassifier(strategy="stratified", random_state=SEED)
 
 
-def load():
+def load(events=False):
     d = pd.concat([pd.read_csv(f, dtype={"subject": str}) for f in sorted(FEAT.glob("sub-*.csv"))
                    if f.stat().st_size > 10], ignore_index=True)
     full = [pd.read_csv(f, dtype={"subject": str}) for f in sorted(FEAT_FULL.glob("sub-*.csv"))] if FEAT_FULL.exists() else []
     if full:   # exploratory arms; same epochs, labels and quality flags as the main arms
         full = pd.concat(full, ignore_index=True)
         d = pd.concat([d, full[full.subject.isin(d.subject.unique())]], ignore_index=True)
+    if events:  # registered arms only, epochs that have event features
+        ev = pd.concat([pd.read_csv(f, dtype={"subject": str}) for f in sorted(FEAT_EVENTS.glob("sub-*.csv"))])
+        d = d[d.arm.isin(ARMS)].merge(ev.drop(columns=["stage", "qc_epoch_bad"], errors="ignore"),
+                                      on=["subject", "session", "t", "arm"], how="inner")
     q = pd.concat([pd.read_csv(f, dtype={"subject": str}) for f in sorted(QC.glob("sub-*.csv"))], ignore_index=True)
     excl = []
     bad_rec = q[q.n_bad_channels.fillna(0) > MAX_BAD_CHANNELS][["subject", "session"]]
@@ -148,11 +154,14 @@ def main():
     ap.add_argument("--no-context", action="store_true")
     ap.add_argument("--save-predictions", action="store_true",
                     help="also write results/predictions.csv (input to the amendment-5 heart-rate check)")
+    ap.add_argument("--feature-set", choices=["spectral", "events"], default="spectral",
+                    help="events = spectral + sleep-event features (amendment 6); writes to results/events/")
     args = ap.parse_args()
-    d, excl = load()
+    d, excl = load(events=args.feature_set == "events")
+    out = OUT / "events" if args.feature_set == "events" else OUT
     feats = [c for c in d.columns if c not in META]
-    OUT.mkdir(exist_ok=True)
-    excl.to_csv(OUT / "exclusions.csv", index=False)
+    out.mkdir(parents=True, exist_ok=True)
+    excl.to_csv(out / "exclusions.csv", index=False)
     per, pooled, cms, tests, preds = [], {}, {}, {}, []
     # only the reference chosen by the amendment-1 rule is evaluated, and none before the rule is applied
     choice_file = OUT / "reference_choice.json"
@@ -180,9 +189,9 @@ def main():
                 if a in wide and b in wide:
                     tests[f"exploratory/{task}/{model}/{b}_vs_{a}"] = paired(wide[a], wide[b])
     per = pd.concat(per, ignore_index=True)
-    per.to_csv(OUT / "per_subject.csv", index=False)
+    per.to_csv(out / "per_subject.csv", index=False)
     if preds:
-        pd.concat(preds, ignore_index=True).to_csv(OUT / "predictions.csv", index=False)
+        pd.concat(preds, ignore_index=True).to_csv(out / "predictions.csv", index=False)
     clean = d[d.arm == "cleaned_mne"]
     preservation = {}
     for arm in ARMS + exploratory:
@@ -199,7 +208,7 @@ def main():
                             "exclusions": "rules 3-4 + Autoreject epoch flags, identical for all arms"},
                "signal_preservation_alpha": preservation,
                "pooled": pooled, "tests_on_per_person_kappa": tests}
-    (OUT / "summary.json").write_text(json.dumps(summary, indent=2))
+    (out / "summary.json").write_text(json.dumps(summary, indent=2))
 
     fig, axes = plt.subplots(1, 2, figsize=(12, 5), sharey=False)
     for ax, task in zip(axes, TASKS):
@@ -213,7 +222,7 @@ def main():
         ax.set_xticks(xs, ["raw", "filtered\nonly", "cleaned\n(MNE)", "cleaned\n(refined)"]); ax.set_ylabel("Cohen's kappa vs expert")
         ax.set_title(f"{'Wake / N1 / N2' if task == '3class' else 'Wake vs N2'} (logistic regression)", loc="left")
         ax.grid(alpha=.25, axis="y"); ax.legend(frameon=False)
-    fig.tight_layout(); fig.savefig(OUT / "kappa_by_arm.png", dpi=150); plt.close(fig)
+    fig.tight_layout(); fig.savefig(out / "kappa_by_arm.png", dpi=150); plt.close(fig)
 
     classes = TASKS["3class"]
     fig, axes = plt.subplots(1, 4, figsize=(16, 3.8))
@@ -227,7 +236,7 @@ def main():
         ax.set_xticks(range(3), classes); ax.set_yticks(range(3), classes)
         ax.set_xlabel("predicted"); ax.set_ylabel("expert")
         ax.set_title(f"{arm}: kappa {pooled[f'3class/logreg/{arm}']['kappa']:.2f}")
-    fig.tight_layout(); fig.savefig(OUT / "confusion_matrices.png", dpi=150); plt.close(fig)
+    fig.tight_layout(); fig.savefig(out / "confusion_matrices.png", dpi=150); plt.close(fig)
 
 
 if __name__ == "__main__":

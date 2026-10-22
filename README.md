@@ -41,7 +41,7 @@ flowchart TB
     end
     subgraph S2 ["2 · Features"]
         direction LR
-        F1["Band power · spectra"]:::done ~~~ F2["Spindles · alpha peak"]:::todo
+        F1["Band power · spectra"]:::done ~~~ F2["Spindles · slow waves<br/>alpha peak"]:::wip
     end
     subgraph S3 ["3 · Research methods"]
         direction LR
@@ -77,7 +77,7 @@ flowchart TB
 | Stage | Folder | What it does | Status |
 |---|---|---|---|
 | 🧹 **1. Preprocessing** | [`src/preprocessing`](src/preprocessing) | Scanner and heartbeat artefact removal, filtering, notch, bad-channel repair, re-reference, movement exclusion; quality checks at every level | ![](https://img.shields.io/badge/7%20of%207%20steps-addressed-059669?style=flat-square) ![](https://img.shields.io/badge/reference-chosen%20at%2033%20people-d97706?style=flat-square) |
-| 📊 **2. Features** | [`src/features`](src/features) | Turns each 30-second epoch into band power, spectral shape and eye-movement numbers | ![](https://img.shields.io/badge/spectral-done-059669?style=flat-square) ![](https://img.shields.io/badge/spindles-planned-94a3b8?style=flat-square) |
+| 📊 **2. Features** | [`src/features`](src/features) | Turns each 30-second epoch into band power, spectral shape and eye-movement numbers, plus sleep events (spindles, slow waves, alpha peak) as a second feature set | ![](https://img.shields.io/badge/spectral-done-059669?style=flat-square) ![](https://img.shields.io/badge/sleep%20events-built%2C%20runs%20after%20build-d97706?style=flat-square) |
 | 🔬 **3. Research methods** | [`src/methods`](src/methods) | The analyses that answer each question: sleep-stage classification, alpha rhythms | ![](https://img.shields.io/badge/classifier-in%20progress-d97706?style=flat-square) |
 | 📈 **4. Post-processing** | [`src/postprocessing`](src/postprocessing) | Statistics, figures and reports | ![](https://img.shields.io/badge/figures-done-059669?style=flat-square) ![](https://img.shields.io/badge/statistics-in%20progress-d97706?style=flat-square) |
 

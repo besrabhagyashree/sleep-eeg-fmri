@@ -125,3 +125,15 @@ Because OBS is not used (amendment 2), some heartbeat artefact remains after ave
 - **Across people:** Wilcoxon signed-rank test of those correlations against 0. A negative median would mean that, within a true stage, slower-heart epochs are more often called N2.
 
 **Two report versions.** Version A is the analysis as already registered. Version B is identical and adds this check at the end (`compare_arms.py --save-predictions`, then `hr_check.py`). The check changes no data, model or score, so the main results are the same in both. **Both versions are produced, and version B is the one reported:** the check's result is reported whatever it shows and cannot be dropped after it is seen. It is exploratory, not an established method, so it does not change which arm is judged better.
+
+## Amendment 6: second feature set with sleep events (22 October 2026, before any comparison results)
+
+The registered 67 spectral features (section 6) stay the **primary** feature set; nothing about the main analysis changes. A **secondary** set, *spectral + events*, adds published sleep-event features ([`src/features/events.py`](../../src/features/events.py)), computed per arm by [`build_event_features.py`](build_event_features.py) after the main build:
+
+- **Spindles:** YASA `spindles_detect` (Vallat & Walker, 2021; thresholds after Lacourse et al., 2019), defaults unchanged, on C3–M2 and C4–M1. Density (per channel per minute), mean amplitude, frequency and duration per epoch.
+- **Slow waves:** YASA `sw_detect` (criteria after Massimini et al., 2004; Carrier et al., 2011), defaults unchanged, on F3–M2 and F4–M1. Density, mean peak-to-peak amplitude and slope per epoch.
+- **Alpha peak:** frequency and log power of the 7–13 Hz maximum of the O1–M2 / O2–M1 spectrum (Klimesch, 1999).
+
+Detection runs on each continuous recording without the expert's stages, so labels cannot leak into the features. Events are assigned to the epoch containing their peak. Channels are the AASM scoring derivations (TP9 = M1, TP10 = M2), because the recording reference, FCz, lies between Fz and Cz and cancels much of their activity. This was found when a first test on recorded-reference Fz/Cz/C3/C4 detected almost no spindles; the switch to the standard derivations was made then, before any classification with these features.
+
+**Analysis:** identical to the main analysis (`compare_arms.py --feature-set events`, registered four arms only; same epochs, exclusions, models, leave-one-person-out testing and paired tests). It answers whether preprocessing matters more or less once sleep-specific events are used. Results are reported alongside the primary set whatever they show. **Disclosed:** within-person previews of the spectral set (4 participants) had been seen before this amendment; no event-set results had.
