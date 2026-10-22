@@ -85,7 +85,7 @@ Only the EEG differs between arms. Epochs, people, quality exclusions, features,
 Updated each time a participant finishes processing, by [`participant_table.py`](participant_table.py). Click a heading to open its table.
 
 <!-- participants-table:start -->
-<img alt="progress" src="https://img.shields.io/badge/participants%20built-10%20of%2033-d97706?style=for-the-badge"> <img alt="percent" src="https://img.shields.io/badge/progress-30%25-33318a?style=for-the-badge">
+<img alt="progress" src="https://img.shields.io/badge/participants%20built-11%20of%2033-d97706?style=for-the-badge"> <img alt="percent" src="https://img.shields.io/badge/progress-33%25-33318a?style=for-the-badge">
 
 **Kappa colours** follow the Landis & Koch (1977) agreement bands: ⬛ ≤ 0 none · 🟥 0.01–0.20 slight · 🟧 0.21–0.40 fair · 🟨 0.41–0.60 moderate · 🟩 0.61–0.80 substantial · 💚 0.81–1.00 almost perfect
 
@@ -114,7 +114,8 @@ Logistic regression · Cohen's kappa vs the expert · – = not scored (fewer th
 | 08 | ⬛ -0.01 | ⬛ -0.01 | ⬛ -0.01 | ⬛ -0.01 | – | – | – | – |
 | 09 | 🟧 0.37 | 🟧 0.39 | 🟨 0.48 | 🟨 0.49 | 🟩 0.65 | 🟩 0.67 | 💚 0.89 | 💚 0.91 |
 | 10 | 🟥 0.17 | 🟧 0.24 | 🟧 0.39 | 🟧 0.40 | 🟧 0.30 | 🟧 0.40 | 🟨 0.44 | 🟨 0.50 |
-| **median** | **🟥 0.16** | **🟥 0.10** | **🟥 0.10** | **🟥 0.09** | **⬛ -0.03** | **🟥 0.03** | **🟧 0.21** | **🟥 0.18** |
+| 11 | 🟧 0.31 | 🟧 0.28 | 🟥 0.16 | 🟥 0.13 | ⬛ -0.11 | ⬛ -0.11 | 🟧 0.29 | 🟧 0.29 |
+| **median** | **🟥 0.17** | **🟥 0.17** | **🟥 0.13** | **🟥 0.09** | **⬛ -0.03** | **⬛ -0.02** | **🟧 0.29** | **🟧 0.29** |
 
 </details>
 
@@ -135,7 +136,7 @@ Logistic regression · Cohen's kappa vs the expert · – = not scored (fewer th
 | 08 | ✅ ok | 9 | 210 (208 / 2 / 0) | ✅ 15.0% | 3 | ✅ 1 | 1.33 / 1.52 | 383 / 0 |
 | 09 | ✅ ok | 8 | 180 (54 / 72 / 54) | ✅ 17.4% | 2 | ✅ 1 | 3.58 / 3.95 | 144 / 0 |
 | 10 | ✅ ok | 8 | 189 (107 / 40 / 42) | ✅ 14.1% | 0 | ✅ 1 | 2.89 / 2.34 | 65 / 0 |
-| 11 | ⏳ processing | | | | | | | |
+| 11 | ✅ ok | 8 | 146 (48 / 95 / 3) | ✅ 24.4% | 27 | ✅ 1 | 0.67 / 1.09 | 790 / 0 |
 | 12 | ⏳ processing | | | | | | | |
 | 13 | ⏳ processing | | | | | | | |
 | 14 | ⏳ processing | | | | | | | |
@@ -234,6 +235,7 @@ These use this study's own tests rather than established metrics, so they inform
 - [`data_accounting.py`](data_accounting.py): share of signal each step removes on participant 1: gradient subtraction 99.68% of raw power; the 0.3–40 Hz filter 12.8% of the rest (10.5% below 0.3 Hz, 2.3% above 40 Hz); heartbeat subtraction 19.9% (sigma band 57%); cropping 3.5% of recording time.
 - [`overcorrection_check.py`](overcorrection_check.py): the same heartbeat subtraction at heartbeat-like times not locked to the heart removes 3.3–5.1% of band power, close to the method's theoretical 1/21 (4.8%), against 22–57% at real heartbeats.
 - [`validate_obs.py`](validate_obs.py): optimal basis sets (4 components) raise heartbeat removal (INPS 6.79 vs 1.69 dB) but remove 69.6% of 0.5–30 Hz power; at times not locked to the heart they still remove 75% of delta and 32% of theta, against 4–5% for average subtraction. Sleep slow waves last about one heartbeat and are absorbed into the basis, so OBS is not used.
+- [`obs_one_person.py`](obs_one_person.py) (amendment 4, exploratory): participant 1 rebuilt with OBS and scored like the other arms ([`results/obs_staging_sub-01.csv`](results/obs_staging_sub-01.csv)). OBS removed 2–5× more heartbeat artefact in every recording (INPS 1.7–6.8 dB vs 0.1–2.1 dB), but staging did not improve. Wake vs N2 was below chance for both OBS arms (kappa −0.17 to −0.10), and no arm beats chance reliably for this person (about 70–120 epochs; kappa standard error ≈ 0.1). No evidence that OBS helps; the amendment-2 decision stands.
 - [`validate_stages.py`](validate_stages.py): notch, spline interpolation and re-reference steps on participant 1 (pre-registration amendment 1).
 - [`signal_preservation.py`](signal_preservation.py): the cleaned spectrum keeps the shape of the 24 s recorded before scanning between 0.5 and 15 Hz. That stretch already contains unmarked scanner warm-up (16.7 Hz), so it is an imperfect reference. A 38.5 Hz peak is present before scanning too (scanner-room equipment), and 3 and 6 Hz peaks appear only during scanning.
 
