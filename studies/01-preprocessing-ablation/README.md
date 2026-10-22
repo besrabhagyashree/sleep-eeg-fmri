@@ -37,6 +37,21 @@ Effect of cleaning on participant 1 (sleep run 1, 15 minutes; [`cleaning_effect.
 
 Classifier comparison across all 33 people: **running**.
 
+## What does cleaning remove?
+
+Measured on participant 1, sleep run 1, with [`data_accounting.py`](data_accounting.py):
+
+| Step | What is removed | Share | Importance for sleep staging |
+|---|---|---|---|
+| Crop to scanning period | Seconds before the first and after the last scanner volume | 3.5% of recording time | None: these seconds have no sleep labels |
+| Gradient subtraction | Scanner artefact | 99.68% of raw signal power | None: artefact; brain loss is about 1/21 (4.8%) of brain power, about 0.015% of raw power |
+| 0.3–40 Hz filter | Slow drift below 0.3 Hz (10.5%) and activity above 40 Hz (2.3%) | 12.8% of remaining power | Low: sleep scoring uses 0.3–35 Hz; very slow brain activity and gamma are lost |
+| Resample to 250 Hz | Samples that only describe frequencies above 125 Hz | 95% of samples | None after the 40 Hz filter |
+| Heartbeat subtraction | Pulse artefact | 19.9% of filtered power: delta 22%, theta 31%, alpha 38%, sigma 57%, beta 34% | Mostly artefact (see below); about 4.8% of brain power goes with the template |
+| Label tidying | Uncertain or unscorable epochs; N3 merged into N2 | 1.9% of epochs dropped; 0.6% relabelled | Deep sleep can't be studied as its own stage |
+
+**Is the large sigma-band removal real artefact?** Heartbeat removal with MNE's standard R-peak detector keeps more sigma-band power (14.4 vs 7.1 µV²/Hz), but its beat times scatter by up to 28 ms, and checked against precise beat times it leaves 42 µV of heartbeat artefact versus 5.5 µV for ours. The extra power is residual artefact, not preserved brain signal.
+
 ## Is brain signal preserved?
 
 [`signal_preservation.py`](signal_preservation.py) compares the cleaned scanning period with the 24 seconds recorded before the first scanner volume. Between 0.5 and 15 Hz both have the same shape, including the alpha peak near 10 Hz and a spindle-range peak near 13 Hz, so cleaning keeps the brain rhythms sleep staging relies on.
@@ -48,7 +63,7 @@ The check also showed:
 - The pre-scan stretch already contains the 16.7 Hz slice rhythm, so the scanner was running unmarked warm-up volumes. It is a useful but imperfect reference.
 - The 38.5 Hz peak is present before scanning too: it comes from other scanner-room equipment, not from incomplete gradient removal, and needs a targeted notch filter.
 - Peaks at about 3 and 6 Hz appear only during scanning and may be residual artefact; to investigate.
-- The percentile-based R-peak detector under-detects on short stretches (7 of 32 beats in 24 s); MNE's detector finds all 32. To be replaced with a more robust detector.
+- The percentile-based R-peak detector under-detects on short stretches (7 of 32 beats in 24 s), though on full recordings it is more precise than MNE's (see above). This comparison used MNE's detector, which leaves residual heartbeat artefact, so its sigma and beta bands are inflated on both sides. To be redone with a detector that is both robust and precise.
 
 ## Limitations
 
