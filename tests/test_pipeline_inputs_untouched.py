@@ -57,3 +57,13 @@ def test_notch_removes_the_known_peaks_only(ch_names, rng):
     o1 = x[ch_names.index("O1")]
     assert spec(y, 38.5) < 0.1 * spec(o1, 38.5)
     assert spec(y, 10) > 0.9 * spec(o1, 10)                # alpha untouched
+
+
+def test_header_typo_is_pointed_at_the_real_data_file(tmp_path):
+    from build_dataset import fix_header
+    (tmp_path / "sub-16_task-rest_run-1_eeg.eeg").write_bytes(b"\0" * 8)
+    vhdr = tmp_path / "sub-16_task-rest_run-1_eeg.vhdr"
+    vhdr.write_text("[Common Infos]\nDataFile=rsub-16_task-rest_run-1_eeg.eeg\nMarkerFile=x.vmrk\n", encoding="latin-1")
+    assert fix_header(vhdr) is True
+    assert "DataFile=sub-16_task-rest_run-1_eeg.eeg" in vhdr.read_text(encoding="latin-1")
+    assert fix_header(vhdr) is False                                   # correct headers are left alone

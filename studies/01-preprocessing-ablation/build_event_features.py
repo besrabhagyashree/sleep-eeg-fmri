@@ -25,7 +25,7 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(HERE))
-from build_dataset import CLEAN_DIR, DS, download, s3_list, to_250  # noqa: E402
+from build_dataset import CLEAN_DIR, DS, download, fix_header, s3_list, to_250  # noqa: E402
 from features.events import ALPHA_CH, MASTOID, SPINDLE_CH, SW_CH, event_features  # noqa: E402
 from preprocessing.mr_artifacts import TARGET_SFREQ, volume_onsets  # noqa: E402
 
@@ -60,6 +60,7 @@ def process_participant(sub):
             continue
         t0 = time.time()
         files = [download(f"{base}_eeg.{ext}") for ext in ("vhdr", "vmrk", "eeg")]
+        fix_header(files[0])
         names, arms = raw_and_filtered(files[0])
         for tag in ("mne", "refined"):
             r = mne.io.read_raw_fif(CLEAN_DIR / f"sub-{sub}_{session}_clean-{tag}_raw.fif", preload=True, verbose="error")

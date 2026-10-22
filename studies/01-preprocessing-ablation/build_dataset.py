@@ -71,6 +71,21 @@ def download(key: str) -> Path:
     return dest
 
 
+def fix_header(vhdr: Path) -> bool:
+    """Point a BrainVision header at its own data file when the header names a file that does not exist.
+
+    The dataset has at least one header with a typo in DataFile (sub-16 rest run 1: "rsub-16_..."). Only the
+    local copy of the header is corrected; the data file is untouched (its MD5 is still checked).
+    """
+    text = vhdr.read_text(encoding="latin-1")
+    m = re.search(r"^DataFile=(.+)$", text, flags=re.M)
+    expected = vhdr.name.replace(".vhdr", ".eeg")
+    if m is None or m.group(1).strip() == expected or (vhdr.parent / m.group(1).strip()).exists():
+        return False
+    vhdr.write_text(text.replace(m.group(0), f"DataFile={expected}"), encoding="latin-1")
+    return True
+
+
 def load_labels(sub: str) -> pd.DataFrame:
     path = download(f"{DS}/sourcedata/sub-{sub}-sleep-stage.tsv")
     d = pd.read_csv(path, sep="\t")
@@ -176,11 +191,19 @@ def run_subject(sub: str, keep_raw: bool):
     for base in runs:
         session = re.search(r"(task-\w+_run-\d+)", base).group(1)
         t0 = time.time()
+        missing = [ext for ext in ("vhdr", "vmrk", "eeg") if f"{base}_eeg.{ext}" not in keys]
+        if missing:                                             # the dataset lacks a file for this run
+            qcs.append({"subject": sub, "session": session, "seconds": 0,
+                        "status": f"skipped: {', '.join(missing)} file missing from dataset"})
+            print(f"sub-{sub} {session}: {qcs[-1]['status']}", flush=True)
+            continue
         files = [download(f"{base}_eeg.{ext}") for ext in ("vhdr", "vmrk", "eeg")]
+        fixed = fix_header(files[0])
         try:
             r, qc = process_run(files[0], labels, sub, session, f"{base}_eeg.eeg")
         except Exception as e:                                  # keep going; record the failure
             r, qc = [], {"subject": sub, "session": session, "status": f"error: {type(e).__name__}: {e}"}
+        qc["header_datafile_fixed"] = fixed
         qc["seconds"] = round(time.time() - t0)
         rows += r
         qcs.append(qc)
