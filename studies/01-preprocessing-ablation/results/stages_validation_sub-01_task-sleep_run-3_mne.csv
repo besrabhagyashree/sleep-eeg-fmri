@@ -1,0 +1,5 @@
+step,peak 33.3 Hz (dB),peak 38.5 Hz (dB),PREP bad,0.5-30 Hz power changed (%),alpha share W / N2 (posterior),sigma share N2 / W (central)
+cleaned (input),7.7,21.3,F8,–,0.171 / 0.095,0.055 / 0.101
++ 4b notch 33.3 & 38.5 Hz,-47.6,-39.5,F8,0.0,0.171 / 0.095,0.055 / 0.101
++ 5 interpolate bad,-48.0,-39.2,none,1.8,0.171 / 0.095,0.055 / 0.101
++ 6 linked mastoids,-49.1,-42.7,none,246.1,0.064 / 0.037,0.062 / 0.084
