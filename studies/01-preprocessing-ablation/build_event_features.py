@@ -29,7 +29,7 @@ from build_dataset import CLEAN_DIR, DS, download, fix_header, s3_list, to_250  
 from features.events import ALPHA_CH, MASTOID, SPINDLE_CH, SW_CH, event_features  # noqa: E402
 from preprocessing.mr_artifacts import TARGET_SFREQ, volume_onsets  # noqa: E402
 
-FEAT, OUT = ROOT / "data" / "features", ROOT / "data" / "features_events"
+FEAT, OUT, QC = ROOT / "data" / "features", ROOT / "data" / "features_events", ROOT / "data" / "qc"
 NEEDED = SPINDLE_CH + SW_CH + ALPHA_CH + list(MASTOID.values())   # only these channels feed the detectors
 
 
@@ -49,6 +49,7 @@ def raw_and_filtered(vhdr):
 
 
 def process_participant(sub):
+    qc = pd.read_csv(QC / f"sub-{sub}.csv").set_index("session")
     main = pd.read_csv(FEAT / f"sub-{sub}.csv", dtype={"subject": str})
     epochs = main[main.arm == "cleaned_mne"][["subject", "session", "t", "stage", "qc_epoch_bad"]]
     keys = s3_list(f"{DS}/sub-{sub}/eeg/")
@@ -65,8 +66,9 @@ def process_participant(sub):
         for tag in ("mne", "refined"):
             r = mne.io.read_raw_fif(CLEAN_DIR / f"sub-{sub}_{session}_clean-{tag}_raw.fif", preload=True, verbose="error")
             arms[f"cleaned_{tag}"] = (r.get_data(picks=names), r.info["sfreq"])
+        bad = [b for b in str(qc.loc[session, "bad_channels"]).split(";") if b and b != "nan"]   # PREP, same for every arm
         for arm, (x, sf) in arms.items():
-            rows.append(pd.concat([ep, event_features(x, sf, names, ep.t).assign(arm=arm)], axis=1))
+            rows.append(pd.concat([ep, event_features(x, sf, names, ep.t, bad).assign(arm=arm)], axis=1))
         files[2].unlink(missing_ok=True)
         print(f"sub-{sub} {session}: {len(ep)} epochs x {len(arms)} arms; {time.time() - t0:.0f}s", flush=True)
     return pd.concat(rows, ignore_index=True) if rows else pd.DataFrame()

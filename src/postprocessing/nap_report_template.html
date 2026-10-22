@@ -1,0 +1,539 @@
+<meta charset="utf-8">
+<title>Scanner Nap Reports</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Manrope:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: two views of the same data. Left, a phone-width sleep-app column on a night sky (for anyone);
+   right, a paper-white research panel with standard charts and tables (for sleep researchers).
+   Side by side on wide screens; a switch at the top on phones. */
+:root {
+  color-scheme: dark;
+  --sky: #0b1124; --card: #141b33; --card-2: #1c2545; --line: #2a3459;
+  --ink: #eef1fb; --ink-2: #aab3d3; --ink-3: #7d87ad;
+  --awake: #e0703a; --n1: #3c9fd6; --n2: #6656d6; --n3: #c055b0; --heart: #ef5d7a; --good: #3fbf7f;
+  /* research panel (paper) */
+  --paper: #f6f5f1; --paper-2: #ecebe5; --rule: #d8d6ce; --pink: #1b1f2e; --pink-2: #4d5163; --pink-3: #7b7f8e;
+  --p-awake: #d2622c; --p-n1: #2f8cc4; --p-n2: #5a4ad0; --p-n3: #b0429e; --p-raw: #8a8d99;
+  --display: "Outfit", "Segoe UI", system-ui, sans-serif;
+  --body: "Manrope", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", monospace;
+}
+* { box-sizing: border-box; }
+body {
+  background: radial-gradient(1200px 600px at 30% -200px, #1b2a5c 0%, var(--sky) 60%) fixed, var(--sky);
+  color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 24px 48px;
+}
+.layout { max-width: 1260px; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 480px) minmax(0, 1fr); gap: 28px; align-items: start; }
+.switch { display: none; margin: 0 auto 16px; max-width: 480px; background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: 4px; }
+.switch button { flex: 1; border: 0; background: transparent; color: var(--ink-2); border-radius: 999px; padding: 9px 10px; font: 600 14px var(--body); cursor: pointer; }
+.switch button[aria-pressed="true"] { background: var(--ink); color: var(--sky); }
+.switch button:focus-visible, .tab:focus-visible { outline: 2px solid var(--n1); outline-offset: 2px; }
+@media (max-width: 980px) {
+  .layout { grid-template-columns: minmax(0, 1fr); max-width: 520px; }
+  .switch { display: flex; }
+  .layout[data-view="app"] .research, .layout[data-view="research"] .app { display: none; }
+}
+
+/* ---------- app view ---------- */
+.app { display: grid; gap: 14px; min-width: 0; }
+header { display: grid; gap: 2px; padding: 4px 4px 10px; }
+.eyebrow { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
+h1 { font-family: var(--display); font-weight: 700; font-size: 28px; line-height: 1.15; margin: 0; text-wrap: balance; }
+h2 { font-family: var(--display); font-weight: 600; font-size: 17px; margin: 0; text-wrap: balance; }
+.sub { color: var(--ink-2); font-size: 14px; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 22px; padding: 18px; display: grid; gap: 12px; min-width: 0; }
+.num { font-family: var(--display); font-variant-numeric: tabular-nums; }
+.muted { color: var(--ink-3); font-size: 13px; }
+.hero { grid-template-columns: 160px 1fr; align-items: center; gap: 18px; }
+.ring { position: relative; width: 160px; height: 160px; }
+.ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.ring .center { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; }
+.ring .big { font-family: var(--display); font-weight: 700; font-size: 36px; line-height: 1; }
+.ring .unit { font-size: 12px; color: var(--ink-2); }
+.legend { display: grid; gap: 9px; }
+.leg { display: grid; grid-template-columns: 12px 1fr auto; gap: 10px; align-items: center; }
+.dot { width: 12px; height: 12px; border-radius: 4px; }
+.leg b { font-weight: 600; display: block; line-height: 1.2; }
+.leg em { font-style: normal; font-size: 12px; color: var(--ink-3); }
+.leg .v { font-family: var(--display); font-variant-numeric: tabular-nums; }
+.leg .p { color: var(--ink-3); font-size: 12px; margin-left: 6px; }
+.leg.none .dot { background: transparent; border: 1.5px dashed var(--ink-3); }
+.leg.none .v { color: var(--ink-3); }
+@media (max-width: 430px) { .hero { grid-template-columns: 1fr; justify-items: center; } .legend { width: 100%; } }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.stat { background: var(--card-2); border-radius: 16px; padding: 12px; display: grid; gap: 2px; min-width: 0; }
+.stat .k { font-size: 12px; color: var(--ink-2); }
+.stat .val { font-family: var(--display); font-weight: 600; font-size: 22px; font-variant-numeric: tabular-nums; }
+.stat .val small { font-size: 13px; color: var(--ink-2); font-weight: 400; margin-left: 2px; }
+.tabs { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
+.tab { flex: none; border: 1px solid var(--line); background: transparent; color: var(--ink-2); border-radius: 999px; padding: 7px 13px; font: 600 13px var(--body); cursor: pointer; }
+.tab[aria-selected="true"] { background: var(--ink); color: var(--sky); border-color: var(--ink); }
+.chart { position: relative; }
+.chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+.lbl { fill: var(--ink-2); font: 600 15px var(--body); }
+.tip { position: absolute; pointer-events: none; background: var(--ink); color: var(--sky); border-radius: 10px; padding: 7px 10px; font-size: 12px; line-height: 1.35; white-space: nowrap; transform: translate(-50%, -110%); opacity: 0; transition: opacity .12s; z-index: 2; }
+.nightline { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 13px; color: var(--ink-2); }
+.nightline b { color: var(--ink); font-family: var(--display); font-weight: 600; }
+.insight { display: grid; grid-template-columns: 40px 1fr; gap: 12px; align-items: start; }
+.badge { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; }
+.badge svg { width: 22px; height: 22px; }
+.compare { display: grid; gap: 8px; }
+.cmp { display: grid; grid-template-columns: 64px 1fr 64px; gap: 10px; align-items: center; font-size: 13px; color: var(--ink-2); }
+.bar { height: 10px; border-radius: 6px; background: var(--card-2); overflow: hidden; }
+.bar i { display: block; height: 100%; border-radius: 6px; }
+.cmp .num { text-align: right; color: var(--ink); }
+.footer { color: var(--ink-3); font-size: 12px; padding: 6px 4px; }
+
+/* ---------- research view ---------- */
+.research { background: var(--paper); color: var(--pink); border-radius: 18px; padding: 26px 26px 30px; display: grid; gap: 26px; min-width: 0;
+  box-shadow: 0 30px 80px -40px #000; }
+.research header { padding: 0; border-bottom: 1.5px solid var(--pink); padding-bottom: 12px; }
+.research .eyebrow { color: var(--pink-3); }
+.research h1 { font-size: 24px; color: var(--pink); }
+.research h3 { font-family: var(--display); font-weight: 600; font-size: 15px; margin: 0; color: var(--pink); }
+.research .note { color: var(--pink-2); font-size: 13px; max-width: 68ch; }
+.fig { display: grid; gap: 8px; min-width: 0; }
+.fig .cap { font-size: 12.5px; color: var(--pink-2); max-width: 75ch; }
+.fig .cap b { color: var(--pink); }
+.grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; }
+.grid1 { display: grid; gap: 26px; }
+.grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+@media (max-width: 760px) { .grid2, .grid3 { grid-template-columns: minmax(0, 1fr); } .research { padding: 18px; } }
+.research svg { display: block; width: 100%; height: auto; overflow: visible; }
+.ax { fill: var(--pink-2); font: 11px var(--mono); }
+.axt { fill: var(--pink); font: 600 11.5px var(--body); }
+.scroll { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; color: var(--pink); font: 12px var(--mono); font-variant-numeric: tabular-nums; }
+th, td { color: var(--pink); padding: 5px 8px; text-align: right; border-bottom: 1px solid var(--rule); white-space: nowrap; }
+th { font: 600 11.5px var(--body); color: var(--pink-2); border-bottom: 1.5px solid var(--pink); }
+th:first-child, td:first-child { text-align: left; }
+tr.total td { border-top: 1.5px solid var(--pink); font-weight: 500; }
+td.k { font-weight: 500; }
+.kap { display: inline-block; min-width: 54px; padding: 2px 6px; border-radius: 4px; text-align: center; }
+.chip { display: inline-flex; gap: 6px; align-items: center; font: 12px var(--body); color: var(--pink-2); }
+.chip i { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+.legendrow { display: flex; flex-wrap: wrap; gap: 6px 16px; }
+.refs { font-size: 11.5px; color: var(--pink-3); line-height: 1.55; }
+
+/* participant picker */
+.picker { max-width: 1260px; margin: 0 auto 18px; display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; }
+.picker .lead { font: 600 13px var(--body); color: var(--ink-2); }
+.people { display: flex; flex-wrap: wrap; gap: 6px; flex: 1; min-width: 0; }
+.pp { border: 1px solid var(--line); background: var(--card); color: var(--ink-2); border-radius: 10px; min-width: 40px; padding: 6px 8px;
+  font: 600 13px var(--display); font-variant-numeric: tabular-nums; cursor: pointer; }
+.pp[aria-pressed="true"] { background: var(--ink); color: var(--sky); border-color: var(--ink); }
+.pp.excl { border-style: dashed; }
+.pp:disabled { opacity: .35; cursor: default; }
+.pp:focus-visible { outline: 2px solid var(--n1); outline-offset: 2px; }
+.status { display: inline-flex; gap: 6px; align-items: center; font-size: 12.5px; padding: 3px 10px; border-radius: 999px; border: 1px solid var(--line); color: var(--ink-2); width: fit-content; }
+.status.bad { border-color: var(--awake); color: #ffb48f; }
+.na { color: var(--pink-3); }
+</style>
+
+<nav class="picker" aria-label="Choose a participant">
+  <span class="lead">Participant</span>
+  <div class="people" id="people"></div>
+</nav>
+
+<div class="switch" role="group" aria-label="Choose a view">
+  <button type="button" id="v-app" aria-pressed="true">Their naps</button>
+  <button type="button" id="v-research" aria-pressed="false">For researchers</button>
+</div>
+
+<div class="layout" id="layout" data-view="app">
+<!-- ================= APP VIEW ================= -->
+<main class="app">
+  <header>
+    <div class="eyebrow">Sleep inside an MRI scanner · OpenNeuro ds003768</div>
+    <h1 id="who"></h1>
+    <div class="sub" id="headline"></div>
+    <div id="statusChip"></div>
+  </header>
+
+  <section class="card hero" aria-label="Time asleep">
+    <div class="ring"><svg viewBox="0 0 120 120" id="ring" aria-hidden="true"></svg>
+      <div class="center"><div class="big num" id="asleep"></div><div class="unit">min asleep</div></div></div>
+    <div class="legend" id="legend"></div>
+  </section>
+
+  <section class="card" aria-label="Key numbers">
+    <div class="stats" id="stats"></div>
+    <div class="muted">Measured the standard clinical way (AASM): asleep means N1, N2 or N3; efficiency is time asleep ÷ time recorded.</div>
+  </section>
+
+  <section class="card" aria-label="Deep sleep">
+    <div class="insight">
+      <div class="badge" style="background: color-mix(in srgb, var(--n3) 22%, transparent)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#e7a1dc" stroke-width="2"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg></div>
+      <div><h2 id="deepTitle"></h2><div class="sub" id="deepText"></div></div>
+    </div>
+  </section>
+
+  <section class="card" aria-label="Each nap">
+    <h2>Each nap, 30 seconds at a time</h2>
+    <div class="tabs" role="tablist" id="tabs"></div>
+    <div class="nightline" id="nightline"></div>
+    <div class="chart" id="hypno"></div>
+    <div class="chart" id="hr"></div>
+    <div class="muted">Striped blocks were set aside by the quality check (movement or noise). Hover or tap a block for details.</div>
+  </section>
+
+  <section class="card" aria-label="Heart rate">
+    <div class="insight">
+      <div class="badge" style="background: color-mix(in srgb, var(--heart) 18%, transparent)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--heart)" stroke-width="2"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></div>
+      <div><h2 id="hrTitle"></h2><div class="sub" id="hrText"></div></div>
+    </div>
+    <div class="compare" id="hrCompare"></div>
+  </section>
+
+  <section class="card" aria-label="Brain waves">
+    <div class="insight">
+      <div class="badge" style="background: color-mix(in srgb, var(--n2) 22%, transparent)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#a99cff" stroke-width="2"><path d="M2 12c2-6 4-6 6 0s4 6 6 0 4-6 6 0 2 3 2 3"/></svg></div>
+      <div><h2>Slow brain waves by stage</h2><div class="sub" id="swText"></div></div>
+    </div>
+    <div class="compare" id="swCompare"></div>
+  </section>
+
+  <section class="card" aria-label="Recording quality">
+    <div class="insight">
+      <div class="badge" id="qBadge"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" id="qIcon"></svg></div>
+      <div><h2 id="qTitle"></h2><div class="sub" id="qText"></div></div>
+    </div>
+  </section>
+
+  <section class="card" aria-label="Automatic scoring">
+    <div class="insight">
+      <div class="badge" style="background: color-mix(in srgb, var(--n1) 18%, transparent)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--n1)" stroke-width="2"><rect x="4" y="5" width="16" height="12" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>
+      <div><h2>Can a computer read this sleep?</h2><div class="sub" id="aiText"></div></div>
+    </div>
+  </section>
+  <div class="footer">Sleep stages were scored by the dataset's sleep experts. Heart rate comes from the ECG worn in the scanner. This is a research summary, not a medical report.</div>
+</main>
+
+<!-- ================= RESEARCH VIEW ================= -->
+<article class="research" aria-label="Research view">
+  <header>
+    <div class="eyebrow" id="r-eyebrow"></div>
+    <h1>Sleep architecture, signal and scoring</h1>
+    <div class="note" id="r-head"></div>
+  </header>
+
+  <section class="fig">
+    <h3>Fig. 1 · Hypnogram, all recordings in acquisition order</h3>
+    <div class="legendrow"><span class="chip"><i style="background:var(--pink)"></i>expert stage (30-s epochs)</span>
+      <span class="chip"><i style="background:var(--p-awake)"></i>epoch rejected by Autoreject</span></div>
+    <div class="scroll"><div id="r-hypno" style="min-width:560px"></div></div>
+    <div class="cap" id="r-hypno-cap"></div>
+  </section>
+
+  <section class="fig">
+    <h3>Table 1 · Sleep parameters per recording (AASM definitions)</h3>
+    <div class="scroll"><table id="r-params"></table></div>
+    <div class="cap">TRT total recording time; TST total sleep time (N1+N2+N3); SE sleep efficiency (TST/TRT); SOL sleep-onset latency (first epoch of any sleep stage, within the recording); WASO wake after sleep onset; Rej. epochs rejected by Autoreject (excluded from analyses, not from these counts). Minutes. † Mean across recordings.</div>
+  </section>
+
+  <div class="grid2">
+    <section class="fig">
+      <h3>Fig. 2 · Stage transitions</h3>
+      <div id="r-trans"></div>
+      <div class="cap">Counts of consecutive-epoch transitions within recordings (row = from, column = to). Diagonal = stage continued.</div>
+    </section>
+    <section class="fig">
+      <h3>Fig. 3 · Heart rate by stage</h3>
+      <div id="r-hr"></div>
+      <div class="cap">Per-epoch heart rate from ECG (60 / median R–R; refined detector). Points = epochs; bar = mean ± 95% CI.</div>
+    </section>
+  </div>
+
+  <section class="fig">
+    <h3>Fig. 4 · Relative band power by stage, before and after artefact removal</h3>
+    <div class="legendrow"><span class="chip"><i style="background:var(--p-raw)"></i>raw (5 kHz, uncorrected)</span>
+      <span class="chip"><i style="background:var(--pink)"></i>cleaned (AAS gradient + BCG, MNE detector)</span></div>
+    <div class="grid3" id="r-bands"></div>
+    <div class="cap">Share of 0.5–30 Hz power (Welch, 4-s windows), mean ± 95% CI over usable epochs; each panel has its own y-axis. In raw data the gradient artefact dominates the spectrum and compresses every band toward zero. Expected after cleaning: posterior alpha W &gt; N2, frontal delta rising from W to N3.</div>
+  </section>
+
+  <div class="grid1">
+    <section class="fig">
+      <h3>Table 2 · Recording quality</h3>
+      <div class="scroll"><table id="r-qc"></table></div>
+      <div class="cap" id="r-qc-cap"></div>
+    </section>
+    <section class="fig">
+      <h3>Table 3 · Within-person staging agreement (Cohen's κ)</h3>
+      <div class="scroll"><table id="r-kappa"></table></div>
+      <div class="cap" id="r-kappa-cap"></div>
+    </section>
+  </div>
+
+  <div class="refs">AASM: Berry et al., <i>AASM Manual for the Scoring of Sleep and Associated Events</i>. AAS: Allen et al., 1998, 2000. OBS: Niazy et al., 2005. PREP: Bigdely-Shamlo et al., 2015. Autoreject: Jas et al., 2017. INPS: Tong et al., 2001. YASA: Vallat &amp; Walker, 2021. κ bands: Landis &amp; Koch, 1977. Dataset: Gu et al., 2022, <i>NeuroImage</i> 264:119720. Full list: REFERENCES.md in github.com/besrabhagyashree/sleep-eeg-fmri.</div>
+</article>
+</div>
+
+<script>
+const DATA = __DATA__;
+const C = { W: "var(--awake)", N1: "var(--n1)", N2: "var(--n2)", N3: "var(--n3)" };
+const PC = { W: "var(--p-awake)", N1: "var(--p-n1)", N2: "var(--p-n2)", N3: "var(--p-n3)" };
+const NAME = { W: "Awake", N1: "N1 · drowsy", N2: "N2 · light sleep", N3: "N3 · deep sleep" };
+const SHORT = { W: "Awake", N1: "N1", N2: "N2", N3: "N3" };
+const HINT = { W: "eyes closed, resting", N1: "drowsy, drifting off", N2: "light sleep", N3: "deep sleep" };
+const STAGES = ["W", "N1", "N2", "N3"];
+const el = id => document.getElementById(id);
+const fmt = (x, d = 1) => (Math.round(x * 10 ** d) / 10 ** d).toString();
+const mean = a => a.reduce((x, y) => x + y, 0) / a.length;
+const ci95 = a => { if (a.length < 2) return 0; const m = mean(a); return 1.96 * Math.sqrt(a.reduce((x, y) => x + (y - m) ** 2, 0) / (a.length - 1)) / Math.sqrt(a.length); };
+const recName = r => `${r.kind === "rest" ? "Rest" : "Sleep"} ${r.run}`;
+const band = k => k === null ? "not scorable" : k < 0 ? "below chance" : k <= .2 ? "slight" : k <= .4 ? "fair" : k <= .6 ? "moderate" : k <= .8 ? "substantial" : "almost perfect";
+let P, recs, all, mins, total, asleep;
+
+// ---------- picker and view switch ----------
+el("people").innerHTML = Array.from({ length: DATA.dataset.n_people }, (_, i) => String(i + 1).padStart(2, "0")).map(id => {
+  const p = DATA.people.find(x => x.participant === id);
+  return `<button type="button" class="pp${p && p.status !== "ok" ? " excl" : ""}" data-id="${id}" ${p ? "" : "disabled title=\"not processed yet\""} aria-pressed="false">${id}</button>`;
+}).join("");
+el("people").addEventListener("click", e => { const b = e.target.closest(".pp"); if (b && !b.disabled) show(b.dataset.id); });
+for (const [id, view] of [["v-app", "app"], ["v-research", "research"]]) el(id).addEventListener("click", () => {
+  el("layout").dataset.view = view; el("v-app").setAttribute("aria-pressed", view === "app"); el("v-research").setAttribute("aria-pressed", view === "research");
+});
+
+function show(id) {
+  P = DATA.people.find(x => x.participant === id); recs = P.recordings; all = recs.flatMap(r => r.epochs);
+  mins = s => all.filter(e => e.s === s).length / 2; total = all.length / 2; asleep = total - mins("W");
+  document.querySelectorAll(".pp").forEach(b => b.setAttribute("aria-pressed", b.dataset.id === id));
+  try { history.replaceState(null, "", "#p" + id); } catch (e) { /* not allowed in some viewers */ }
+  [appHeader, ring, stats, deep, tabs, heart, waves, quality, ai, rHeader, rHypno, rParams, rTrans, rHr, rBands, rQc, rKappa].forEach(f => f());
+}
+
+// ---------- app view ----------
+function appHeader() {
+  el("who").textContent = `Participant ${P.participant}`;
+  const sk = P.skipped.length ? ` · ${P.skipped.length} recording${P.skipped.length > 1 ? "s" : ""} missing from the dataset` : "";
+  el("headline").textContent = `${recs.length} naps · ${total} minutes recorded${sk}`;
+  el("statusChip").innerHTML = P.status === "ok" ? "" : `<span class="status bad">Left out of the study analysis: ${P.flagged_pct}% of half-minutes rejected (limit 25%)</span>`;
+}
+function ring() {
+  el("asleep").textContent = fmt(asleep);
+  const r = 50, c = 2 * Math.PI * r; let off = 0;
+  let h = `<circle cx="60" cy="60" r="${r}" fill="none" stroke="var(--card-2)" stroke-width="14"/>`;
+  for (const s of ["N3", "N2", "N1", "W"]) { const len = c * mins(s) / total; if (!len) continue;
+    h += `<circle cx="60" cy="60" r="${r}" fill="none" stroke="${C[s]}" stroke-width="14" stroke-dasharray="${Math.max(len - 3, 0)} ${c}" stroke-dashoffset="${-off}"/>`; off += len; }
+  el("ring").innerHTML = h;
+  el("legend").innerHTML = STAGES.map(s => `<div class="leg${mins(s) ? "" : " none"}"><span class="dot" style="background:${C[s]}"></span>
+    <span><b>${SHORT[s]}</b><em>${HINT[s]}</em></span><span><span class="v">${fmt(mins(s))} min</span><span class="p">${Math.round(100 * mins(s) / total)}%</span></span></div>`).join("");
+}
+function stats() {
+  const lat = recs.filter(r => r.latency_min !== null).map(r => r.latency_min);
+  const items = [["Efficiency", Math.round(100 * asleep / total), "%"], ["Falls asleep in", lat.length ? fmt(mean(lat)) : "–", "min"], ["Wake-ups", recs.reduce((a, r) => a + r.awakenings, 0), "total"]];
+  el("stats").innerHTML = items.map(([k, v, u]) => `<div class="stat"><span class="k">${k}</span><span class="val">${v}<small>${u}</small></span></div>`).join("");
+}
+function deep() {
+  const m = mins("N3");
+  el("deepTitle").textContent = m ? `${fmt(m)} minutes of deep sleep` : "Where's the deep sleep?";
+  el("deepText").innerHTML = m
+    ? `This participant reached deep sleep (N3), which few people in the study did. Deep sleep is when the brain makes its largest, slowest waves. It usually starts 20 to 40 minutes after falling asleep, so it needs the naps to run on from one another. Across all 33 people there are only <b class="num" style="color:var(--ink)">${DATA.dataset.n3_minutes} minutes</b> of deep sleep.`
+    : `None in these naps, and that's expected. Deep sleep (N3) usually arrives only after 20 to 40 minutes of continuous sleep, and each nap here lasted 10 to 15 minutes in a loud scanner. Across all 33 people there are only <b class="num" style="color:var(--ink)">${DATA.dataset.n3_minutes} minutes</b> of deep sleep in total.`;
+}
+const W = 480, PAD = { l: 62, r: 8 }, ROW = 34, rows = STAGES;
+function draw(i) {
+  const r = recs[i], n = r.epochs.length, bw = (W - PAD.l - PAD.r) / n, x = j => PAD.l + j * bw;
+  let s = `<svg viewBox="0 0 ${W} ${rows.length * ROW + 30}" role="img" aria-label="Sleep stages over time">
+    <defs><pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <rect width="6" height="6" fill="var(--card)"/><line x1="0" y1="0" x2="0" y2="6" stroke="var(--ink-3)" stroke-width="2"/></pattern></defs>`;
+  rows.forEach((st, k) => { s += `<text class="lbl" x="0" y="${k * ROW + ROW / 2 + 5}">${SHORT[st]}</text>
+    <line x1="${PAD.l}" x2="${W - PAD.r}" y1="${k * ROW + ROW / 2}" y2="${k * ROW + ROW / 2}" stroke="var(--line)" stroke-dasharray="2 4"/>`; });
+  r.epochs.forEach((e, j) => { if (!e.s) return; const y = rows.indexOf(e.s) * ROW + 5;
+    s += `<rect data-j="${j}" x="${x(j) + 1}" y="${y}" width="${Math.max(bw - 2, 1)}" height="${ROW - 10}" rx="4" fill="${e.bad ? "url(#hatch)" : C[e.s]}" stroke="${e.bad ? C[e.s] : "none"}" stroke-width="1.5"/>`; });
+  for (let m = 0; m <= r.minutes; m += 5) s += `<text class="lbl" x="${x(m * 2)}" y="${rows.length * ROW + 22}" text-anchor="middle" style="font-weight:400;font-size:13px">${m} min</text>`;
+  el("hypno").innerHTML = s + `</svg><div class="tip" id="tip"></div>`;
+  const hrs = r.epochs.map(e => e.hr).filter(v => v !== null);
+  if (hrs.length > 1) {
+    const lo = Math.floor(Math.min(...hrs) - 2), hi = Math.ceil(Math.max(...hrs) + 2), H = 80, y = v => 6 + (H - 12) * (1 - (v - lo) / (hi - lo));
+    const pts = r.epochs.map((e, j) => e.hr === null ? null : [x(j) + bw / 2, y(e.hr)]).filter(Boolean);
+    const path = pts.map((p, k) => (k ? "L" : "M") + p[0].toFixed(1) + " " + p[1].toFixed(1)).join(" ");
+    el("hr").innerHTML = `<svg viewBox="0 0 ${W} ${H + 4}" role="img" aria-label="Heart rate over time">
+      <defs><linearGradient id="hg" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="var(--heart)" stop-opacity=".35"/><stop offset="1" stop-color="var(--heart)" stop-opacity="0"/></linearGradient></defs>
+      <text class="lbl" x="0" y="18">Heart</text><text class="lbl" x="0" y="38" style="font-weight:400;font-size:13px">${lo}–${hi}</text>
+      <path d="${path} L${pts.at(-1)[0]} ${H} L${pts[0][0]} ${H} Z" fill="url(#hg)"/><path d="${path}" fill="none" stroke="var(--heart)" stroke-width="2" stroke-linejoin="round"/>
+      <circle cx="${pts.at(-1)[0]}" cy="${pts.at(-1)[1]}" r="3.5" fill="var(--heart)"/></svg>`;
+  } else el("hr").innerHTML = `<div class="muted">No heart-rate trace for this nap.</div>`;
+  el("nightline").innerHTML = `<span>${r.kind === "rest" ? "Resting" : "Sleep"} run ${r.run}</span><span><b>${fmt(r.tst_min)}</b> of ${r.minutes} min asleep</span>
+    <span>${r.latency_min === null ? "did not fall asleep" : `fell asleep after <b>${fmt(r.latency_min)}</b> min`}</span><span><b>${r.awakenings}</b> wake-ups</span><span>avg <b>${r.hr_bpm ?? "–"}</b> bpm</span>`;
+  const tip = el("tip"), box = el("hypno");
+  box.querySelectorAll("rect[data-j]").forEach(rect => {
+    const showTip = () => {
+      const e = r.epochs[+rect.dataset.j], b = rect.getBoundingClientRect(), c = box.getBoundingClientRect();
+      tip.innerHTML = `<b>${Math.floor(e.t / 60)}:${String(e.t % 60).padStart(2, "0")}</b> · ${NAME[e.s]}<br>${e.hr ? `${e.hr} bpm` : "heart rate n/a"}${e.sw !== null ? ` · ${e.sw} slow waves/min` : ""}${e.bad ? "<br>set aside by quality check" : ""}`;
+      tip.style.left = Math.min(Math.max(b.left - c.left + b.width / 2, 90), c.width - 90) + "px"; tip.style.top = (b.top - c.top) + "px"; tip.style.opacity = 1;
+    };
+    rect.addEventListener("mouseenter", showTip); rect.addEventListener("click", showTip); rect.addEventListener("mouseleave", () => { tip.style.opacity = 0; });
+  });
+}
+function tabs() {
+  // open on the sleepiest recording
+  let best = 0; recs.forEach((r, i) => { if (r.tst_min > recs[best].tst_min) best = i; });
+  el("tabs").innerHTML = recs.map((r, i) => `<button class="tab" role="tab" aria-selected="${i === best}">${recName(r)}</button>`).join("");
+  el("tabs").querySelectorAll(".tab").forEach((b, i) => b.addEventListener("click", () => { el("tabs").querySelectorAll(".tab").forEach(t => t.setAttribute("aria-selected", t === b)); draw(i); }));
+  draw(best);
+}
+function compareBars(target, values, unit, lo0) {
+  const present = STAGES.filter(s => values[s] !== undefined && !Number.isNaN(values[s]));
+  const vs = present.map(s => values[s]), mx = Math.max(...vs), mn = lo0 ? 0 : Math.min(...vs) - 6;
+  el(target).innerHTML = present.map(s => `<div class="cmp"><span>${SHORT[s]}</span><span class="bar"><i style="width:${Math.max(4, 100 * (values[s] - mn) / (mx - mn || 1))}%;background:${C[s]}"></i></span><span class="num">${fmt(values[s])}${unit}</span></div>`).join("");
+  return present;
+}
+const MIN_EP = 5;                                         // a stage needs at least this many epochs to be compared
+function heart() {
+  const h = {}; STAGES.forEach(s => { const v = all.filter(e => e.s === s && e.hr !== null).map(e => e.hr); if (v.length >= MIN_EP) h[s] = mean(v); });
+  compareBars("hrCompare", h, " bpm", false);
+  const sleepy = ["N3", "N2", "N1"].find(s => h[s] !== undefined);
+  if (h.W !== undefined && sleepy) {
+    const d = h.W - h[sleepy];
+    el("hrTitle").textContent = d > 0.5 ? "Heart slows as sleep deepens" : "Heart rate barely changed";
+    el("hrText").textContent = d > 0.5 ? `Average heart rate is ${fmt(d)} beats per minute lower in ${sleepy} than when awake.` : `Average heart rate in ${sleepy} is within ${fmt(Math.abs(d))} bpm of awake.`;
+  } else { el("hrTitle").textContent = "Heart rate by stage"; el("hrText").textContent = "Not enough awake and sleep time (at least 2.5 minutes of each) to compare."; }
+}
+function waves() {
+  const v = {}; STAGES.forEach(s => { const x = all.filter(e => e.s === s && !e.bad && e.sw !== null).map(e => e.sw); if (x.length >= MIN_EP) v[s] = mean(x); });
+  compareBars("swCompare", v, "/min", true);
+  const deepest = ["N3", "N2"].find(s => v[s] !== undefined);
+  el("swText").textContent = v.W !== undefined && deepest
+    ? (v[deepest] > v.W ? `Large, slow brain waves (found automatically after cleaning) are ${fmt(v[deepest] / Math.max(v.W, 0.01))} times as common in ${deepest} as when awake.` : `For this participant slow waves were not more common in ${deepest} than awake, which can happen when artefacts remain.`)
+    : "Large, slow brain waves found automatically after cleaning, per minute. Stages with under 2.5 usable minutes are not shown.";
+}
+function quality() {
+  const bad = all.filter(e => e.bad).length, pct = Math.round(100 * (all.length - bad) / all.length), ok = P.status === "ok";
+  el("qTitle").textContent = ok ? "Recording quality: good" : "Recording quality: too noisy for the study";
+  el("qBadge").style.background = `color-mix(in srgb, ${ok ? "var(--good)" : "var(--awake)"} 18%, transparent)`;
+  el("qIcon").setAttribute("stroke", ok ? "var(--good)" : "var(--awake)");
+  el("qIcon").innerHTML = ok ? `<path d="M5 12.5l4.5 4.5L19 7.5"/>` : `<path d="M12 7v6M12 16.5v.5"/><circle cx="12" cy="12" r="9"/>`;
+  const md5 = recs.every(r => r.qc.md5);
+  el("qText").textContent = `${all.length - bad} of ${all.length} half-minute epochs (${pct}%) were clean enough to use. ${md5 ? `All ${recs.length} files matched their published checksums` : "Some files did not match their checksums"}, and scanner and heartbeat noise were removed before analysis.${ok ? "" : " More than a quarter of the epochs were rejected, so this person is left out of the main comparison."}`;
+}
+function ai() {
+  const k = P.staging.filter(x => x.model === "logreg" && x.task === "w_vs_n2" && x.arm.startsWith("cleaned") && x.kappa !== null).map(x => x.kappa);
+  if (!k.length) { el("aiText").textContent = "Not tested for this person: a fair test needs at least three recordings with both awake and N2 time, so the computer can learn from some and be checked on another."; return; }
+  const best = Math.max(...k), word = band(best);
+  el("aiText").textContent = best > 0.6 ? `Yes, well. After cleaning, a model trained on this person's other naps told awake from light sleep with ${word} agreement with the experts (κ = ${fmt(best, 2)}, where 1 is perfect).`
+    : best > 0.2 ? `Partly. After cleaning, a model trained on this person's other naps reached ${word} agreement with the experts on awake vs light sleep (κ = ${fmt(best, 2)}, where 1 is perfect).`
+    : `Not yet for this person. A model trained on their other naps matched the experts only at about chance level (κ = ${fmt(best, 2)}; 0 is chance, 1 is perfect).`;
+}
+
+// ---------- research view ----------
+function rHeader() {
+  el("r-eyebrow").textContent = `For sleep researchers · sub-${P.participant} · ds003768 (Gu et al., 2022)`;
+  const rest = recs.filter(r => r.kind === "rest").length;
+  el("r-head").textContent = `${recs.length} recordings (${rest} eyes-closed rest, ${recs.length - rest} sleep), ${all.length} expert-scored 30-s epochs, ${all.filter(e => e.bad).length} rejected by Autoreject${P.status === "ok" ? "" : ` (${P.flagged_pct}%: excluded under the 25% rule)`}. 32-channel EEG + ECG + EOG at 5 kHz during simultaneous fMRI (TR ${recs[0].qc.tr} s).${P.skipped.length ? " Missing from the dataset: " + P.skipped.map(s => s.id).join(", ") + "." : ""}`;
+}
+function rHypno() {
+  const levels = ["W", "R", "N1", "N2", "N3"], Wd = 860, Hh = 170, L = 38, R = 8, T = 10, gap = 3;
+  const n = all.length + gap * (recs.length - 1), bw = (Wd - L - R) / n, yy = k => T + k * 26;
+  let s = `<svg viewBox="0 0 ${Wd} ${Hh + 26}" role="img" aria-label="Hypnogram">`;
+  levels.forEach((lv, k) => { s += `<text class="ax" x="${L - 8}" y="${yy(k) + 4}" text-anchor="end">${lv}</text><line x1="${L}" x2="${Wd - R}" y1="${yy(k)}" y2="${yy(k)}" stroke="var(--rule)"/>`; });
+  let pos = 0;
+  recs.forEach(r => {
+    const x0 = L + pos * bw; let d = "";
+    r.epochs.forEach((e, j) => { if (!e.s) return; const x = L + (pos + j) * bw, y = yy(levels.indexOf(e.s)); d += (d ? `L${x} ${y}` : `M${x} ${y}`) + ` L${x + bw} ${y} `;
+      if (e.bad) s += `<rect x="${x + 0.5}" y="${yy(4) + 12}" width="${Math.max(bw - 1, 1)}" height="7" fill="var(--p-awake)"/>`; });
+    s += `<path d="${d}" fill="none" stroke="var(--pink)" stroke-width="1.6"/>`;
+    if (recs.length <= 10) s += `<text class="axt" x="${(x0 + L + (pos + r.epochs.length) * bw) / 2}" y="${Hh + 18}" text-anchor="middle">${recName(r)}</text>`;
+    pos += r.epochs.length + gap;
+  });
+  el("r-hypno").innerHTML = s + "</svg>";
+  el("r-hypno-cap").innerHTML = `Stages scored by the dataset's experts (AASM). Recordings are separated by gaps; the time between them is not shown. ${mins("N3") ? `N3 present (${fmt(mins("N3"))} min); merged into N2 for classification (pre-registration).` : "N3 did not occur."} REM did not occur. <b>R</b> = REM.`;
+}
+function rParams() {
+  const row = (name, ep, cls) => {
+    const c = s => ep.filter(e => e.s === s).length / 2, trt = ep.length / 2, tst = trt - c("W");
+    const onset = ep.findIndex(e => e.s !== "W"), waso = onset < 0 ? 0 : ep.slice(onset).filter(e => e.s === "W").length / 2;
+    return `<tr class="${cls || ""}"><td class="k">${name}</td><td>${fmt(trt)}</td><td>${fmt(tst)}</td><td>${fmt(100 * tst / trt, 0)}%</td><td>${onset < 0 ? "–" : fmt(onset / 2)}</td>
+      <td>${fmt(waso)}</td><td>${fmt(c("W"))}</td><td>${fmt(c("N1"))}</td><td>${fmt(c("N2"))}</td><td>${fmt(c("N3"))}</td><td>${ep.filter(e => e.bad).length}</td></tr>`;
+  };
+  const lat = recs.filter(r => r.latency_min !== null).map(r => r.latency_min);
+  el("r-params").innerHTML = `<tr><th>Recording</th><th>TRT</th><th>TST</th><th>SE</th><th>SOL</th><th>WASO</th><th>W</th><th>N1</th><th>N2</th><th>N3</th><th>Rej.</th></tr>`
+    + recs.map(r => row(recName(r), r.epochs)).join("")
+    + `<tr class="total"><td class="k">All</td><td>${total}</td><td>${fmt(asleep)}</td><td>${fmt(100 * asleep / total, 0)}%</td><td>${lat.length ? fmt(mean(lat)) : "–"}<sup>†</sup></td>
+      <td>${fmt(recs.reduce((a, r) => a + r.waso_min, 0))}</td><td>${fmt(mins("W"))}</td><td>${fmt(mins("N1"))}</td><td>${fmt(mins("N2"))}</td><td>${fmt(mins("N3"))}</td><td>${all.filter(e => e.bad).length}</td></tr>`;
+}
+function rTrans() {
+  const st = STAGES.filter(s => mins(s) > 0), M = st.map(() => st.map(() => 0));
+  recs.forEach(r => r.epochs.forEach((e, j) => { const a = st.indexOf(r.epochs[j - 1]?.s), b = st.indexOf(e.s); if (j && a >= 0 && b >= 0) M[a][b]++; }));
+  const mx = Math.max(1, ...M.flat()), cs = st.length > 3 ? 56 : 70, L = 54, T = 26;
+  let s = `<svg viewBox="0 0 ${L + cs * st.length + 10} ${T + cs * st.length + 10}" role="img" aria-label="Stage transition matrix">`;
+  st.forEach((a, i) => { s += `<text class="axt" x="${L + i * cs + cs / 2}" y="${T - 9}" text-anchor="middle">→ ${a}</text><text class="axt" x="${L - 10}" y="${T + i * cs + cs / 2 + 4}" text-anchor="end">${a}</text>`; });
+  M.forEach((rw, i) => rw.forEach((v, j) => { const a = 0.08 + 0.8 * v / mx;
+    s += `<rect x="${L + j * cs + 1}" y="${T + i * cs + 1}" width="${cs - 2}" height="${cs - 2}" rx="3" fill="${PC[st[j]]}" fill-opacity="${a}"/>
+      <text x="${L + j * cs + cs / 2}" y="${T + i * cs + cs / 2 + 5}" text-anchor="middle" style="font:500 14px var(--mono);fill:${a > .55 ? "#fff" : "var(--pink)"}">${v}</text>`; }));
+  el("r-trans").innerHTML = s + "</svg>";
+}
+function rHr() {
+  const Wd = 300, Hh = 232, L = 44, R = 8, T = 10, B = 48;
+  const st = STAGES.filter(s => all.some(e => e.s === s && e.hr !== null)), groups = st.map(s => all.filter(e => e.s === s && e.hr !== null).map(e => e.hr));
+  if (!groups.length) { el("r-hr").innerHTML = `<div class="na">No heart-rate data.</div>`; return; }
+  const flat = groups.flat(), lo = Math.floor(Math.min(...flat) - 2), hi = Math.ceil(Math.max(...flat) + 2);
+  const y = v => T + (Hh - T - B) * (1 - (v - lo) / (hi - lo)), bw = (Wd - L - R) / st.length;
+  let s = `<svg viewBox="0 0 ${Wd} ${Hh}" role="img" aria-label="Heart rate by stage">`;
+  const step = hi - lo > 40 ? 10 : 5;
+  for (let v = Math.ceil(lo / step) * step; v <= hi; v += step) s += `<line x1="${L}" x2="${Wd - R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--rule)"/><text class="ax" x="${L - 6}" y="${y(v) + 3.5}" text-anchor="end">${v}</text>`;
+  s += `<text class="ax" transform="translate(10 ${(Hh - B) / 2}) rotate(-90)" text-anchor="middle">bpm</text>`;
+  groups.forEach((g, i) => {
+    const cx = L + bw * (i + 0.5), m = mean(g), ci = ci95(g), spread = Math.min(22, bw / 2 - 4);
+    g.forEach((v, k) => { s += `<circle cx="${cx - spread + ((k * 7919) % (2 * spread))}" cy="${y(v)}" r="2.2" fill="${PC[st[i]]}" fill-opacity=".35"/>`; });
+    s += `<line x1="${cx - 18}" x2="${cx + 18}" y1="${y(m)}" y2="${y(m)}" stroke="var(--pink)" stroke-width="2.5"/><line x1="${cx}" x2="${cx}" y1="${y(m - ci)}" y2="${y(m + ci)}" stroke="var(--pink)" stroke-width="2"/>
+      <text class="axt" x="${cx}" y="${Hh - B + 15}" text-anchor="middle">${st[i]}</text><text class="ax" x="${cx}" y="${Hh - B + 28}" text-anchor="middle">${m.toFixed(0)}</text><text class="ax" x="${cx}" y="${Hh - B + 41}" text-anchor="middle">n=${g.length}</text>`;
+  });
+  el("r-hr").innerHTML = s + "</svg>";
+}
+function dotPairs(target, series, title) {
+  const Wd = 300, Hh = 210, L = 44, R = 8, T = 18, B = 30, slots = series.length / 2;
+  const vals = series.flatMap(g => g.values); const hi = Math.max(...vals) * 1.08;
+  const y = v => T + (Hh - T - B) * (1 - v / hi), bw = (Wd - L - R) / slots;
+  let s = `<svg viewBox="0 0 ${Wd} ${Hh}" role="img" aria-label="${title}"><text class="axt" x="0" y="11">${title}</text>`;
+  for (let k = 0; k <= 4; k++) { const v = hi * k / 4; s += `<line x1="${L}" x2="${Wd - R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--rule)"/><text class="ax" x="${L - 6}" y="${y(v) + 3.5}" text-anchor="end">${v.toFixed(2)}</text>`; }
+  series.forEach((g, i) => {
+    const slot = Math.floor(i / 2), cx = L + bw * (slot + 0.5) + g.dx, m = mean(g.values), ci = ci95(g.values);
+    s += `<line x1="${cx}" x2="${cx}" y1="${y(m - ci)}" y2="${y(m + ci)}" stroke="${g.colour}" stroke-width="2"/>
+      <circle cx="${cx}" cy="${y(m)}" r="5" fill="${g.hollow ? "var(--paper)" : g.colour}" stroke="${g.colour}" stroke-width="2"><title>${m.toFixed(3)} ± ${ci.toFixed(3)} (95% CI)</title></circle>`;
+    if (g.tick) s += `<text class="ax" x="${L + bw * (slot + 0.5)}" y="${Hh - B + 17}" text-anchor="middle">${g.tick}</text>`;
+  });
+  target.innerHTML = s + "</svg>";
+}
+function rBands() {
+  const good = all.filter(e => !e.bad && e.s), box = el("r-bands"); box.innerHTML = "";
+  [["alpha", "Posterior alpha (8–12 Hz)"], ["sigma", "Central sigma (12–16 Hz)"], ["delta", "Frontal delta (0.5–4 Hz)"]].forEach(([b, title]) => {
+    const series = [];
+    STAGES.forEach(st => { const ep = good.filter(e => e.s === st); if (!ep.length) return;
+      series.push({ values: ep.map(e => e.raw[b]), colour: "var(--p-raw)", hollow: true, dx: -8, tick: `${st} (${ep.length})` });
+      series.push({ values: ep.map(e => e.cln[b]), colour: PC[st], hollow: false, dx: 8 }); });
+    const wrap = document.createElement("div"); box.appendChild(wrap); dotPairs(wrap, series, title);
+  });
+}
+function rQc() {
+  el("r-qc").innerHTML = `<tr><th>Recording</th><th>Vol.</th><th>MD5</th><th>Bad ch.</th><th>INPS MNE</th><th>INPS ref.</th><th>Dbl MNE</th><th>Dbl ref.</th><th>Rej.</th></tr>`
+    + recs.map(r => `<tr><td class="k">${recName(r)}</td><td>${r.qc.volumes}</td><td>${r.qc.md5 ? "✓" : "✗"}</td><td>${r.qc.bad_ch ? r.qc.bad_ch.replaceAll(";", ", ") : "–"}</td><td>${r.qc.inps_mne?.toFixed(2) ?? "–"}</td><td>${r.qc.inps_ref?.toFixed(2) ?? "–"}</td><td>${r.qc.dbl_mne}</td><td>${r.qc.dbl_ref}</td><td>${r.epochs.filter(e => e.bad).length}/${r.epochs.length}</td></tr>`).join("");
+  el("r-qc-cap").innerHTML = `MD5 against OpenNeuro ETags; bad channels by PREP (PyPREP; a recording with more than 3 is excluded); INPS (Tong et al., 2001), dB of heartbeat-harmonic power removed by AAS; double counts = R–R intervals &lt; 0.6 × median; Rej. = epochs rejected by Autoreject (a person with more than 25% is excluded).`;
+}
+function rKappa() {
+  const head = { raw: "Raw", filtered: "Filt.", cleaned_mne: "AAS MNE", cleaned_refined: "AAS ref.", obs_mne: "OBS MNE", obs_refined: "OBS ref." };
+  const arms = Object.keys(head).filter(a => P.staging.some(x => x.arm === a));
+  const models = [...new Set(P.staging.map(x => x.model))];
+  const rowsK = []; for (const t of ["w_vs_n2", "3class"]) for (const m of models) rowsK.push([t, m, `${t === "w_vs_n2" ? "W vs N2" : "W/N1/N2"} · ${m === "logreg" ? "LR" : "GBM"}`]);
+  const shade = k => k >= 0 ? `rgba(47,140,196,${Math.min(k / 0.6, 1) * 0.55})` : `rgba(210,98,44,${Math.min(-k / 0.4, 1) * 0.55})`;
+  const any = P.staging.some(x => x.kappa !== null);
+  el("r-kappa").innerHTML = `<tr><th>Task · model</th>${arms.map(a => `<th>${head[a]}</th>`).join("")}</tr>`
+    + rowsK.map(([t, m, name]) => `<tr><td class="k">${name}</td>${arms.map(a => { const g = P.staging.find(x => x.task === t && x.model === m && x.arm === a);
+      return `<td>${!g || g.kappa === null ? `<span class="na">n/a</span>` : `<span class="kap" style="background:${shade(g.kappa)}" title="${band(g.kappa)}">${g.kappa >= 0 ? "+" : "−"}${Math.abs(g.kappa).toFixed(2)}</span>`}</td>`; }).join("")}</tr>`).join("");
+  el("r-kappa-cap").innerHTML = any
+    ? `Leave-one-recording-out within sub-${P.participant}; 67 spectral features with ±2-epoch context; LR logistic regression${models.includes("gbm") ? ", GBM gradient boosting" : ""}. Shading: blue above chance, red below. Interpretation bands after Landis &amp; Koch (1977); with ~100 epochs, |κ| &lt; 0.2 is within noise.${arms.includes("obs_mne") ? " OBS arms are exploratory (pre-registration amendment 4)." : ""} The main analysis instead tests each person with a model trained on everyone else.`
+    : `Not scorable within this person: leave-one-recording-out needs at least three recordings that together contain both classes. This person is still scored in the main (leave-one-person-out) analysis.`;
+}
+
+// open the participant named in the link (#p17), else the first one
+const fromHash = (location.hash.match(/^#p(\d{2})$/) || [])[1];
+show(DATA.people.some(p => p.participant === fromHash) ? fromHash : DATA.people[0].participant);
+</script>

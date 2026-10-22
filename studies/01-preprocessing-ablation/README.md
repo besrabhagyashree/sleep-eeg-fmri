@@ -263,6 +263,7 @@ These use this study's own tests rather than established metrics, so they inform
 - **Analysis plan revised before results.** After a code test on 4–5 people, logistic regression and the wake-vs-N2 task were added and per-person feature scaling moved to a sensitivity analysis (`--norm`), because people's stage mixes differ hugely (one is 96% wake, another 76% N2).
 - **Two dataset file problems (handled 22 Oct 2026).** sub-16 sleep run 1 has no `.eeg` data file on OpenNeuro (header and markers only); the build crashed on the missing download and now skips such runs, logged as "file missing from dataset". sub-16 rest run 1's header names its data file `rsub-16_…` (a typo); the local copy of the header is pointed at the real file and the fix is recorded in the quality table (`header_datafile_fixed`); the data file itself is unchanged and its MD5 is still checked.
 - **Label-file typo (handled 22 Oct 2026, before sub-32 was built).** In `sub-32-sleep-stage.tsv`, line 69 (sleep run 1, 810 s) separates the time and the stage with a space instead of a tab. The reader now accepts that one pattern; all other 32 label files were checked to parse identically.
+- **Event channels (fixed 22 Oct 2026, before any event-set results).** The right mastoid (TP10) is bad in 40 of the first 149 recordings, and event detection had used it for the left-hemisphere derivations. Events now use the AASM recommended derivations (F4–M1, C4–M1, O2–M1), with the backups only when a recommended electrode is bad (amendment 7); all event features are recomputed.
 </details>
 
 > [!TIP]

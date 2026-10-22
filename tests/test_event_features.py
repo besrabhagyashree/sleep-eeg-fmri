@@ -46,7 +46,17 @@ def test_derivations_use_the_opposite_mastoid():
     from features.events import _pick
     x = np.zeros((len(NAMES), 10)); x[NAMES.index("C3")] = 3e-6; x[NAMES.index("TP10")] = 1e-6; x[NAMES.index("TP9")] = 2e-6
     d, names = _pick(x, NAMES, ["C3", "C4"])
-    assert names == ["C3-M2", "C4-M1"] and np.allclose(d[0], 2.0) and np.allclose(d[1], -2.0)
+    assert names == ["C3-M2"] and np.allclose(d[0], 2.0)
+    d, names = _pick(x, NAMES, ["C4", "C3"])
+    assert names == ["C4-M1"] and np.allclose(d[0], -2.0)
+
+
+def test_bad_mastoid_falls_back_to_the_aasm_backup():
+    from features.events import _pick
+    x = np.ones((len(NAMES), 10))
+    assert _pick(x, NAMES, ["C4", "C3"], bad=["TP9"])[1] == ["C3-M2"]        # M1 bad -> backup C3-M2
+    assert _pick(x, NAMES, ["C4", "C3"], bad=["TP10"])[1] == ["C4-M1"]       # M2 bad -> recommended still fine
+    assert _pick(x, NAMES, ["C4", "C3"], bad=["TP9", "TP10"])[1] == []       # neither usable
 
 
 def test_one_row_per_epoch_and_missing_channels_are_safe():
