@@ -67,3 +67,15 @@ def test_header_typo_is_pointed_at_the_real_data_file(tmp_path):
     assert fix_header(vhdr) is True
     assert "DataFile=sub-16_task-rest_run-1_eeg.eeg" in vhdr.read_text(encoding="latin-1")
     assert fix_header(vhdr) is False                                   # correct headers are left alone
+
+
+def test_label_line_with_space_instead_of_tab(tmp_path, monkeypatch):
+    import build_dataset
+    f = tmp_path / "labels.tsv"
+    f.write_text("session\tepoch_start_time_sec\t30-sec_epoch_sleep_stage\r\n"
+                 "task-sleep_run-1\t780\t1\r\ntask-sleep_run-1\t810 W\r\ntask-sleep_run-1\t840\tW (uncertain)\r\n", encoding="utf-8")
+    monkeypatch.setattr(build_dataset, "download", lambda key: f)
+    d = build_dataset.load_labels("32")
+    assert d.t.tolist() == [780.0, 810.0, 840.0]
+    assert d.stage_raw.tolist() == ["1", "W", "W (uncertain)"]
+    assert d.stage.tolist()[:2] == ["N1", "W"] and d.stage.isna().tolist()[2]

@@ -17,6 +17,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import io
 import json
 import re
 import sys
@@ -88,7 +89,9 @@ def fix_header(vhdr: Path) -> bool:
 
 def load_labels(sub: str) -> pd.DataFrame:
     path = download(f"{DS}/sourcedata/sub-{sub}-sleep-stage.tsv")
-    d = pd.read_csv(path, sep="\t")
+    # dataset typo: one line uses a space instead of a tab before the stage (sub-32, line 69: "810 W")
+    text = re.sub(r"(?m)^([^\t\r\n]+\t\d+(?:\.\d+)?) (?=\S[^\t\r\n]*\r?$)", r"\1\t", path.read_text(encoding="utf-8"))
+    d = pd.read_csv(io.StringIO(text), sep="\t")
     d = pd.DataFrame({"session": d.iloc[:, -3], "t": d.iloc[:, -2].astype(float),
                       "stage_raw": d.iloc[:, -1].astype(str).str.strip()})
     d["stage"] = d.stage_raw.map(STAGE_MAP)          # uncertain / unscorable -> NaN (dropped)
