@@ -37,7 +37,7 @@ flowchart TB
 
     subgraph S1 ["1 · Preprocessing"]
         direction LR
-        P1["Scanner<br/>artefact"]:::done --> P2["Heartbeat<br/>artefact"]:::done --> P3["Filter<br/>250 Hz"]:::done --> P4["Residual<br/>peaks"]:::todo --> P5["Bad<br/>channels"]:::todo --> P6["Re-<br/>reference"]:::todo --> P7["Movement<br/>bursts"]:::todo
+        P1["1 · Scanner<br/>artefact"]:::done --> P2["2 · Heartbeat<br/>artefact"]:::done --> P3["3 · Filter<br/>250 Hz"]:::done --> P4A["4a · OBS<br/>tested, not used"]:::rejected --> P4B["4b · Notch<br/>33.3 / 38.5 Hz"]:::done --> P5["5 · Bad<br/>channels"]:::done --> P6["6 · Re-<br/>reference"]:::wip --> P7["7 · Movement<br/>Autoreject"]:::done
     end
     subgraph S2 ["2 · Features"]
         direction LR
@@ -60,6 +60,7 @@ flowchart TB
     classDef wip fill:#fef3c7,stroke:#d97706,color:#78350f
     classDef todo fill:#f1f5f9,stroke:#94a3b8,color:#334155,stroke-dasharray: 4 3
     classDef data fill:#ede9fe,stroke:#6d28d9,color:#2e1065
+    classDef rejected fill:#fee2e2,stroke:#dc2626,color:#7f1d1d,stroke-dasharray: 2 2
     style S1 fill:#f8fafc,stroke:#cbd5e1,color:#0f172a
     style S2 fill:#f8fafc,stroke:#cbd5e1,color:#0f172a
     style S3 fill:#f8fafc,stroke:#cbd5e1,color:#0f172a
@@ -70,11 +71,12 @@ flowchart TB
   <img alt="done" src="https://img.shields.io/badge/●-done-059669?style=flat-square">
   <img alt="in progress" src="https://img.shields.io/badge/●-in%20progress-d97706?style=flat-square">
   <img alt="planned" src="https://img.shields.io/badge/●-planned-94a3b8?style=flat-square">
+  <img alt="tested, not adopted" src="https://img.shields.io/badge/●-tested%2C%20not%20adopted-dc2626?style=flat-square">
 </p>
 
 | Stage | Folder | What it does | Status |
 |---|---|---|---|
-| 🧹 **1. Preprocessing** | [`src/preprocessing`](src/preprocessing) | Removes scanner and heartbeat artefacts, filters and resamples | ![](https://img.shields.io/badge/3%20of%207%20steps-done-059669?style=flat-square) |
+| 🧹 **1. Preprocessing** | [`src/preprocessing`](src/preprocessing) | Scanner and heartbeat artefact removal, filtering, notch, bad-channel repair, re-reference, movement exclusion; quality checks at every level | ![](https://img.shields.io/badge/7%20of%207%20steps-addressed-059669?style=flat-square) ![](https://img.shields.io/badge/reference-chosen%20at%2033%20people-d97706?style=flat-square) |
 | 📊 **2. Features** | [`src/features`](src/features) | Turns each 30-second epoch into band power, spectral shape and eye-movement numbers | ![](https://img.shields.io/badge/spectral-done-059669?style=flat-square) ![](https://img.shields.io/badge/spindles-planned-94a3b8?style=flat-square) |
 | 🔬 **3. Research methods** | [`src/methods`](src/methods) | The analyses that answer each question: sleep-stage classification, alpha rhythms | ![](https://img.shields.io/badge/classifier-in%20progress-d97706?style=flat-square) |
 | 📈 **4. Post-processing** | [`src/postprocessing`](src/postprocessing) | Statistics, figures and reports | ![](https://img.shields.io/badge/figures-done-059669?style=flat-square) ![](https://img.shields.io/badge/statistics-in%20progress-d97706?style=flat-square) |
