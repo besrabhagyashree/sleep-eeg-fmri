@@ -93,31 +93,54 @@ def main():
 
     def fmt(v):
         return "–" if pd.isna(v) else (f"{v:.2f}" if isinstance(v, float) else str(v))
+
+    def kappa_cell(v):
+        """Colour by the Landis & Koch (1977) agreement bands for Cohen's kappa."""
+        if pd.isna(v):
+            return "–"
+        dot = "⬛" if v <= 0 else "🟥" if v <= .20 else "🟧" if v <= .40 else "🟨" if v <= .60 else "🟩" if v <= .80 else "💚"
+        return f"{dot} {v:.2f}"
+
+    def ok(flag):
+        return "✅" if flag else "❌"
+
     done = t[t.status != "processing"]
-    md = [f"Participants built: {len(done)} of 33 · updated by `participant_table.py`", "",
-          "**Data quality**", "",
-          "| # | Status | Recordings | Epochs kept (W/N1/N2) | Flagged % | Expert-unscorable | Max bad channels | INPS MNE / refined (dB) | Double-counted beats MNE / refined |",
-          "|---|---|---|---|---|---|---|---|---|"]
-    for _, r in t.iterrows():
-        if r.status == "processing":
-            md.append(f"| {r.participant} | processing | | | | | | | |"); continue
-        md.append(f"| {r.participant} | {r.status} | {int(r.recordings)} | {int(r.kept)} ({int(r.W)}/{int(r.N1)}/{int(r.N2)}) | "
-                  f"{r.flagged_pct} | {int(r.expert_unscorable)} | {int(r.max_bad_channels)} | "
-                  f"{fmt(r.inps_mne_db)} / {fmt(r.inps_refined_db)} | {int(r.double_counts_mne)} / {int(r.double_counts_refined)} |")
-    for scope, label in (("within", "Within-person preview (trained on the person's other recordings)"),
-                         ("across", "Main analysis (trained on all other people)")):
+    n_done = len(done)
+    pct = round(100 * n_done / 33)
+    md = [f'<img alt="progress" src="https://img.shields.io/badge/participants%20built-{n_done}%20of%2033-{"059669" if n_done == 33 else "d97706"}?style=for-the-badge"> '
+          f'<img alt="percent" src="https://img.shields.io/badge/progress-{pct}%25-33318a?style=for-the-badge">', "",
+          "**Kappa colours** follow the Landis & Koch (1977) agreement bands: "
+          "⬛ ≤ 0 none · 🟥 0.01–0.20 slight · 🟧 0.21–0.40 fair · 🟨 0.41–0.60 moderate · 🟩 0.61–0.80 substantial · 💚 0.81–1.00 almost perfect", ""]
+
+    for scope, label, open_ in (("across", "🎯 Main result: scored by a model trained on all other people", True),
+                                ("within", "🔍 Within-person preview: trained on the person's other recordings", False)):
         cols = [c for c in t.columns if c.startswith(scope + "_")]
+        md += [f"<details{' open' if open_ else ''}>", f"<summary><b>{label}</b></summary>", ""]
         if not cols:
-            md += ["", f"**Sleep-staging kappa: {label}:** available when the full build finishes."]; continue
-        md += ["", f"**Sleep-staging kappa (logistic regression): {label}.** 0 = chance, 1 = perfect; – = not scored (fewer than 3 recordings, or only one stage)", "",
-               "| # | " + " | ".join(f"{'W/N1/N2' if task == '3class' else 'W vs N2'} {SHORT[a]}" for task in TASKS for a in ARMS) + " |",
-               "|---|" + "---|" * (len(TASKS) * len(ARMS))]
+            md += ["> [!NOTE]", "> Available when all 33 participants are built.", "", "</details>", ""]
+            continue
+        md += ["Logistic regression · Cohen's kappa vs the expert · – = not scored (fewer than 3 recordings, or only one stage)", "",
+               "| # | " + " | ".join(f"{'W/N1/N2' if task == '3class' else 'W vs N2'}<br>{SHORT[a]}" for task in TASKS for a in ARMS) + " |",
+               "|:---:|" + ":---:|" * (len(TASKS) * len(ARMS))]
         for _, r in t.iterrows():
             if r.status == "processing":
                 continue
-            md.append(f"| {r.participant} | " + " | ".join(fmt(r.get(f"{scope}_{task}_{a}")) for task in TASKS for a in ARMS) + " |")
+            md.append(f"| {r.participant} | " + " | ".join(kappa_cell(r.get(f"{scope}_{task}_{a}")) for task in TASKS for a in ARMS) + " |")
         sub = done[[f"{scope}_{task}_{a}" for task in TASKS for a in ARMS if f"{scope}_{task}_{a}" in done]]
-        md.append("| **median** | " + " | ".join(fmt(sub[c].median()) for c in sub.columns) + " |")
+        md += ["| **median** | " + " | ".join(f"**{kappa_cell(sub[c].median())}**" for c in sub.columns) + " |", "", "</details>", ""]
+
+    md += ["<details>", "<summary><b>🩺 Data quality per participant</b></summary>", "",
+           "✅/❌ against the pre-set conventions: ≤ 3 bad channels (PREP) per recording; ≤ 25% of epochs flagged (Autoreject). "
+           "INPS has no published threshold, so it is shown without a colour.", "",
+           "| # | Status | Recordings | Epochs kept<br>(W / N1 / N2) | Flagged | Expert-<br>unscorable | Bad channels<br>(max) | INPS dB<br>MNE / refined | Double-counted beats<br>MNE / refined |",
+           "|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|"]
+    for _, r in t.iterrows():
+        if r.status == "processing":
+            md.append(f"| {r.participant} | ⏳ processing | | | | | | | |"); continue
+        md.append(f"| {r.participant} | {ok(r.status == 'ok')} {r.status} | {int(r.recordings)} | {int(r.kept)} ({int(r.W)} / {int(r.N1)} / {int(r.N2)}) | "
+                  f"{ok(r.flagged_pct <= 25)} {r.flagged_pct}% | {int(r.expert_unscorable)} | {ok(r.max_bad_channels <= 3)} {int(r.max_bad_channels)} | "
+                  f"{fmt(r.inps_mne_db)} / {fmt(r.inps_refined_db)} | {int(r.double_counts_mne)} / {int(r.double_counts_refined)} |")
+    md += ["", "</details>"]
     text = "\n".join(md) + "\n"
     (OUT / "participants_table.md").write_text(text, encoding="utf-8")
 

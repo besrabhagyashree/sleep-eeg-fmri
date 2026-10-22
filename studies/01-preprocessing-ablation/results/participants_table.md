@@ -1,49 +1,67 @@
-Participants built: 2 of 33 · updated by `participant_table.py`
+<img alt="progress" src="https://img.shields.io/badge/participants%20built-2%20of%2033-d97706?style=for-the-badge"> <img alt="percent" src="https://img.shields.io/badge/progress-6%25-33318a?style=for-the-badge">
 
-**Data quality**
+**Kappa colours** follow the Landis & Koch (1977) agreement bands: ⬛ ≤ 0 none · 🟥 0.01–0.20 slight · 🟧 0.21–0.40 fair · 🟨 0.41–0.60 moderate · 🟩 0.61–0.80 substantial · 💚 0.81–1.00 almost perfect
 
-| # | Status | Recordings | Epochs kept (W/N1/N2) | Flagged % | Expert-unscorable | Max bad channels | INPS MNE / refined (dB) | Double-counted beats MNE / refined |
-|---|---|---|---|---|---|---|---|---|
-| 01 | ok | 5 | 118 (38/46/34) | 9.2 | 0 | 1 | 0.99 / 1.51 | 336 / 0 |
-| 02 | ok | 2 | 38 (27/7/4) | 5.0 | 0 | 1 | 1.73 / 1.67 | 122 / 0 |
-| 03 | processing | | | | | | | |
-| 04 | processing | | | | | | | |
-| 05 | processing | | | | | | | |
-| 06 | processing | | | | | | | |
-| 07 | processing | | | | | | | |
-| 08 | processing | | | | | | | |
-| 09 | processing | | | | | | | |
-| 10 | processing | | | | | | | |
-| 11 | processing | | | | | | | |
-| 12 | processing | | | | | | | |
-| 13 | processing | | | | | | | |
-| 14 | processing | | | | | | | |
-| 15 | processing | | | | | | | |
-| 16 | processing | | | | | | | |
-| 17 | processing | | | | | | | |
-| 18 | processing | | | | | | | |
-| 19 | processing | | | | | | | |
-| 20 | processing | | | | | | | |
-| 21 | processing | | | | | | | |
-| 22 | processing | | | | | | | |
-| 23 | processing | | | | | | | |
-| 24 | processing | | | | | | | |
-| 25 | processing | | | | | | | |
-| 26 | processing | | | | | | | |
-| 27 | processing | | | | | | | |
-| 28 | processing | | | | | | | |
-| 29 | processing | | | | | | | |
-| 30 | processing | | | | | | | |
-| 31 | processing | | | | | | | |
-| 32 | processing | | | | | | | |
-| 33 | processing | | | | | | | |
+<details open>
+<summary><b>🎯 Main result: scored by a model trained on all other people</b></summary>
 
-**Sleep-staging kappa (logistic regression): Within-person preview (trained on the person's other recordings).** 0 = chance, 1 = perfect; – = not scored (fewer than 3 recordings, or only one stage)
+> [!NOTE]
+> Available when all 33 participants are built.
 
-| # | W/N1/N2 raw | W/N1/N2 filt | W/N1/N2 clean-MNE | W/N1/N2 clean-ref | W vs N2 raw | W vs N2 filt | W vs N2 clean-MNE | W vs N2 clean-ref |
-|---|---|---|---|---|---|---|---|---|
-| 01 | -0.03 | -0.06 | -0.01 | -0.04 | -0.11 | 0.09 | 0.03 | -0.10 |
+</details>
+
+<details>
+<summary><b>🔍 Within-person preview: trained on the person's other recordings</b></summary>
+
+Logistic regression · Cohen's kappa vs the expert · – = not scored (fewer than 3 recordings, or only one stage)
+
+| # | W/N1/N2<br>raw | W/N1/N2<br>filt | W/N1/N2<br>clean-MNE | W/N1/N2<br>clean-ref | W vs N2<br>raw | W vs N2<br>filt | W vs N2<br>clean-MNE | W vs N2<br>clean-ref |
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| 01 | ⬛ -0.03 | ⬛ -0.06 | ⬛ -0.01 | ⬛ -0.04 | ⬛ -0.11 | 🟥 0.09 | 🟥 0.03 | ⬛ -0.10 |
 | 02 | – | – | – | – | – | – | – | – |
-| **median** | -0.03 | -0.06 | -0.01 | -0.04 | -0.11 | 0.09 | 0.03 | -0.10 |
+| **median** | **⬛ -0.03** | **⬛ -0.06** | **⬛ -0.01** | **⬛ -0.04** | **⬛ -0.11** | **🟥 0.09** | **🟥 0.03** | **⬛ -0.10** |
 
-**Sleep-staging kappa: Main analysis (trained on all other people):** available when the full build finishes.
+</details>
+
+<details>
+<summary><b>🩺 Data quality per participant</b></summary>
+
+✅/❌ against the pre-set conventions: ≤ 3 bad channels (PREP) per recording; ≤ 25% of epochs flagged (Autoreject). INPS has no published threshold, so it is shown without a colour.
+
+| # | Status | Recordings | Epochs kept<br>(W / N1 / N2) | Flagged | Expert-<br>unscorable | Bad channels<br>(max) | INPS dB<br>MNE / refined | Double-counted beats<br>MNE / refined |
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| 01 | ✅ ok | 5 | 118 (38 / 46 / 34) | ✅ 9.2% | 0 | ✅ 1 | 0.99 / 1.51 | 336 / 0 |
+| 02 | ✅ ok | 2 | 38 (27 / 7 / 4) | ✅ 5.0% | 0 | ✅ 1 | 1.73 / 1.67 | 122 / 0 |
+| 03 | ⏳ processing | | | | | | | |
+| 04 | ⏳ processing | | | | | | | |
+| 05 | ⏳ processing | | | | | | | |
+| 06 | ⏳ processing | | | | | | | |
+| 07 | ⏳ processing | | | | | | | |
+| 08 | ⏳ processing | | | | | | | |
+| 09 | ⏳ processing | | | | | | | |
+| 10 | ⏳ processing | | | | | | | |
+| 11 | ⏳ processing | | | | | | | |
+| 12 | ⏳ processing | | | | | | | |
+| 13 | ⏳ processing | | | | | | | |
+| 14 | ⏳ processing | | | | | | | |
+| 15 | ⏳ processing | | | | | | | |
+| 16 | ⏳ processing | | | | | | | |
+| 17 | ⏳ processing | | | | | | | |
+| 18 | ⏳ processing | | | | | | | |
+| 19 | ⏳ processing | | | | | | | |
+| 20 | ⏳ processing | | | | | | | |
+| 21 | ⏳ processing | | | | | | | |
+| 22 | ⏳ processing | | | | | | | |
+| 23 | ⏳ processing | | | | | | | |
+| 24 | ⏳ processing | | | | | | | |
+| 25 | ⏳ processing | | | | | | | |
+| 26 | ⏳ processing | | | | | | | |
+| 27 | ⏳ processing | | | | | | | |
+| 28 | ⏳ processing | | | | | | | |
+| 29 | ⏳ processing | | | | | | | |
+| 30 | ⏳ processing | | | | | | | |
+| 31 | ⏳ processing | | | | | | | |
+| 32 | ⏳ processing | | | | | | | |
+| 33 | ⏳ processing | | | | | | | |
+
+</details>
