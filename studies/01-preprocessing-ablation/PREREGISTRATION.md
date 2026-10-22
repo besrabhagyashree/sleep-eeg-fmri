@@ -76,3 +76,26 @@ Per 30-s epoch, for frontal, central, posterior and temporal channel groups: log
 ## 9. Inference criteria
 
 H1 is supported if the primary test gives p < 0.05 with a positive mean difference; contradicted if p < 0.05 with a negative difference; otherwise inconclusive. Results are reported whichever way they come out.
+
+## Amendment 1: exploratory "fully cleaned" arm (22 October 2026, before full results)
+
+Added after validating three further preprocessing steps on one recording (participant 1, sleep run 3; [`validate_stages.py`](validate_stages.py), results in `results/stages_validation_sub-01_task-sleep_run-3_mne.csv`). **The primary analysis and all hypotheses above are unchanged.** The new arm is exploratory and reported as such.
+
+**Fifth arm, "fully cleaned":** the *cleaned (MNE)* recording plus, in this order (PREP-pipeline order):
+
+1. FIR notch filters at 33.3 Hz (2nd harmonic of the scanner slice frequency) and 38.5 Hz (scanner-room equipment peak present before scanning started), 1 Hz wide (MNE-Python).
+2. Spherical-spline interpolation (Perrin et al., 1989) of the channels PREP marked bad for that recording.
+3. Re-reference, chosen by the rule below.
+
+**Reference-selection rule (fixed now):** for every included participant with at least 3 wake and 3 N2 epochs, compute under (a) linked mastoids (TP9, TP10) and (b) average reference of all good scalp channels:
+- *alpha contrast* = mean posterior (O1, O2, Pz) 8–12 Hz power in wake ÷ in N2;
+- *spindle contrast* = mean central (C3, C4, Cz) 12–16 Hz power in N2 ÷ in wake;
+- *score* = log(alpha contrast) + log(spindle contrast).
+
+The reference with the higher **median score across participants** is used for the fully cleaned arm. Both references' scores are reported. Ties (difference < 0.01) go to the average reference, the PREP default.
+
+**Movement bursts:** no within-epoch masking is added. Epoch-level exclusion by Autoreject (section 5) remains the movement step, as the established method.
+
+**Optimal basis sets** (Niazy et al., 2005) for residual heartbeat artefact need the recording before heartbeat removal, which the current build does not store. They will be added in a later amendment, before being run.
+
+**Observation recorded before results:** in the validation recording, central 12–16 Hz power was lower in N2 than in wake under every reference (ratio 0.49–0.64; 5 N2 epochs). Whether this holds across participants will be reported.
