@@ -32,12 +32,17 @@ import pandas as pd
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
 from features.spectral import epoch_features                                   # noqa: E402
 from preprocessing.mr_artifacts import TARGET_SFREQ, r_peaks, remove_bcg, remove_gradient, volume_onsets  # noqa: E402
+from preprocessing import quality                                      # noqa: E402
+
+SLICES_PER_VOLUME = 35            # from the dataset's BOLD headers (80 x 80 x 35 voxels); slice rate = 35 / TR
 
 ROOT = Path(__file__).resolve().parents[2]
 S3 = "https://s3.amazonaws.com/openneuro.org"
 DS = "ds003768"
 RAW_DIR = ROOT / "data" / "raw"
 OUT_DIR = ROOT / "data" / "features"
+QC_DIR = ROOT / "data" / "qc"
+CLEAN_DIR = ROOT / "data" / "clean"
 EPOCH_S = 30
 STAGE_MAP = {"W": "W", "1": "N1", "2": "N2", "3": "N2"}   # N3 (42 epochs in total) merged into N2
 
@@ -81,7 +86,7 @@ def to_250(data, info, span):
     return r.get_data()
 
 
-def process_run(vhdr: Path, labels: pd.DataFrame, sub: str, session: str):
+def process_run(vhdr: Path, labels: pd.DataFrame, sub: str, session: str, eeg_key: str):
     raw = mne.io.read_raw_brainvision(vhdr, preload=True, verbose="error")
     sf = raw.info["sfreq"]
     names = raw.ch_names
@@ -89,7 +94,9 @@ def process_run(vhdr: Path, labels: pd.DataFrame, sub: str, session: str):
     fi = [names.index(c) for c in feat_ch]
     data = raw.get_data()
     onsets = volume_onsets(raw)
-    qc = {"subject": sub, "session": session, "sfreq": sf, "n_volumes": len(onsets)}
+    qc = {"subject": sub, "session": session}
+    qc.update(quality.file_check(vhdr.with_suffix(".eeg"), f"{S3}/{eeg_key}"))       # level 1
+    qc.update(quality.header_check(raw, onsets))
     if len(onsets) < 50:
         qc["status"] = "skipped: too few scanner triggers"
         return [], qc
@@ -113,17 +120,34 @@ def process_run(vhdr: Path, labels: pd.DataFrame, sub: str, session: str):
     clean = to_250(data, raw.info, span)
     peaks = r_peaks(clean[names.index("ECG")], TARGET_SFREQ)
     hr = 60.0 / (np.median(np.diff(peaks)) / TARGET_SFREQ) if len(peaks) > 10 else np.nan
-    qc["heart_rate_bpm"] = round(float(hr), 1)
+    scalp = [i for i, c in enumerate(names) if c not in ("ECG", "EOG")]
     if 40 <= hr <= 120:
-        scalp = [i for i, c in enumerate(names) if c not in ("ECG", "EOG")]
+        before = clean[scalp].copy()
         sub_data = clean[scalp]
         remove_bcg(sub_data, peaks, TARGET_SFREQ)
         clean[scalp] = sub_data
         qc["bcg"] = "removed"
+        qc.update(quality.heartbeat_check(before, sub_data, peaks, TARGET_SFREQ, remove_bcg))   # level 4
     else:
-        qc["bcg"] = "skipped: implausible heart rate"
+        qc.update(bcg="skipped: implausible heart rate", heart_rate_bpm=float(hr))
     add("cleaned", clean[fi], TARGET_SFREQ)
-    qc.update(status="ok", n_epochs=len(lab))
+
+    # quality checks on the cleaned recording (levels 2-4); the cleaned recording is kept for later studies
+    info250 = mne.create_info(names, TARGET_SFREQ,
+                              ["ecg" if c == "ECG" else "eog" if c == "EOG" else "eeg" for c in names])
+    clean_raw = mne.io.RawArray(clean.astype(np.float32), info250, verbose="error")
+    tr = np.median(np.diff(onsets)) / sf
+    qc.update(quality.slice_peak_db(clean[scalp], TARGET_SFREQ, SLICES_PER_VOLUME / tr))
+    qc.update(quality.channel_check(clean_raw))                                                 # level 2
+    bad_ch = [c for c in qc["bad_channels"].split(";") if c]
+    ep, flags = quality.epoch_check(clean_raw, lab.t.tolist(), bad_ch)                           # level 3
+    qc.update(ep)
+    bad_at = dict(zip(lab.t.tolist(), flags))
+    for r in rows:
+        r["qc_epoch_bad"] = bad_at[r["t"]]
+    CLEAN_DIR.mkdir(parents=True, exist_ok=True)
+    clean_raw.save(CLEAN_DIR / f"sub-{sub}_{session}_clean_raw.fif", overwrite=True, verbose="error")
+    qc.update(status="ok")
     return rows, qc
 
 
@@ -141,14 +165,16 @@ def run_subject(sub: str, keep_raw: bool):
         t0 = time.time()
         files = [download(f"{base}_eeg.{ext}") for ext in ("vhdr", "vmrk", "eeg")]
         try:
-            r, qc = process_run(files[0], labels, sub, session)
+            r, qc = process_run(files[0], labels, sub, session, f"{base}_eeg.eeg")
         except Exception as e:                                  # keep going; record the failure
-            r, qc = [], {"subject": sub, "session": session, "status": f"error: {e}"}
+            r, qc = [], {"subject": sub, "session": session, "status": f"error: {type(e).__name__}: {e}"}
         qc["seconds"] = round(time.time() - t0)
         rows += r
         qcs.append(qc)
+        hr_ = qc.get("heart_rate_bpm")
         print(f"sub-{sub} {session}: {qc.get('status')} epochs={qc.get('n_epochs', 0)} "
-              f"hr={qc.get('heart_rate_bpm')} {qc['seconds']}s", flush=True)
+              f"bad_epochs={qc.get('n_bad_epochs')} bad_ch={qc.get('n_bad_channels')} "
+              f"hr={None if hr_ is None else round(hr_, 1)} md5={qc.get('file_md5_ok')} {qc['seconds']}s", flush=True)
         if not keep_raw:
             files[2].unlink(missing_ok=True)                    # the big .eeg file
     OUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -161,12 +187,11 @@ def main():
     ap.add_argument("--subjects", nargs="*", default=[f"{i:02d}" for i in range(1, 34)])
     ap.add_argument("--keep-raw", action="store_true")
     args = ap.parse_args()
-    qc_path = OUT_DIR / "qc.csv"
+    QC_DIR.mkdir(parents=True, exist_ok=True)
     for sub in args.subjects:
         qcs = run_subject(sub, args.keep_raw)
         if qcs:
-            qc = pd.DataFrame(qcs)
-            qc.to_csv(qc_path, mode="a", header=not qc_path.exists(), index=False)
+            pd.DataFrame(qcs).to_csv(QC_DIR / f"sub-{sub}.csv", index=False)
 
 
 if __name__ == "__main__":

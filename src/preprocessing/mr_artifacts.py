@@ -59,16 +59,30 @@ def remove_gradient(data: np.ndarray, onsets: np.ndarray, window: int = GRAD_WIN
     return seg_len, onsets
 
 
+def heart_rate_mne(ecg: np.ndarray, sfreq: float) -> float:
+    """Average heart rate (bpm) from MNE's QRS detector: robust for the rate, imprecise for timing."""
+    raw = mne.io.RawArray(ecg[None], mne.create_info(["ECG"], sfreq, ["ecg"]), verbose="error")
+    _, _, hr = mne.preprocessing.find_ecg_events(raw, ch_name="ECG", verbose="error")
+    return float(hr)
+
+
 def r_peaks(ecg: np.ndarray, sfreq: float) -> np.ndarray:
-    """R-peak samples from an in-scanner ECG trace (band-pass + energy + peak picking)."""
+    """R-peak samples from an in-scanner ECG trace.
+
+    Band-pass 8-25 Hz and take the energy of the dominant polarity (precise timing). The
+    minimum distance between peaks is 0.6 x the beat interval given by MNE's heart-rate
+    estimate, so a T-wave or a residual artefact spike cannot be counted as an extra beat.
+    """
     b, a = signal.butter(3, [8, 25], btype="band", fs=sfreq)
     x = signal.filtfilt(b, a, ecg)
     # polarity of in-scanner ECG is arbitrary: use the dominant sign
     if np.abs(np.percentile(x, 0.5)) > np.abs(np.percentile(x, 99.5)):
         x = -x
     energy = np.clip(x, 0, None) ** 2
+    hr = heart_rate_mne(ecg, sfreq)
+    min_gap = 0.6 * 60.0 / hr if 40 <= hr <= 150 else 0.4      # seconds
     height = np.percentile(energy, 99) * 0.25
-    peaks, _ = signal.find_peaks(energy, height=height, distance=int(0.4 * sfreq))
+    peaks, _ = signal.find_peaks(energy, height=height, distance=int(min_gap * sfreq))
     return peaks
 
 
