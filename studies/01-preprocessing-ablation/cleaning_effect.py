@@ -1,6 +1,6 @@
 """Measure how each cleaning step changes EEG band power (the classifier's main features).
 
-Usage: python src/cleaning_effect.py data/raw/sub-01/eeg/sub-01_task-sleep_run-1_eeg.vhdr
+Usage: python studies/01-preprocessing-ablation/cleaning_effect.py data/raw/sub-01/eeg/sub-01_task-sleep_run-1_eeg.vhdr
 Prints mean band power across scalp channels for: no artefact removal, gradient removal only,
 gradient + heartbeat removal. Same filtering (0.3-40 Hz) and 250 Hz rate in all three.
 """
@@ -11,8 +11,8 @@ import mne
 import numpy as np
 from scipy import signal
 
-sys.path.insert(0, str(Path(__file__).parent))
-from mr_artifacts import TARGET_SFREQ, r_peaks, remove_bcg, remove_gradient, volume_onsets  # noqa: E402
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
+from preprocessing.mr_artifacts import TARGET_SFREQ, r_peaks, remove_bcg, remove_gradient, volume_onsets  # noqa: E402
 
 BANDS = {"delta": (0.5, 4), "theta": (4, 8), "alpha": (8, 12), "sigma": (12, 16), "beta": (16, 30)}
 

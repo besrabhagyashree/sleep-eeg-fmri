@@ -10,7 +10,7 @@ Two artefacts dominate EEG recorded during fMRI:
    field. Removed with the same idea locked to ECG R-peaks (Allen et al., 1998).
 
 Usage:
-    python src/mr_artifacts.py data/raw/sub-01/eeg/sub-01_task-sleep_run-1_eeg.vhdr
+    python src/preprocessing/mr_artifacts.py data/raw/sub-01/eeg/sub-01_task-sleep_run-1_eeg.vhdr
 Writes a cleaned 250 Hz recording to data/clean/ and diagnostic figures to figures/.
 """
 from __future__ import annotations
@@ -25,7 +25,7 @@ import mne
 import numpy as np
 from scipy import signal
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 TARGET_SFREQ = 250.0
 GRAD_WINDOW = 21   # volumes averaged per gradient template
 BCG_WINDOW = 21    # heartbeats averaged per BCG template

@@ -18,7 +18,7 @@ notes/
 private/
 
 # results: share the summary and figures, not per-epoch tables
-results/*
-!results/summary.json
-!results/per_subject.csv
-!results/*.png
+studies/*/results/*
+!studies/*/results/summary.json
+!studies/*/results/per_subject.csv
+!studies/*/results/*.png

@@ -1,71 +1,50 @@
-# Does preprocessing matter? Sleep staging from EEG recorded inside an MRI scanner
+# Sleep EEG-fMRI
 
 **Bhagyashree Besra** · started October 2026 · work in progress
 
-EEG recorded during fMRI is buried under scanner and heartbeat artefacts hundreds of times larger than brain activity. Labs routinely remove them before analysis, but how much does that cleaning actually change what a sleep-staging model can learn?
+Research on sleep and wakefulness using EEG recorded simultaneously with fMRI. The project is built in stages, each a reusable part of the pipeline, and answers its research questions as separate studies that share that pipeline.
 
-This project answers that with an **ablation study**: the same sleep-staging classifier, trained and tested on the same people and the same expert labels, using three versions of the same EEG:
+## Pipeline stages
 
-| Arm | EEG used |
-|---|---|
-| **raw** | Straight from the dataset: 5 kHz, nothing removed or filtered |
-| **filtered** | 0.3–40 Hz filter, 250 Hz, no artefact removal |
-| **cleaned** | Scanner (gradient) and heartbeat (ballistocardiogram) artefacts removed, then the same filter |
+| Stage | Folder | What it does | Status |
+|---|---|---|---|
+| **1. Preprocessing** | [`src/preprocessing`](src/preprocessing) | Removes MRI scanner and heartbeat artefacts, filters and resamples the EEG | Scanner + heartbeat removal done; residual peaks, bad channels, re-referencing, movement to do |
+| **2. Features** | [`src/features`](src/features) | Turns each 30-second epoch into numbers: band power, spectral shape, eye movements | Spectral features done; spindle detection to do |
+| **3. Research methods** | [`src/methods`](src/methods) | The analyses that answer each question: sleep-stage classification, alpha-rhythm analysis | In progress |
+| **4. Post-processing** | [`src/postprocessing`](src/postprocessing) | Statistics, figures and reports | Example figures done |
+
+## Studies
+
+| # | Question | Status |
+|---|---|---|
+| [01](studies/01-preprocessing-ablation) | **Does preprocessing matter?** The same sleep-staging classifier on raw, filtered-only and fully cleaned EEG | Running on all 33 people |
+| 02 | **Alpha before and after learning:** does individual alpha frequency change after a visual-motor task? | Planned |
 
 ## Data
 
-[OpenNeuro ds003768](https://openneuro.org/datasets/ds003768/versions/1.0.13): simultaneous EEG and fMRI from 33 healthy adults resting and napping in a 3T scanner, with expert sleep-stage labels for every 30 seconds (Gu et al., Penn State; CC0 licence). Analysed here: 32-channel EEG and the stage labels, 6,858 cleanly labelled epochs (wake 3,343, N1 2,148, N2 1,325, N3 42). N3 is too rare to model and is merged with N2.
-
-The data is not included in this repository; the scripts download it directly from OpenNeuro.
-
-## Methods
-
-1. **Scanner artefact:** average artefact subtraction locked to the R128 volume triggers, 21-volume sliding template (Allen, Josephs & Turner, 2000, *NeuroImage*).
-2. **Heartbeat artefact:** R-peaks detected in the ECG channel, then average artefact subtraction locked to each beat, 21-beat template (Allen et al., 1998, *NeuroImage*).
-3. **Filter and resample:** 0.3–40 Hz, 250 Hz.
-4. **Features (identical for every arm):** per 30-second epoch and per region (frontal, central, posterior, temporal): log and relative power in delta, theta, alpha, sigma and beta bands, 95% spectral edge, theta/alpha ratio, Hjorth mobility and complexity; slow and fast eye-channel power. 67 features, plus a ±2-epoch context average.
-5. **Model and testing:** gradient-boosted trees with balanced class weights, **leave-one-person-out** cross-validation (each person is scored by a model that never saw them), features robust-scaled within each person.
-6. **Statistics:** Cohen's kappa against the expert per person; arms compared with paired Wilcoxon signed-rank tests and bootstrap 95% confidence intervals.
-
-## Results so far
-
-Cleaning on participant 1 (sleep run 1, 15 minutes):
-
-| What | Before | After |
-|---|---|---|
-| Heartbeat artefact, O1, average over 1,229 beats | 86 µV peak-to-peak | 4 µV |
-| Sleep-spindle band (sigma, 12–16 Hz) power, scalp mean | 23.5 µV²/Hz | 7.2 µV²/Hz (3.3× lower) |
-| Beta band (16–30 Hz) power, scalp mean | 81.6 µV²/Hz | 1.3 µV²/Hz (62× lower) |
+[OpenNeuro ds003768](https://openneuro.org/datasets/ds003768/versions/1.0.13): simultaneous EEG and fMRI from 33 healthy adults resting and napping in a 3T scanner, with expert sleep-stage labels for every 30 seconds (Gu et al., Penn State; CC0 licence). The data is not stored in this repository; the scripts download it from OpenNeuro.
 
 ![Raw, gradient-corrected and fully cleaned EEG](figures/sub-01_task-sleep_run-1_stages.png)
 
-![Power spectrum before and after cleaning](figures/sub-01_task-sleep_run-1_psd.png)
+*Stage 1 on participant 1: raw in-scanner EEG (top), after scanner-artefact removal (middle) and after heartbeat removal (bottom).*
 
-Classifier comparison across all 33 people: **running**.
+## Repository layout
 
-## Status
-
-- [x] Scanner and heartbeat artefact removal
-- [x] Feature extraction for all three arms
-- [ ] Full 33-person feature build (in progress)
-- [ ] Classifier comparison and statistics
-- [ ] Remaining cleaning: residual 20–48 Hz peaks (optimal basis sets), bad channels, mastoid re-reference, movement bursts
-- [ ] Individual alpha frequency before vs after a visual-motor learning task
-
-## Known limitations
-
-- Narrow residual artefact peaks between 20 and 48 Hz remain after cleaning (visible in the spectrum above).
-- Naps in a scanner contain almost no deep sleep (N3), and only 16 of 33 people have 10 or more minutes of N2.
-- 33 people is a small sample; results are reported per person with confidence intervals, not only as one pooled number.
+```
+src/            reusable pipeline code, one folder per stage
+studies/        one folder per research question: its scripts, results and write-up
+figures/        figures shared across studies
+```
 
 ## Reproduce
 
 ```bash
-python -m venv .venv && .venv/Scripts/pip install -r requirements.txt   # Windows; use .venv/bin on Linux/macOS
-python src/build_dataset.py            # downloads, cleans and extracts features (~5 h; ~0.5 GB disk at a time)
-python src/train_eval.py               # leave-one-person-out comparison -> results/
-python src/mr_artifacts.py <run.vhdr>  # cleaning figures for one recording
+python -m venv .venv && .venv/Scripts/pip install -r requirements.txt   # Windows; .venv/bin on Linux/macOS
+python src/preprocessing/mr_artifacts.py <recording.vhdr>              # clean one recording, with figures
+python src/postprocessing/example_figures.py                           # example figures for participant 1
 ```
+
+Each study's README gives the commands for that study.
 
 ## Citation
 

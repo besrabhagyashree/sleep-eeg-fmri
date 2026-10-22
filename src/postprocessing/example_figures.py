@@ -1,7 +1,7 @@
 """Example figures showing what each kind of data in ds003768 looks like (participant 1).
 
-Usage: python src/make_examples.py
-Needs: data/clean/sub-01_task-sleep_run-1_clean_raw.fif (from mr_artifacts.py),
+Usage: python src/postprocessing/example_figures.py
+Needs: data/clean/sub-01_task-sleep_run-1_clean_raw.fif (from preprocessing/mr_artifacts.py),
        data/raw/sourcedata/sub-01-sleep-stage.tsv, sub-01 T1w and rest run-1 BOLD.
 """
 from pathlib import Path
@@ -14,7 +14,7 @@ import nibabel as nib
 import numpy as np
 import pandas as pd
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 RAW = ROOT / "data" / "raw"
 OUT = ROOT / "figures" / "examples"
 OUT.mkdir(parents=True, exist_ok=True)

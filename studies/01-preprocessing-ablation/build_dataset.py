@@ -10,9 +10,9 @@ Recordings are downloaded one at a time and deleted after use, so disk use stays
 Output: data/features/sub-XX.csv (one row per epoch per arm) + data/features/qc.csv.
 
 Usage:
-    python src/build_dataset.py                 # all 33 participants (skips finished ones)
-    python src/build_dataset.py --subjects 01   # just one
-    python src/build_dataset.py --keep-raw      # don't delete downloaded EEG
+    python studies/01-preprocessing-ablation/build_dataset.py                 # all 33 participants (skips finished ones)
+    python studies/01-preprocessing-ablation/build_dataset.py --subjects 01   # just one
+    python studies/01-preprocessing-ablation/build_dataset.py --keep-raw      # don't delete downloaded EEG
 """
 from __future__ import annotations
 
@@ -29,11 +29,11 @@ import mne
 import numpy as np
 import pandas as pd
 
-sys.path.insert(0, str(Path(__file__).parent))
-from features import epoch_features                                   # noqa: E402
-from mr_artifacts import TARGET_SFREQ, r_peaks, remove_bcg, remove_gradient, volume_onsets  # noqa: E402
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
+from features.spectral import epoch_features                                   # noqa: E402
+from preprocessing.mr_artifacts import TARGET_SFREQ, r_peaks, remove_bcg, remove_gradient, volume_onsets  # noqa: E402
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 S3 = "https://s3.amazonaws.com/openneuro.org"
 DS = "ds003768"
 RAW_DIR = ROOT / "data" / "raw"

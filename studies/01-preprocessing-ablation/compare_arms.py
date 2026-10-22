@@ -7,8 +7,8 @@ Per person (test fold) we compute Cohen's kappa against the expert, balanced acc
 macro F1. Arms are compared with paired Wilcoxon signed-rank tests on per-person kappa,
 plus a bootstrap 95% CI of the mean difference.
 
-Usage: python src/train_eval.py [--no-context] [--no-norm]
-Writes results/ per_subject.csv, summary.json, kappa_by_arm.png, confusion_matrices.png
+Usage: python studies/01-preprocessing-ablation/compare_arms.py [--no-context] [--no-norm]
+Writes studies/01-preprocessing-ablation/results/ per_subject.csv, summary.json, kappa_by_arm.png, confusion_matrices.png
 """
 import argparse
 import json
@@ -24,9 +24,9 @@ from sklearn.dummy import DummyClassifier
 from sklearn.ensemble import HistGradientBoostingClassifier
 from sklearn.metrics import balanced_accuracy_score, cohen_kappa_score, confusion_matrix, f1_score
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 FEAT = ROOT / "data" / "features"
-OUT = ROOT / "results"
+OUT = Path(__file__).resolve().parent / "results"
 META = ["subject", "session", "t", "stage", "arm"]
 CLASSES = ["W", "N1", "N2"]
 ARMS = ["raw", "filtered", "cleaned"]
