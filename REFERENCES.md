@@ -64,6 +64,7 @@ Every published method, metric, dataset, standard and software package this proj
 | Cohen, J. (1960). A coefficient of agreement for nominal scales. *Educational and Psychological Measurement*, 20(1), 37–46. [doi:10.1177/001316446002000104](https://doi.org/10.1177/001316446002000104) | Cohen's kappa, the agreement score |
 | Landis, J. R., & Koch, G. G. (1977). The measurement of observer agreement for categorical data. *Biometrics*, 33(1), 159–174. [doi:10.2307/2529310](https://doi.org/10.2307/2529310) | Kappa agreement bands and table colours (`participant_table.py`) |
 | Wilcoxon, F. (1945). Individual comparisons by ranking methods. *Biometrics Bulletin*, 1(6), 80–83. [doi:10.2307/3001968](https://doi.org/10.2307/3001968) | Paired comparisons between arms (`compare_arms.py`) |
+| Spearman, C. (1904). The proof and measurement of association between two things. *The American Journal of Psychology*, 15(1), 72–101. [doi:10.2307/1412159](https://doi.org/10.2307/1412159) | Rank correlation between heart rate and predictions in the residual-heartbeat check (`hr_check.py`) |
 | Efron, B. (1979). Bootstrap methods: another look at the jackknife. *The Annals of Statistics*, 7(1), 1–26. [doi:10.1214/aos/1176344552](https://doi.org/10.1214/aos/1176344552) | Bootstrap 95% confidence intervals (`compare_arms.py`) |
 
 ## Scientific software

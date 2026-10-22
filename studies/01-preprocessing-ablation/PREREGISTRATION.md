@@ -115,3 +115,13 @@ Following an automated code review:
 ## Amendment 4: OBS staging check on participant 1 (22 October 2026, before its result)
 
 At the author's request, the staging effect of OBS is checked on **participant 1 only**, as an exploratory follow-up to amendment 2 ([`obs_one_person.py`](obs_one_person.py)). Two arms, `obs_mne` and `obs_refined` (OBS with each beat detector), use the same recordings, epochs, Autoreject flags, exclusions, features, models and within-person leave-one-recording-out scoring as [`score_one_person.py`](score_one_person.py); only the heartbeat-removal method differs. The result is reported whatever it shows. It does **not** reopen the decision in amendment 2: that decision rests on signal preservation, and one person's staging score, with about 100 epochs, cannot outweigh it.
+
+## Amendment 5: residual-heartbeat check, two report versions (22 October 2026, before any comparison results)
+
+Because OBS is not used (amendment 2), some heartbeat artefact remains after average subtraction, and heart rate falls from wake into sleep. An exploratory check tests whether this residual influences classification ([`hr_check.py`](hr_check.py)):
+
+- **Heart rate per epoch:** 60 ÷ median R–R interval of the refined detector's beats in the epoch (ECG of the saved cleaned recording); epochs with fewer than 10 beats are left out.
+- **Per person and arm (wake vs N2, both models):** Spearman correlation between heart rate and "predicted N2", computed within true wake and within true N2 epochs (at least 5 epochs and both predictions present), then averaged.
+- **Across people:** Wilcoxon signed-rank test of those correlations against 0. A negative median would mean that, within a true stage, slower-heart epochs are more often called N2.
+
+**Two report versions.** Version A is the analysis as already registered. Version B is identical and adds this check at the end (`compare_arms.py --save-predictions`, then `hr_check.py`). The check changes no data, model or score, so the main results are the same in both. **Both versions are produced, and version B is the one reported:** the check's result is reported whatever it shows and cannot be dropped after it is seen. It is exploratory, not an established method, so it does not change which arm is judged better.

@@ -20,7 +20,7 @@ Pre-set analysis plan (fixed 22 Oct 2026, before results):
   stages, so scaling around each person's median would remove stage information); --norm runs
   it as a sensitivity analysis.
 
-Usage: python studies/01-preprocessing-ablation/compare_arms.py [--norm] [--no-context]
+Usage: python studies/01-preprocessing-ablation/compare_arms.py [--norm] [--no-context] [--save-predictions]
 Writes results/: per_subject.csv, summary.json, exclusions.csv, kappa_by_arm.png, confusion_matrices.png
 """
 import argparse
@@ -106,7 +106,7 @@ def prepare(d, feats, norm, context):
     return x.fillna(0).to_numpy()
 
 
-def evaluate(d, feats, classes, model, norm, context):
+def evaluate(d, feats, classes, model, norm, context, keep=None):
     d = d[d.stage.isin(classes)].reset_index(drop=True)
     X, y, subj = prepare(d, feats, norm, context), d.stage.to_numpy(), d.subject.to_numpy()
     pred = np.empty_like(y)
@@ -115,6 +115,8 @@ def evaluate(d, feats, classes, model, norm, context):
         if len(set(y[tr])) < len(classes):
             pred[te] = pd.Series(y[tr]).mode()[0]; continue
         m = make_model(model); m.fit(X[tr], y[tr]); pred[te] = m.predict(X[te])
+    if keep is not None:                                        # per-epoch predictions (--save-predictions)
+        keep.append(d[["subject", "session", "t", "stage"]].assign(pred=pred))
     rows = []
     for s in np.unique(subj):
         k = subj == s
@@ -144,12 +146,14 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--norm", action="store_true", help="per-person feature scaling (sensitivity analysis)")
     ap.add_argument("--no-context", action="store_true")
+    ap.add_argument("--save-predictions", action="store_true",
+                    help="also write results/predictions.csv (input to the amendment-5 heart-rate check)")
     args = ap.parse_args()
     d, excl = load()
     feats = [c for c in d.columns if c not in META]
     OUT.mkdir(exist_ok=True)
     excl.to_csv(OUT / "exclusions.csv", index=False)
-    per, pooled, cms, tests = [], {}, {}, {}
+    per, pooled, cms, tests, preds = [], {}, {}, {}, []
     # only the reference chosen by the amendment-1 rule is evaluated, and none before the rule is applied
     choice_file = OUT / "reference_choice.json"
     chosen = json.loads(choice_file.read_text())["choice"] if choice_file.exists() else None
@@ -158,7 +162,10 @@ def main():
     for task, classes in TASKS.items():
         for model in MODELS + ["chance"]:
             for arm in (ARMS + exploratory if model != "chance" else ["cleaned_mne"]):
-                r, p, cm = evaluate(d[d.arm == arm], feats, classes, model, args.norm, not args.no_context)
+                keep = [] if args.save_predictions else None
+                r, p, cm = evaluate(d[d.arm == arm], feats, classes, model, args.norm, not args.no_context, keep)
+                if keep:
+                    preds.append(keep[0].assign(arm=arm if model != "chance" else "chance", model=model, task=task))
                 r["arm"], r["model"], r["task"] = (arm if model != "chance" else "chance"), model, task
                 per.append(r); pooled[f"{task}/{model}/{arm}"] = p; cms[(task, model, arm)] = cm
                 print(f"{task:8s} {model:7s} {arm:9s} pooled kappa {p['kappa']:.3f}  bal.acc {p['bal_acc']:.3f}  "
@@ -174,6 +181,8 @@ def main():
                     tests[f"exploratory/{task}/{model}/{b}_vs_{a}"] = paired(wide[a], wide[b])
     per = pd.concat(per, ignore_index=True)
     per.to_csv(OUT / "per_subject.csv", index=False)
+    if preds:
+        pd.concat(preds, ignore_index=True).to_csv(OUT / "predictions.csv", index=False)
     clean = d[d.arm == "cleaned_mne"]
     preservation = {}
     for arm in ARMS + exploratory:
