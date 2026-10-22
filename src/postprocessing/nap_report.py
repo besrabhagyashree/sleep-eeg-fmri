@@ -86,7 +86,7 @@ def main():
     template = Path(sys.argv[1]) if len(sys.argv) > 1 else Path(__file__).with_name("nap_report_template.html")
     out = Path(sys.argv[2]) if len(sys.argv) > 2 else DATA / "report" / "nap-report.html"
     table = pd.read_csv(STUDY / "results" / "participants_table.csv", dtype={"participant": str}).set_index("participant")
-    done = sorted(p.stem.split("-")[1] for p in (DATA / "features_events").glob("sub-*.csv"))
+    done = sorted(p.stem.split("-")[1] for p in (DATA / "features").glob("sub-*.csv"))   # event charts only where events exist
     people = []
     for sub in done:
         if sub in table.index and (DATA / "qc" / f"sub-{sub}.csv").exists():
