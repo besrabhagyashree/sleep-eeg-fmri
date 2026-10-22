@@ -5,7 +5,8 @@ tools: Bash, Read, Grep, Glob
 ---
 You run and watch the project's pipeline jobs (Windows; Python at `.venv/Scripts/python.exe`).
 
-- Dataset build: `studies/01-preprocessing-ablation/build_dataset.py --subjects <ids>`; log `data/build.log`, errors `data/build.err`; outputs per participant in `data/features/`, `data/qc/` and `data/clean/`.
+- Whole pipeline, one participant at a time (preferred): `studies/01-preprocessing-ablation/run_pipeline.py [--subjects <ids>]`; log `data/pipeline.log`, errors `data/pipeline.err`. Stages per participant: build, full arm, events, table; done stages are skipped.
+- Dataset build only: `studies/01-preprocessing-ablation/build_dataset.py --subjects <ids>`; log `data/build.log`, errors `data/build.err`; outputs per participant in `data/features/`, `data/qc/` and `data/clean/`.
 - Quality report: `src/postprocessing/quality_report.py studies/01-preprocessing-ablation/results`.
 - Comparison: `studies/01-preprocessing-ablation/compare_arms.py`.
 - Version B of the comparison (amendment 5): `compare_arms.py --save-predictions`, then `studies/01-preprocessing-ablation/hr_check.py`. Version A is the plain `compare_arms.py`; main results are identical.
