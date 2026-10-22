@@ -1,4 +1,4 @@
-"""Compare sleep-staging performance across preprocessing arms (raw / filtered / cleaned).
+"""Compare sleep-staging performance across preprocessing arms (raw / filtered / cleaned x 2 detectors).
 
 Identical for every arm: epochs and people (after quality exclusions), features, temporal
 context, models and leave-one-person-out testing. Only the EEG the features came from differs.
@@ -8,9 +8,12 @@ Pre-set analysis plan (fixed 22 Oct 2026, before results):
   models  logistic regression (standardised features) and gradient-boosted trees
   test    leave-one-person-out; per-person Cohen's kappa; paired Wilcoxon signed-rank tests between
           arms + bootstrap 95% CI of the mean difference; stratified-chance baseline
-  quality exclusions (from the cleaned recording, applied to all arms):
-          epochs flagged by Autoreject; recordings with > 3 bad channels (rule 3);
-          people with > 25% of epochs flagged (rule 4)
+  quality exclusions (judged on the standard-cleaned recording, applied identically to all arms):
+          epochs the dataset's expert marked uncertain/unscorable (removed when building);
+          epochs flagged by Autoreject; recordings with > 3 PREP bad channels (10%);
+          people with > 25% of epochs flagged (common EEG conventions)
+  signal preservation: per person, is posterior alpha higher in wake than in N2 (the dataset's
+          expert labels)? Reported for every arm.
   per-person feature scaling is OFF in the main analysis (people differ greatly in their mix of
   stages, so scaling around each person's median would remove stage information); --norm runs
   it as a sensitivity analysis.
@@ -40,7 +43,9 @@ FEAT = ROOT / "data" / "features"
 QC = ROOT / "data" / "qc"
 OUT = Path(__file__).resolve().parent / "results"
 META = ["subject", "session", "t", "stage", "arm", "qc_epoch_bad"]
-ARMS = ["raw", "filtered", "cleaned"]
+ARMS = ["raw", "filtered", "cleaned_mne", "cleaned_refined"]
+PAIRS = [("raw", "cleaned_mne"), ("raw", "cleaned_refined"), ("filtered", "cleaned_mne"),
+         ("cleaned_mne", "cleaned_refined"), ("raw", "filtered")]
 TASKS = {"3class": ["W", "N1", "N2"], "w_vs_n2": ["W", "N2"]}
 MODELS = ["logreg", "gbm"]
 MAX_BAD_CHANNELS, MAX_BAD_EPOCH_PCT = 3, 25.0
@@ -66,13 +71,13 @@ def load():
         excl.append({"subject": r.subject, "session": r.session, "reason": f"> {MAX_BAD_CHANNELS} bad channels (rule 3)"})
     key = d.subject + "|" + d.session
     d = d[~key.isin(bad_rec.subject + "|" + bad_rec.session)]
-    clean = d[d.arm == "cleaned"]
+    clean = d[d.arm == "cleaned_mne"]
     pct = clean.groupby("subject").qc_epoch_bad.mean() * 100
     bad_people = pct[pct > MAX_BAD_EPOCH_PCT].index
     for s in bad_people:
         excl.append({"subject": s, "session": "all", "reason": f"{pct[s]:.0f}% epochs flagged > {MAX_BAD_EPOCH_PCT:.0f}% (rule 4)"})
     d = d[~d.subject.isin(bad_people)]
-    n_flag = int(d[d.arm == "cleaned"].qc_epoch_bad.sum())
+    n_flag = int(d[d.arm == "cleaned_mne"].qc_epoch_bad.sum())
     d = d[~d.qc_epoch_bad.astype(bool)]
     excl.append({"subject": "all", "session": "all", "reason": f"{n_flag} individual epochs flagged by Autoreject"})
     return d.sort_values(["arm", "subject", "session", "t"]).reset_index(drop=True), pd.DataFrame(excl)
@@ -136,7 +141,7 @@ def main():
     per, pooled, cms, tests = [], {}, {}, {}
     for task, classes in TASKS.items():
         for model in MODELS + ["chance"]:
-            for arm in (ARMS if model != "chance" else ["cleaned"]):
+            for arm in (ARMS if model != "chance" else ["cleaned_mne"]):
                 r, p, cm = evaluate(d[d.arm == arm], feats, classes, model, args.norm, not args.no_context)
                 r["arm"], r["model"], r["task"] = (arm if model != "chance" else "chance"), model, task
                 per.append(r); pooled[f"{task}/{model}/{arm}"] = p; cms[(task, model, arm)] = cm
@@ -146,16 +151,25 @@ def main():
                 continue
             sub = pd.concat(per)
             wide = sub[(sub.task == task) & (sub.model == model)].pivot(index="subject", columns="arm", values="kappa")
-            for a, b in [("raw", "cleaned"), ("filtered", "cleaned"), ("raw", "filtered")]:
+            for a, b in PAIRS:
                 tests[f"{task}/{model}/{b}_vs_{a}"] = paired(wide[a], wide[b])
     per = pd.concat(per, ignore_index=True)
     per.to_csv(OUT / "per_subject.csv", index=False)
-    clean = d[d.arm == "cleaned"]
+    clean = d[d.arm == "cleaned_mne"]
+    preservation = {}
+    for arm in ARMS:
+        a = d[(d.arm == arm) & d.stage.isin(["W", "N2"])]
+        m = a.pivot_table(index="subject", columns="stage", values="posterior_rel_alpha").dropna()
+        preservation[arm] = {"people_with_wake_and_n2": int(len(m)),
+                             "people_alpha_wake_gt_n2": int((m.W > m.N2).sum()),
+                             "median_wake_minus_n2": float((m.W - m.N2).median()) if len(m) else None}
+        print(f"alpha wake > N2  {arm:16s} {preservation[arm]['people_alpha_wake_gt_n2']} of {len(m)} people", flush=True)
     summary = {"n_people": int(clean.subject.nunique()), "n_epochs_per_arm": int(len(clean)),
                "class_counts": clean.stage.value_counts().to_dict(),
                "settings": {"per_person_norm": args.norm, "context_pm2": not args.no_context,
                             "models": MODELS, "tasks": TASKS, "cv": "leave-one-person-out",
                             "exclusions": "rules 3-4 + Autoreject epoch flags, identical for all arms"},
+               "signal_preservation_alpha": preservation,
                "pooled": pooled, "tests_on_per_person_kappa": tests}
     (OUT / "summary.json").write_text(json.dumps(summary, indent=2))
 
@@ -168,13 +182,16 @@ def main():
         ax.plot(xs, w[ARMS].median().values, color="#33318a", lw=3, marker="o", label="median person")
         ch = per[(per.task == task) & (per.model == "chance")].kappa.median()
         ax.axhline(ch, color="#b53b6d", ls="--", lw=1, label="chance (median)")
-        ax.set_xticks(xs, ["raw", "filtered only", "cleaned"]); ax.set_ylabel("Cohen's kappa vs expert")
+        ax.set_xticks(xs, ["raw", "filtered
+only", "cleaned
+(MNE)", "cleaned
+(refined)"]); ax.set_ylabel("Cohen's kappa vs expert")
         ax.set_title(f"{'Wake / N1 / N2' if task == '3class' else 'Wake vs N2'} (logistic regression)", loc="left")
         ax.grid(alpha=.25, axis="y"); ax.legend(frameon=False)
     fig.tight_layout(); fig.savefig(OUT / "kappa_by_arm.png", dpi=150); plt.close(fig)
 
     classes = TASKS["3class"]
-    fig, axes = plt.subplots(1, 3, figsize=(12, 3.8))
+    fig, axes = plt.subplots(1, 4, figsize=(16, 3.8))
     for ax, arm in zip(axes, ARMS):
         cm = cms[("3class", "logreg", arm)]; cmn = cm / cm.sum(1, keepdims=True)
         ax.imshow(cmn, cmap="Purples", vmin=0, vmax=1)

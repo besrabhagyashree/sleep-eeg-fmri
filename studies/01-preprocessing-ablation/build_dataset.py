@@ -17,6 +17,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import json
 import re
 import sys
 import time
@@ -31,7 +32,8 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
 from features.spectral import epoch_features                                   # noqa: E402
-from preprocessing.mr_artifacts import TARGET_SFREQ, r_peaks, remove_bcg, remove_gradient, volume_onsets  # noqa: E402
+from preprocessing.mr_artifacts import (TARGET_SFREQ, heart_rate_mne, r_peaks, r_peaks_mne,  # noqa: E402
+                                        remove_bcg, remove_gradient, volume_onsets)
 from preprocessing import quality                                      # noqa: E402
 
 SLICES_PER_VOLUME = 35            # from the dataset's BOLD headers (80 x 80 x 35 voxels); slice rate = 35 / TR
@@ -79,7 +81,7 @@ def load_labels(sub: str) -> pd.DataFrame:
 
 
 def to_250(data, info, span):
-    r = mne.io.RawArray(data[:, span], info.copy(), verbose="error")
+    r = mne.io.RawArray(data[:, span].copy(), info.copy(), verbose="error")   # copy: RawArray does not copy, and filter() is in place
     r.set_channel_types({"ECG": "ecg", "EOG": "eog"})
     r.filter(0.3, 40.0, picks="all", verbose="error")
     r.resample(TARGET_SFREQ, verbose="error")
@@ -96,7 +98,11 @@ def process_run(vhdr: Path, labels: pd.DataFrame, sub: str, session: str, eeg_ke
     onsets = volume_onsets(raw)
     qc = {"subject": sub, "session": session}
     qc.update(quality.file_check(vhdr.with_suffix(".eeg"), f"{S3}/{eeg_key}"))       # level 1
-    qc.update(quality.header_check(raw, onsets))
+    task = re.search(r"task-(\w+?)_", session).group(1)
+    sidecar = json.loads(download(f"{DS}/task-{task}_eeg.json").read_text())
+    qc.update(quality.header_check(raw, onsets, sidecar))
+    lab_all = labels[labels.session == session]
+    qc["expert_uncertain_or_unscorable"] = int(lab_all.stage.isna().sum())          # dataset's own flags
     if len(onsets) < 50:
         qc["status"] = "skipped: too few scanner triggers"
         return [], qc
@@ -116,37 +122,44 @@ def process_run(vhdr: Path, labels: pd.DataFrame, sub: str, session: str, eeg_ke
 
     add("raw", data[fi, span], sf)                             # A: untouched
     add("filtered", to_250(data, raw.info, span)[fi], TARGET_SFREQ)   # B: filter only
-    remove_gradient(data, onsets)                              # C: full cleaning (in place)
-    clean = to_250(data, raw.info, span)
-    peaks = r_peaks(clean[names.index("ECG")], TARGET_SFREQ)
-    hr = 60.0 / (np.median(np.diff(peaks)) / TARGET_SFREQ) if len(peaks) > 10 else np.nan
+    remove_gradient(data, onsets)                              # scanner artefact (shared by C and D)
+    grad = to_250(data, raw.info, span)
+    ecg = grad[names.index("ECG")]
     scalp = [i for i, c in enumerate(names) if c not in ("ECG", "EOG")]
-    if 40 <= hr <= 120:
-        before = clean[scalp].copy()
-        sub_data = clean[scalp]
-        remove_bcg(sub_data, peaks, TARGET_SFREQ)
-        clean[scalp] = sub_data
-        qc["bcg"] = "removed"
-        qc.update(quality.heartbeat_check(before, sub_data, peaks, TARGET_SFREQ, remove_bcg))   # level 4
-    else:
-        qc.update(bcg="skipped: implausible heart rate", heart_rate_bpm=float(hr))
-    add("cleaned", clean[fi], TARGET_SFREQ)
-
-    # quality checks on the cleaned recording (levels 2-4); the cleaned recording is kept for later studies
+    before = grad[scalp].copy()
+    ref_hz = heart_rate_mne(ecg, TARGET_SFREQ) / 60.0          # common heart rate for INPS
     info250 = mne.create_info(names, TARGET_SFREQ,
                               ["ecg" if c == "ECG" else "eog" if c == "EOG" else "eeg" for c in names])
-    clean_raw = mne.io.RawArray(clean.astype(np.float32), info250, verbose="error")
+    CLEAN_DIR.mkdir(parents=True, exist_ok=True)
+    cleaned = {}
+    # C: heartbeat removal with MNE's standard detector, unmodified; D: with timing refinement
+    for arm, detector in (("cleaned_mne", r_peaks_mne), ("cleaned_refined", r_peaks)):
+        x = grad.copy()
+        peaks = detector(ecg, TARGET_SFREQ)
+        stats = quality.heartbeat_detection_stats(peaks, TARGET_SFREQ)
+        tag = arm.split("_")[1]
+        qc.update({f"{k}_{tag}": v for k, v in stats.items()})
+        if 40 <= stats["heart_rate_bpm"] <= 120:
+            s = x[scalp]; remove_bcg(s, peaks, TARGET_SFREQ); x[scalp] = s
+            qc[f"inps_db_{tag}"] = quality.inps_db(before, s, ref_hz, TARGET_SFREQ)          # level 4
+        else:
+            qc[f"bcg_{tag}"] = "skipped: implausible heart rate"
+        add(arm, x[fi], TARGET_SFREQ)
+        cleaned[arm] = x
+        mne.io.RawArray(x.astype(np.float32), info250, verbose="error").save(
+            CLEAN_DIR / f"sub-{sub}_{session}_clean-{tag}_raw.fif", overwrite=True, verbose="error")
+
+    # channel and epoch quality on the standard-cleaned recording (MNE detector); used for all arms
+    std = mne.io.RawArray(cleaned["cleaned_mne"].astype(np.float32), info250, verbose="error")
     tr = np.median(np.diff(onsets)) / sf
-    qc.update(quality.slice_peak_db(clean[scalp], TARGET_SFREQ, SLICES_PER_VOLUME / tr))
-    qc.update(quality.channel_check(clean_raw))                                                 # level 2
+    qc.update(quality.slice_peak_db(cleaned["cleaned_mne"][scalp], TARGET_SFREQ, SLICES_PER_VOLUME / tr))
+    qc.update(quality.channel_check(std))                                                       # level 2
     bad_ch = [c for c in qc["bad_channels"].split(";") if c]
-    ep, flags = quality.epoch_check(clean_raw, lab.t.tolist(), bad_ch)                           # level 3
+    ep, flags = quality.epoch_check(std, lab.t.tolist(), bad_ch)                                # level 3
     qc.update(ep)
     bad_at = dict(zip(lab.t.tolist(), flags))
     for r in rows:
         r["qc_epoch_bad"] = bad_at[r["t"]]
-    CLEAN_DIR.mkdir(parents=True, exist_ok=True)
-    clean_raw.save(CLEAN_DIR / f"sub-{sub}_{session}_clean_raw.fif", overwrite=True, verbose="error")
     qc.update(status="ok")
     return rows, qc
 
@@ -171,10 +184,12 @@ def run_subject(sub: str, keep_raw: bool):
         qc["seconds"] = round(time.time() - t0)
         rows += r
         qcs.append(qc)
-        hr_ = qc.get("heart_rate_bpm")
+        hr_ = qc.get("heart_rate_bpm_mne")
         print(f"sub-{sub} {session}: {qc.get('status')} epochs={qc.get('n_epochs', 0)} "
               f"bad_epochs={qc.get('n_bad_epochs')} bad_ch={qc.get('n_bad_channels')} "
-              f"hr={None if hr_ is None else round(hr_, 1)} md5={qc.get('file_md5_ok')} {qc['seconds']}s", flush=True)
+              f"hr={None if hr_ is None else round(hr_, 1)} dbl_mne={qc.get('double_counts_mne')} "
+              f"inps_mne={qc.get('inps_db_mne', float('nan')):.2f} inps_ref={qc.get('inps_db_refined', float('nan')):.2f} "
+              f"md5={qc.get('file_md5_ok')} {qc['seconds']}s", flush=True)
         if not keep_raw:
             files[2].unlink(missing_ok=True)                    # the big .eeg file
     OUT_DIR.mkdir(parents=True, exist_ok=True)

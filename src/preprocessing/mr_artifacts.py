@@ -59,19 +59,32 @@ def remove_gradient(data: np.ndarray, onsets: np.ndarray, window: int = GRAD_WIN
     return seg_len, onsets
 
 
+def _mne_ecg(ecg: np.ndarray, sfreq: float):
+    raw = mne.io.RawArray(ecg[None].copy(), mne.create_info(["ECG"], sfreq, ["ecg"]), verbose="error")  # copy: never alter the caller's ECG
+    events, _, hr = mne.preprocessing.find_ecg_events(raw, ch_name="ECG", verbose="error")
+    return events[:, 0] - raw.first_samp, float(hr)
+
+
 def heart_rate_mne(ecg: np.ndarray, sfreq: float) -> float:
     """Average heart rate (bpm) from MNE's QRS detector: robust for the rate, imprecise for timing."""
-    raw = mne.io.RawArray(ecg[None], mne.create_info(["ECG"], sfreq, ["ecg"]), verbose="error")
-    _, _, hr = mne.preprocessing.find_ecg_events(raw, ch_name="ECG", verbose="error")
-    return float(hr)
+    return _mne_ecg(ecg, sfreq)[1]
+
+
+def r_peaks_mne(ecg: np.ndarray, sfreq: float) -> np.ndarray:
+    """R-peaks exactly as MNE-Python's standard ECG detector returns them (find_ecg_events).
+
+    The established EEG-toolbox method, used unmodified. On this in-scanner ECG it gets the heart
+    rate right but double-counts 7-14% of beats (see compare_qrs_detectors.py).
+    """
+    return _mne_ecg(ecg, sfreq)[0]
 
 
 def r_peaks(ecg: np.ndarray, sfreq: float) -> np.ndarray:
-    """R-peak samples from an in-scanner ECG trace.
+    """R-peaks with timing refinement: this study's documented adaptation of MNE's detector.
 
-    Band-pass 8-25 Hz and take the energy of the dominant polarity (precise timing). The
-    minimum distance between peaks is 0.6 x the beat interval given by MNE's heart-rate
-    estimate, so a T-wave or a residual artefact spike cannot be counted as an extra beat.
+    The heart rate comes from MNE's detector; each beat is placed at the peak of the 8-25 Hz ECG
+    energy, with at most one beat per 0.6 beat intervals so a T-wave or an artefact spike cannot
+    be counted as an extra beat. Not a published detector; compared against r_peaks_mne in study 01.
     """
     b, a = signal.butter(3, [8, 25], btype="band", fs=sfreq)
     x = signal.filtfilt(b, a, ecg)

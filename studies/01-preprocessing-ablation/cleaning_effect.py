@@ -18,7 +18,7 @@ BANDS = {"delta": (0.5, 4), "theta": (4, 8), "alpha": (8, 12), "sigma": (12, 16)
 
 
 def to_250(data, info, span):
-    r = mne.io.RawArray(data[:, span], info.copy(), verbose="error")
+    r = mne.io.RawArray(data[:, span].copy(), info.copy(), verbose="error")   # copy: RawArray does not copy, and filter() is in place
     r.set_channel_types({"ECG": "ecg", "EOG": "eog"})
     r.filter(0.3, 40.0, picks="all", verbose="error")
     r.resample(TARGET_SFREQ, verbose="error")

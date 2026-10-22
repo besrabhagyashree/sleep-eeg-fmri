@@ -21,7 +21,7 @@ Research on sleep and wakefulness using **EEG recorded simultaneously with fMRI*
 | | Uncleaned | Cleaned |
 |---|:---:|:---:|
 | 💓 Heartbeat artefact (O1, average of 1,229 beats) | 86 µV | **4 µV** |
-| 🌙 Sleep-spindle band power (12–16 Hz) | 23.5 µV²/Hz | **7.2 µV²/Hz** · 3.3× lower |
+| 🌙 Sleep-spindle band power (12–16 Hz) | 23.5 µV²/Hz | **7.1 µV²/Hz** · 3.3× lower |
 | 📡 Beta band power, mostly scanner noise (16–30 Hz) | 81.6 µV²/Hz | **1.3 µV²/Hz** · 62× lower |
 
 <sub>Participant 1, 15-minute sleep recording, mean of 30 scalp channels.</sub>
