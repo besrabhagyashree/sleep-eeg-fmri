@@ -21,6 +21,29 @@ from compare_arms import ARMS, META, TASKS, make_model, prepare  # noqa: E402
 ROOT = Path(__file__).resolve().parents[2]
 
 
+def score_arms(d, arms, feats):
+    """Leave-one-recording-out staging scores for each arm of one person's (quality-filtered) epochs."""
+    rows = []
+    for task, classes in TASKS.items():
+        for model in ("logreg", "gbm"):
+            for arm in arms:
+                a = d[(d.arm == arm) & d.stage.isin(classes)].reset_index(drop=True)
+                X, y, runs = prepare(a, feats, norm=False, context=True), a.stage.to_numpy(), a.session.to_numpy()
+                pred = np.empty_like(y)
+                for r in np.unique(runs):
+                    tr, te = runs != r, runs == r
+                    if len(set(y[tr])) < len(classes):
+                        pred[te] = pd.Series(y[tr]).mode()[0]; continue
+                    m = make_model(model); m.fit(X[tr], y[tr]); pred[te] = m.predict(X[te])
+                rows.append({"task": task, "model": model, "arm": arm, "n": len(y),
+                             "kappa": cohen_kappa_score(y, pred), "bal_acc": balanced_accuracy_score(y, pred)})
+                if task == "3class" and model == "logreg":
+                    cm = confusion_matrix(y, pred, labels=classes)
+                    print(f"\n{arm} (3-class, logistic regression) confusion, rows = expert {classes}, cols = predicted:")
+                    print(pd.DataFrame(cm, index=classes, columns=classes).to_string())
+    return pd.DataFrame(rows)
+
+
 def main(sub):
     d = pd.read_csv(ROOT / "data" / "features" / f"sub-{sub}.csv", dtype={"subject": str})
     q = pd.read_csv(ROOT / "data" / "qc" / f"sub-{sub}.csv", dtype={"subject": str})
@@ -38,25 +61,7 @@ def main(sub):
              "double_counts_refined", "inps_db_refined", "n_bad_channels", "bad_channels", "n_bad_epochs"]]
           .round(2).to_string(index=False))
 
-    rows = []
-    for task, classes in TASKS.items():
-        for model in ("logreg", "gbm"):
-            for arm in ARMS:
-                a = d[(d.arm == arm) & d.stage.isin(classes)].reset_index(drop=True)
-                X, y, runs = prepare(a, feats, norm=False, context=True), a.stage.to_numpy(), a.session.to_numpy()
-                pred = np.empty_like(y)
-                for r in np.unique(runs):
-                    tr, te = runs != r, runs == r
-                    if len(set(y[tr])) < len(classes):
-                        pred[te] = pd.Series(y[tr]).mode()[0]; continue
-                    m = make_model(model); m.fit(X[tr], y[tr]); pred[te] = m.predict(X[te])
-                rows.append({"task": task, "model": model, "arm": arm, "n": len(y),
-                             "kappa": cohen_kappa_score(y, pred), "bal_acc": balanced_accuracy_score(y, pred)})
-                if task == "3class" and model == "logreg":
-                    cm = confusion_matrix(y, pred, labels=classes)
-                    print(f"\n{arm} (3-class, logistic regression) confusion, rows = expert {classes}, cols = predicted:")
-                    print(pd.DataFrame(cm, index=classes, columns=classes).to_string())
-    res = pd.DataFrame(rows)
+    res = score_arms(d, ARMS, feats)
     kappa = res.pivot_table(index=["task", "model"], columns="arm", values="kappa")[ARMS].round(3)
     bacc = res.pivot_table(index=["task", "model"], columns="arm", values="bal_acc")[ARMS].round(3)
     print("\nscores (leave-one-recording-out within this person; kappa 0 = chance, 1 = perfect):")
