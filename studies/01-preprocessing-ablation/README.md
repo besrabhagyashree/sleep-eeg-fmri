@@ -37,6 +37,21 @@ Effect of cleaning on participant 1 (sleep run 1, 15 minutes; [`cleaning_effect.
 
 Classifier comparison across all 33 people: **running**.
 
+## Quality rules (set 22 Oct 2026, before the 33-person results)
+
+Fixed in advance so cleaning is judged against criteria, not adjusted to the results. No universal published threshold exists for "acceptable power loss" in EEG-fMRI cleaning; rules 1–2 are this study's own criteria, based on the method's theoretical cost. Rules 3–4 follow common EEG-research conventions.
+
+| # | Rule | Limit | How it's measured |
+|---|---|---|---|
+| 1 | **Brain signal lost to each artefact subtraction** | ≤ 5% of power in any band | Surrogate test: the same subtraction at random times ([`overcorrection_check.py`](overcorrection_check.py)) |
+| 2 | **Residual heartbeat artefact** | Heartbeat-locked average no larger than averages locked to random times | Same script, extended to all participants |
+| 3 | **Bad channels repaired by interpolation** | ≤ 10% of channels (3 of 30 scalp channels) per recording; more → recording excluded | Bad-channel step (planned) |
+| 4 | **Epochs rejected for artefact** | ≤ 25% of a person's epochs; more → person excluded from the main analysis and reported separately | Movement step (planned) |
+
+Every exclusion is listed in the results with its reason.
+
+**Check of rule 1 on participant 1, sleep run 1:** heartbeat subtraction at real beat times removes 22–57% of band power; at random times it removes 3.3–5.1% (± 0.3–0.6 over 20 surrogates). So 79–92% of what it removes is artefact, and the brain-signal cost (3.3–5.1%) is within the 5% limit. A spindle-contrast check (sigma share in N2 vs wake) did not shrink after cleaning (ratio 0.67 → 0.70) but has only 3 wake epochs here and will be repeated across all participants.
+
 ## What does cleaning remove?
 
 Measured on participant 1, sleep run 1, with [`data_accounting.py`](data_accounting.py):
