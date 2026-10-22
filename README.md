@@ -4,6 +4,7 @@
 </picture>
 
 <p align="center">
+  <a href="https://github.com/besrabhagyashree/sleep-eeg-fmri/actions/workflows/tests.yml"><img alt="Tests" src="https://img.shields.io/github/actions/workflow/status/besrabhagyashree/sleep-eeg-fmri/tests.yml?branch=main&label=tests&style=for-the-badge&logo=github"></a>
   <img alt="Status: work in progress" src="https://img.shields.io/badge/status-work%20in%20progress-f59e0b?style=for-the-badge">
   <img alt="Python 3.11" src="https://img.shields.io/badge/Python-3.11-3776AB?style=for-the-badge&logo=python&logoColor=white">
   <img alt="MNE-Python 1.13" src="https://img.shields.io/badge/MNE--Python-1.13-0b7285?style=for-the-badge">
