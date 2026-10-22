@@ -182,10 +182,7 @@ def main():
         ax.plot(xs, w[ARMS].median().values, color="#33318a", lw=3, marker="o", label="median person")
         ch = per[(per.task == task) & (per.model == "chance")].kappa.median()
         ax.axhline(ch, color="#b53b6d", ls="--", lw=1, label="chance (median)")
-        ax.set_xticks(xs, ["raw", "filtered
-only", "cleaned
-(MNE)", "cleaned
-(refined)"]); ax.set_ylabel("Cohen's kappa vs expert")
+        ax.set_xticks(xs, ["raw", "filtered\nonly", "cleaned\n(MNE)", "cleaned\n(refined)"]); ax.set_ylabel("Cohen's kappa vs expert")
         ax.set_title(f"{'Wake / N1 / N2' if task == '3class' else 'Wake vs N2'} (logistic regression)", loc="left")
         ax.grid(alpha=.25, axis="y"); ax.legend(frameon=False)
     fig.tight_layout(); fig.savefig(OUT / "kappa_by_arm.png", dpi=150); plt.close(fig)

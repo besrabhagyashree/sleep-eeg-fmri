@@ -22,3 +22,4 @@ studies/*/results/*
 !studies/*/results/summary.json
 !studies/*/results/per_subject.csv
 !studies/*/results/*.png
+!studies/*/results/preview_*.csv

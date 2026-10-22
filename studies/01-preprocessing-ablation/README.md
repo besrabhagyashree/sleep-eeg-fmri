@@ -60,6 +60,31 @@ Effect of cleaning on participant 1 (sleep run 1, 15 minutes; [`cleaning_effect.
 
 Classifier comparison across all 33 people: **running**.
 
+### Preview: participant 1 alone (not the study result)
+
+Scored with [`score_one_person.py`](score_one_person.py): trained on 4 of participant 1's recordings and tested on the fifth, rotating through all five. Same features, models, tasks and quality exclusions as the main analysis. 118 epochs kept (wake 38, N1 46, N2 34; 12 flagged by Autoreject). Full tables: [`results/preview_sub-01_scores.csv`](results/preview_sub-01_scores.csv), [`results/preview_sub-01_quality.csv`](results/preview_sub-01_quality.csv).
+
+**Sleep-staging agreement with the expert** (Cohen's kappa; 0 = chance, 1 = perfect)
+
+| Task | Model | Raw | Filtered | Cleaned (MNE) | Cleaned (refined) |
+|---|---|---|---|---|---|
+| Wake / N1 / N2 | Logistic regression | −0.03 | −0.06 | −0.01 | −0.04 |
+| Wake / N1 / N2 | Gradient boosting | 0.10 | −0.08 | 0.01 | −0.11 |
+| Wake vs N2 | Logistic regression | −0.11 | 0.09 | 0.03 | −0.10 |
+| Wake vs N2 | Gradient boosting | 0.12 | −0.04 | 0.03 | 0.23 |
+
+**Heartbeat removal** (INPS in dB, higher = more removed; double-counted beats in brackets)
+
+| Recording | MNE detector | Refined detector | Bad channels (PREP) | Epochs flagged |
+|---|---|---|---|---|
+| Rest 1 | 1.63 (54) | 1.37 (0) | Fp2 | 2 of 20 |
+| Rest 2 | 0.10 (8) | 0.05 (0) | — | 3 of 20 |
+| Sleep 1 | 0.99 (87) | 1.69 (0) | — | 5 of 30 |
+| Sleep 2 | 1.34 (122) | 2.10 (0) | — | 1 of 30 |
+| Sleep 3 | 0.88 (65) | 1.51 (0) | F8 | 1 of 30 |
+
+**Reading:** within participant 1, every arm stays near chance, and the order of the arms changes between rows, so this person alone cannot separate them. Likely reasons: about 90 training epochs for 134 features; recordings with very different stage mixes (rest 1 mostly N2, rest 2 mostly wake); and participant 1 being a hard case (in an earlier 5-person code test, wake vs N2 stayed at chance for them in both raw and cleaned data). The refined detector removed more heartbeat artefact in all three sleep recordings and never double-counted. In rest 2 both detectors removed almost nothing and disagree on the heart rate (65 vs 80 bpm): that recording's ECG needs investigating.
+
 ## Exploratory diagnostics (not used for scoring)
 
 These scripts use this study's own tests rather than established metrics, so they inform the method but never decide inclusion or results.
