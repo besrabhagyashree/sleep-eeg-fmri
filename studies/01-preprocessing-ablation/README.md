@@ -85,7 +85,7 @@ Only the EEG differs between arms. Epochs, people, quality exclusions, features,
 Updated each time a participant finishes processing, by [`participant_table.py`](participant_table.py). Click a heading to open its table.
 
 <!-- participants-table:start -->
-<img alt="progress" src="https://img.shields.io/badge/participants%20built-12%20of%2033-d97706?style=for-the-badge"> <img alt="percent" src="https://img.shields.io/badge/progress-36%25-33318a?style=for-the-badge">
+<img alt="progress" src="https://img.shields.io/badge/participants%20built-13%20of%2033-d97706?style=for-the-badge"> <img alt="percent" src="https://img.shields.io/badge/progress-39%25-33318a?style=for-the-badge">
 
 **Kappa colours** follow the Landis & Koch (1977) agreement bands: ⬛ ≤ 0 none · 🟥 0.01–0.20 slight · 🟧 0.21–0.40 fair · 🟨 0.41–0.60 moderate · 🟩 0.61–0.80 substantial · 💚 0.81–1.00 almost perfect
 
@@ -116,7 +116,8 @@ Logistic regression · Cohen's kappa vs the expert · – = not scored (fewer th
 | 10 | 🟥 0.17 | 🟧 0.24 | 🟧 0.39 | 🟧 0.40 | 🟧 0.30 | 🟧 0.40 | 🟨 0.44 | 🟨 0.50 |
 | 11 | 🟧 0.31 | 🟧 0.28 | 🟥 0.16 | 🟥 0.13 | ⬛ -0.11 | ⬛ -0.11 | 🟧 0.29 | 🟧 0.29 |
 | 12 | 🟥 0.14 | 🟧 0.34 | ⬛ -0.54 | ⬛ -0.47 | ⬛ -0.15 | ⬛ -0.16 | ⬛ -0.22 | ⬛ -0.24 |
-| **median** | **🟥 0.16** | **🟧 0.24** | **🟥 0.10** | **🟥 0.09** | **⬛ -0.04** | **⬛ -0.03** | **🟥 0.16** | **🟥 0.13** |
+| 13 | ⬛ -0.04 | ⬛ 0.00 | 🟥 0.11 | 🟥 0.06 | ⬛ -0.16 | ⬛ -0.15 | ⬛ -0.14 | ⬛ -0.12 |
+| **median** | **🟥 0.15** | **🟥 0.17** | **🟥 0.11** | **🟥 0.07** | **⬛ -0.04** | **⬛ -0.03** | **🟥 0.03** | **⬛ -0.03** |
 
 </details>
 
@@ -139,7 +140,7 @@ Logistic regression · Cohen's kappa vs the expert · – = not scored (fewer th
 | 10 | ✅ ok | 8 | 189 (107 / 40 / 42) | ✅ 14.1% | 0 | ✅ 1 | 2.89 / 2.34 | 65 / 0 |
 | 11 | ✅ ok | 8 | 146 (48 / 95 / 3) | ✅ 24.4% | 27 | ✅ 1 | 0.67 / 1.09 | 790 / 0 |
 | 12 | ✅ ok | 5 | 99 (61 / 29 / 9) | ✅ 23.8% | 0 | ✅ 1 | 3.24 / 3.50 | 64 / 0 |
-| 13 | ⏳ processing | | | | | | | |
+| 13 | ❌ excluded (> 25% epochs flagged) | 6 | 108 (86 / 9 / 13) | ❌ 32.5% | 0 | ✅ 2 | 0.82 / 0.96 | 272 / 0 |
 | 14 | ⏳ processing | | | | | | | |
 | 15 | ⏳ processing | | | | | | | |
 | 16 | ⏳ processing | | | | | | | |
