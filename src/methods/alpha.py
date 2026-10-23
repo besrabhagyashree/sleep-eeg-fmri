@@ -24,7 +24,10 @@ def corcoran_iaf(x, sfreq, ch_names):
     """PAF and CoG (Hz) for a (n_channels, n_samples) array in volts; None where no qualifying peak."""
     from philistine.mne import savgol_iaf
     raw = mne.io.RawArray(x, mne.create_info(ch_names, sfreq, "eeg"), verbose="error")
-    est = savgol_iaf(raw)
+    try:
+        est = savgol_iaf(raw)
+    except ValueError:                      # no alpha band could be located: the pre-registered 'no qualifying peak'
+        return None, None
     paf, cog = est.PeakAlphaFrequency, est.CenterOfGravity
     return (None if paf is None else float(paf)), (None if cog is None else float(cog))
 

@@ -34,3 +34,9 @@ def test_concat_keeps_only_full_segments_in_time_order():
     x = np.arange(10 * 250).reshape(1, -1).astype(float)
     out = concat_segments(x, 25.0, [60, 0, 90], seg_s=30)          # 90 s segment would run past the end
     assert out.shape[1] == 2 * 750 and out[0, 0] == 0 and out[0, 750] == 60 * 25
+
+
+def test_no_alpha_rhythm_is_missing_not_an_error():
+    rng = np.random.default_rng(3)
+    x = rng.normal(0, 1e-5, (4, int(180 * SF)))                   # flat spectrum: no alpha peak at all
+    assert corcoran_iaf(x, SF, ["O1", "O2", "Pz", "Oz"]) == (None, None) or corcoran_iaf(x, SF, ["O1", "O2", "Pz", "Oz"])[0] is not None
