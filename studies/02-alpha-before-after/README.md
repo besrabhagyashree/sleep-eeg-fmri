@@ -9,6 +9,10 @@
 > [!IMPORTANT]
 > **Primary hypothesis inconclusive.** Peak alpha frequency did not differ between the rest runs (median change 0.0 Hz, 4 higher / 4 lower / 4 unchanged, p = 1.0, n = 12). In exploratory analyses, **alpha power was higher after the task** (12 of 13 participants, p < 0.001; aperiodic-adjusted peak power 11 of 13, p = 0.010). Because the design has no control condition, this increase cannot be attributed to the task rather than to time spent in the scanner or changes in vigilance.
 
+![Study 02 overview: design, inclusion, mean spectra, per-participant alpha frequency and power, wake share](results/alpha_overview.png)
+
+The mean spectra (panel C) show the alpha increase after the task as a raised peak between 8 and 12 Hz; the narrow peaks above 20 Hz are residual scanner artefact, identical in both runs. Each line in panels D–E is one participant (green higher, red lower, grey unchanged; black the median).
+
 **Sample.** Only 13 of 29 participants had at least 3 minutes of usable wake in both runs: many participants were drowsy or asleep during the rest runs, especially the second (median wake share 0.50 in run 1, 0.75 in run 2; paired difference not significant, p = 0.42). A peak alpha frequency could be estimated in both runs for 12.
 
 ### Primary (pre-registered)
