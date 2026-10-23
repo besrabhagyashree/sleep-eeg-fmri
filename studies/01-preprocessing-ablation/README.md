@@ -169,6 +169,21 @@ The pattern replicated the spectral analysis: the contrast corresponding to H1 w
 
 Adding event features did not measurably change per-participant agreement (exploratory paired comparison with the spectral-only analysis, same arm: Δκ between −0.009 and 0.031, all p > 0.37). A likely reason is that the spectral set already captures the energy of these events (sigma and delta band power), and that spindles were rare in this in-scanner dataset. Event features therefore added no detectable information for staging here, and the conclusions of the primary analysis do not depend on the feature set.
 
+#### Validity of slow-wave detection across arms (exploratory)
+
+Although event features did not improve classification, the arms differed markedly in whether a published detector could recover physiologically plausible events. Slow waves increase from wake through N1 to N2, and are not expected in wake. For each participant with both stages (n = 25), the mean slow-wave rate (YASA, F4–M1) was compared between N2 and wake epochs (two-sided Wilcoxon signed-rank).
+
+| Arm | Median rate, events/min (W · N1 · N2) | N2 > W | W statistic, p | Wake epochs with ≥ 1 detection |
+|---|:---:|:---:|:---:|:---:|
+| Raw | 0.0 · 0.0 · 0.0 | 4 / 25 | 0, p = 0.068 | 1% |
+| Filtered | 5.7 · 7.0 · 11.5 | 20 / 25 | 44, p = 0.0008 | 74% |
+| AAS-MNE | 2.1 · 4.0 · 4.8 | 19 / 25 | 46, p = 0.001 | 52% |
+| AAS-refined | 2.0 · 3.8 · 4.7 | 20 / 25 | 28, p < 0.001 | 47% |
+
+Artefact correction had two effects on event detection. Relative to uncorrected data, it made detection possible: on raw recordings the detector returned almost no events, because gradient-artefact amplitude exceeded its plausibility limits. Relative to filtering alone, it improved specificity: the expected N2 > wake gradient was present in both filtered and corrected data, but filtered data yielded detections in 74% of wake epochs, and a median wake rate about three times that after correction (5.7 vs 2.1 events/min), consistent with residual scanner and ballistocardiogram activity being counted as slow waves. Detection was not fully specific after correction: 47–52% of wake epochs still contained at least one event, plausibly reflecting eye movements or residual cardiac activity at the frontal derivation. Thus, beyond its effect on staging accuracy, correction is a precondition for valid application of standard sleep-event detectors to in-scanner EEG.
+
+Spindle detection did not show a physiological pattern in any arm: no events were detected in raw or filtered data, and after correction spindle rates were higher in wake than in N2 (mean 0.97 vs 0.57 events/min; N2 > W in 8 of 25 participants). Because detection was run on the full recording without the hypnogram (to prevent label leakage), events in wake are likely false positives, possibly high-frequency alpha activity; this interpretation was not verified by inspecting the detected events.
+
 <details>
 <summary><b>📈 Per-participant κ by arm, and confusion matrices</b></summary>
 
