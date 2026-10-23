@@ -1,4 +1,4 @@
-<img alt="progress" src="https://img.shields.io/badge/participants%20built-31%20of%2033-d97706?style=for-the-badge"> <img alt="percent" src="https://img.shields.io/badge/progress-94%25-33318a?style=for-the-badge">
+<img alt="progress" src="https://img.shields.io/badge/participants%20built-32%20of%2033-d97706?style=for-the-badge"> <img alt="percent" src="https://img.shields.io/badge/progress-97%25-33318a?style=for-the-badge">
 
 **Kappa colours** follow the Landis & Koch (1977) agreement bands: ⬛ ≤ 0 none · 🟥 0.01–0.20 slight · 🟧 0.21–0.40 fair · 🟨 0.41–0.60 moderate · 🟩 0.61–0.80 substantial · 💚 0.81–1.00 almost perfect
 
@@ -48,7 +48,8 @@ Logistic regression · Cohen's kappa vs the expert · – = not scored (fewer th
 | 29 | 🟧 0.37 | 🟧 0.35 | 🟨 0.42 | 🟨 0.52 | ⬛ -0.02 | ⬛ -0.01 | ⬛ 0.00 | ⬛ 0.00 |
 | 30 | 🟥 0.14 | 🟥 0.12 | ⬛ -0.03 | 🟥 0.01 | 🟩 0.64 | 🟥 0.20 | 🟨 0.59 | 🟨 0.56 |
 | 31 | ⬛ -0.01 | 🟥 0.07 | 🟧 0.34 | 🟥 0.02 | ⬛ -0.10 | 🟧 0.29 | 🟥 0.11 | ⬛ -0.05 |
-| **median** | **🟥 0.15** | **🟥 0.18** | **🟥 0.11** | **🟥 0.09** | **🟥 0.04** | **🟥 0.15** | **🟧 0.28** | **🟥 0.17** |
+| 32 | ⬛ -0.14 | ⬛ -0.18 | ⬛ -0.12 | ⬛ -0.08 | ⬛ -0.14 | ⬛ -0.14 | ⬛ -0.12 | 🟥 0.03 |
+| **median** | **🟥 0.15** | **🟥 0.17** | **🟥 0.11** | **🟥 0.09** | **⬛ 0.00** | **🟥 0.15** | **🟧 0.26** | **🟥 0.11** |
 
 </details>
 
@@ -90,7 +91,7 @@ Logistic regression · Cohen's kappa vs the expert · – = not scored (fewer th
 | 29 | ✅ ok | 9 | 222 (203 / 12 / 7) | ✅ 11.2% | 0 | ✅ 2 | 2.02 / 2.86 | 764 / 153 |
 | 30 | ✅ ok | 8 | 184 (96 / 72 / 16) | ✅ 15.6% | 2 | ✅ 2 | 4.95 / 5.10 | 11 / 0 |
 | 31 | ❌ excluded (> 25% epochs flagged) | 8 | 138 (9 / 72 / 57) | ❌ 37.3% | 0 | ✅ 0 | 0.41 / 0.64 | 826 / 0 |
-| 32 | ⏳ processing | | | | | | | |
+| 32 | ✅ ok | 10 | 236 (198 / 21 / 17) | ✅ 12.6% | 10 | ✅ 1 | 0.71 / 0.78 | 1837 / 445 |
 | 33 | ⏳ processing | | | | | | | |
 
 </details>
