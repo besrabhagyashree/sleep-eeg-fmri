@@ -79,20 +79,20 @@ def load(events=False):
         d = pd.concat([d, full[full.subject.isin(d.subject.unique())]], ignore_index=True)
     if events:  # registered arms only, epochs that have event features
         ev = pd.concat([pd.read_csv(f, dtype={"subject": str}) for f in sorted(FEAT_EVENTS.glob("sub-*.csv"))])
-        d = d[d.arm.isin(ARMS)].merge(ev.drop(columns=["stage", "qc_epoch_bad"], errors="ignore"),
+        d = d[d.arm.isin(ARMS)].merge(ev.drop(columns=["stage", "qc_epoch_bad", "derivations"], errors="ignore"),
                                       on=["subject", "session", "t", "arm"], how="inner")
     q = pd.concat([pd.read_csv(f, dtype={"subject": str}) for f in sorted(QC.glob("sub-*.csv"))], ignore_index=True)
     excl = []
     bad_rec = q[q.n_bad_channels.fillna(0) > MAX_BAD_CHANNELS][["subject", "session"]]
     for _, r in bad_rec.iterrows():
-        excl.append({"subject": r.subject, "session": r.session, "reason": f"> {MAX_BAD_CHANNELS} bad channels (rule 3)"})
+        excl.append({"subject": r.subject, "session": r.session, "reason": f"> {MAX_BAD_CHANNELS} bad channels (rule 4)"})
     key = d.subject + "|" + d.session
     d = d[~key.isin(bad_rec.subject + "|" + bad_rec.session)]
     clean = d[d.arm == "cleaned_mne"]
     pct = clean.groupby("subject").qc_epoch_bad.mean() * 100
     bad_people = pct[pct > MAX_BAD_EPOCH_PCT].index
     for s in bad_people:
-        excl.append({"subject": s, "session": "all", "reason": f"{pct[s]:.0f}% epochs flagged > {MAX_BAD_EPOCH_PCT:.0f}% (rule 4)"})
+        excl.append({"subject": s, "session": "all", "reason": f"{pct[s]:.0f}% epochs flagged > {MAX_BAD_EPOCH_PCT:.0f}% (rule 5)"})
     d = d[~d.subject.isin(bad_people)]
     n_flag = int(d[d.arm == "cleaned_mne"].qc_epoch_bad.sum())
     d = d[~d.qc_epoch_bad.astype(bool)]

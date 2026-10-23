@@ -4,6 +4,9 @@ Band powers from Welch spectra (Welch, 1967); Hjorth mobility and complexity (Hj
 feature design follows common sleep-staging practice (e.g. Vallat & Walker, 2021). Full
 citations: REFERENCES.md.
 
+Band limits are half-open, lo <= f < hi (e.g. alpha 8-12 Hz excludes the 12 Hz bin; total power 0.5-30 Hz
+excludes 30 Hz), with 0.25 Hz Welch bins.
+
 One 30-second epoch (n_channels x n_samples, volts) -> one feature row. Works at any sampling
 rate, so raw 5 kHz data and cleaned 250 Hz data go through exactly the same code.
 """

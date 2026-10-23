@@ -60,7 +60,7 @@ def process_participant(sub):
         path = CLEAN / f"sub-{sub}_{session}_clean-mne_raw.fif"
         if not path.exists() or session not in qc.index:
             continue
-        excluded_rec = qc.loc[session, "n_bad_channels"] > MAX_BAD_CHANNELS     # pre-registered rule 3
+        excluded_rec = qc.loc[session, "n_bad_channels"] > MAX_BAD_CHANNELS     # pre-registered rule 4
         raw = mne.io.read_raw_fif(path, preload=True, verbose="error")
         bads = [b for b in str(qc.loc[session, "bad_channels"]).split(";") if b and b != "nan"]
         base = stages.interpolate_bad(stages.notch_known_peaks(raw), bads)          # steps 4b and 5
@@ -105,7 +105,7 @@ def choose_reference(scores: pd.DataFrame) -> tuple[str, pd.Series]:
 
 
 def excluded_people() -> set:
-    """People excluded by pre-registered rule 4 (> 25% of epochs flagged by Autoreject)."""
+    """People excluded by pre-registered rule 5 (> 25% of epochs flagged by Autoreject)."""
     out = set()
     for f in QC.glob("sub-*.csv"):
         q = pd.read_csv(f, dtype={"subject": str})

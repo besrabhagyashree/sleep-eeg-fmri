@@ -10,3 +10,5 @@
 Both work at any sampling rate, so raw 5 kHz data and cleaned 250 Hz data go through the same code.
 
 Event detection runs on the whole continuous recording, never sees the expert's stages, and uses the AASM recommended derivations, switching to the backup only when PREP marks an electrode bad: the recording reference (FCz) sits between Fz and Cz and cancels much of their activity. Not included: K-complexes, which have no detector of comparable standing in open software.
+
+Band edges: spectral bands are half-open (lo ≤ f < hi, e.g. alpha 8–12 Hz leaves out the 12 Hz bin); the alpha-peak search range is closed (7 ≤ f ≤ 13 Hz). Both use 4-s Welch windows (0.25 Hz bins).
