@@ -40,3 +40,4 @@ studies/*/results/*/*
 !studies/*/results/*/per_subject.csv
 !studies/*/results/*/exclusions.csv
 !studies/*/results/*/*.png
+!studies/*/results/per_participant.csv
