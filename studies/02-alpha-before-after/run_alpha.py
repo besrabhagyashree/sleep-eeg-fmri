@@ -71,21 +71,25 @@ def main():
         rows += participant(sub)
         r1, r2 = rows[-2], rows[-1]
         print(f"sub-{sub}: wake epochs {r1['n_wake_epochs']} / {r2['n_wake_epochs']} · PAF {r1.get('paf')} -> {r2.get('paf')}", flush=True)
-    d = pd.DataFrame(rows)
+    screened = pd.DataFrame(rows)
     OUT.mkdir(exist_ok=True)
+    counts = screened.pivot(index="subject", columns="run", values="n_wake_epochs")
+    qualified = sorted(counts.index[counts.min(axis=1) >= MIN_EPOCHS])
+    screened[["subject", "run", "n_wake_epochs", "wake_share"]].to_csv(OUT / "screening.csv", index=False)
+    d = screened[screened.subject.isin(qualified)]                   # every result uses the qualified participants only
     d.to_csv(OUT / "alpha_per_participant.csv", index=False)
     wide = d.pivot(index="subject", columns="run")
     tests = {}
     for m in ("paf", "cog", "fooof_cf", "fooof_power", "fooof_exponent", "alpha_log_power", "wake_share", "paf_equal_n"):
         if m in d:
             a, b = wide[m]["before"].astype(float), wide[m]["after"].astype(float)
-            tests[m] = {**paired(a, b), "median_before": float(a.median()), "median_after": float(b.median())}
+            both = a.notna() & b.notna()                                 # medians over the same participants as the test
+            tests[m] = {**paired(a, b), "median_before": float(a[both].median()), "median_after": float(b[both].median())}
     included = int(wide["paf"].dropna().shape[0]) if "paf" in d else 0
-    summary = {"n_participants": int(d.subject.nunique()),
-               "n_with_enough_wake_both_runs": int((wide["n_wake_epochs"].min(axis=1) >= MIN_EPOCHS).sum()),
-               "n_with_paf_both_runs": included, "primary": tests.get("paf"), "all": tests}
+    summary = {"n_screened": int(screened.subject.nunique()), "qualified": qualified,
+               "n_qualified": len(qualified), "n_with_paf_both_runs": included, "primary": tests.get("paf"), "all": tests}
     (OUT / "summary.json").write_text(json.dumps(summary, indent=2, default=float))
-    print(json.dumps({k: summary[k] for k in ("n_participants", "n_with_enough_wake_both_runs", "n_with_paf_both_runs", "primary")}, indent=1, default=float))
+    print(json.dumps({k: summary[k] for k in ("n_screened", "n_qualified", "qualified", "n_with_paf_both_runs", "primary")}, indent=1, default=float))
 
 
 if __name__ == "__main__":

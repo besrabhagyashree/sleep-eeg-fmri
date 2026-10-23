@@ -44,3 +44,4 @@ studies/*/results/*/*
 !studies/*/results/pairwise_auc.csv
 !studies/*/results/alpha_per_participant.csv
 !studies/*/results/threshold_*
+!studies/*/results/screening.csv
