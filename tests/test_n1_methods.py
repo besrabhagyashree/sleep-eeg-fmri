@@ -76,3 +76,15 @@ def test_decide_lowers_the_bar_for_the_target_class():
                   [0.20, 0.10, 0.70],        # N1 below threshold -> N2
                   [0.60, 0.20, 0.20]])       # N1 below threshold -> W
     assert list(decide(P, ["W", "N1", "N2"], "N1", 0.25)) == ["N1", "N2", "W"]
+
+
+def test_corner_and_f1_thresholds():
+    from methods.threshold import corner_threshold, f1_threshold
+    prob = np.r_[np.linspace(0.05, 0.30, 50), np.linspace(0.35, 0.60, 50)]
+    y = np.r_[np.zeros(50), np.ones(50)]
+    t, d = corner_threshold(y, prob)
+    assert 0.30 < t <= 0.35 and d == 0.0
+    P = np.column_stack([1 - prob, prob, np.zeros(100)])                  # classes W, N1, N2
+    labels = np.where(y == 1, "N1", "W")
+    t, f = f1_threshold(P, labels, ["W", "N1", "N2"], "N1")
+    assert 0.30 < t <= 0.35 and f == 1.0
