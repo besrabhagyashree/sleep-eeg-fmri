@@ -85,7 +85,7 @@ Only the EEG differs between arms. Epochs, people, quality exclusions, features,
 Updated each time a participant finishes processing, by [`participant_table.py`](participant_table.py). Click a heading to open its table.
 
 <!-- participants-table:start -->
-<img alt="progress" src="https://img.shields.io/badge/participants%20built-26%20of%2033-d97706?style=for-the-badge"> <img alt="percent" src="https://img.shields.io/badge/progress-79%25-33318a?style=for-the-badge">
+<img alt="progress" src="https://img.shields.io/badge/participants%20built-27%20of%2033-d97706?style=for-the-badge"> <img alt="percent" src="https://img.shields.io/badge/progress-82%25-33318a?style=for-the-badge">
 
 **Kappa colours** follow the Landis & Koch (1977) agreement bands: ⬛ ≤ 0 none · 🟥 0.01–0.20 slight · 🟧 0.21–0.40 fair · 🟨 0.41–0.60 moderate · 🟩 0.61–0.80 substantial · 💚 0.81–1.00 almost perfect
 
@@ -130,7 +130,8 @@ Logistic regression · Cohen's kappa vs the expert · – = not scored (fewer th
 | 24 | 🟥 0.04 | ⬛ -0.03 | 🟥 0.09 | 🟥 0.06 | 🟥 0.19 | 🟥 0.15 | 🟧 0.38 | 🟥 0.03 |
 | 25 | 🟥 0.11 | 🟥 0.16 | 🟥 0.05 | ⬛ -0.02 | ⬛ 0.00 | ⬛ 0.00 | ⬛ 0.00 | ⬛ 0.00 |
 | 26 | 🟥 0.18 | 🟥 0.18 | 🟧 0.34 | 🟧 0.21 | – | – | – | – |
-| **median** | **🟥 0.15** | **🟥 0.17** | **🟥 0.10** | **🟥 0.09** | **⬛ 0.00** | **🟥 0.09** | **🟧 0.26** | **🟥 0.11** |
+| 27 | 🟨 0.42 | 🟧 0.33 | 🟨 0.48 | 🟨 0.53 | 🟩 0.77 | 🟩 0.77 | 🟩 0.74 | 🟩 0.70 |
+| **median** | **🟥 0.15** | **🟥 0.18** | **🟥 0.10** | **🟥 0.09** | **🟥 0.04** | **🟥 0.12** | **🟧 0.28** | **🟥 0.17** |
 
 </details>
 
@@ -167,7 +168,7 @@ Logistic regression · Cohen's kappa vs the expert · – = not scored (fewer th
 | 24 | ✅ ok | 8 | 193 (96 / 46 / 51) | ✅ 12.3% | 0 | ✅ 0 | 1.50 / 2.74 | 2069 / 64 |
 | 25 | ✅ ok | 8 | 208 (63 / 128 / 17) | ✅ 5.5% | 0 | ✅ 2 | 4.47 / 5.61 | 102 / 0 |
 | 26 | ✅ ok | 8 | 175 (168 / 7 / 0) | ✅ 20.5% | 0 | ✅ 3 | 2.28 / 3.64 | 278 / 0 |
-| 27 | ⏳ processing | | | | | | | |
+| 27 | ✅ ok | 9 | 207 (51 / 75 / 81) | ✅ 16.5% | 2 | ✅ 1 | 1.36 / 1.55 | 1251 / 58 |
 | 28 | ⏳ processing | | | | | | | |
 | 29 | ⏳ processing | | | | | | | |
 | 30 | ⏳ processing | | | | | | | |
