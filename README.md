@@ -5,7 +5,7 @@
 
 <p align="center">
   <a href="https://github.com/besrabhagyashree/sleep-eeg-fmri/actions/workflows/tests.yml"><img alt="Tests" src="https://img.shields.io/github/actions/workflow/status/besrabhagyashree/sleep-eeg-fmri/tests.yml?branch=main&label=tests&style=for-the-badge&logo=github"></a>
-  <img alt="Status: work in progress" src="https://img.shields.io/badge/status-work%20in%20progress-f59e0b?style=for-the-badge">
+  <a href="studies/01-preprocessing-ablation#-results"><img alt="Study 01: results available" src="https://img.shields.io/badge/study%2001-results%20available-059669?style=for-the-badge"></a>
   <img alt="Python 3.11" src="https://img.shields.io/badge/Python-3.11-3776AB?style=for-the-badge&logo=python&logoColor=white">
   <img alt="MNE-Python 1.13" src="https://img.shields.io/badge/MNE--Python-1.13-0b7285?style=for-the-badge">
   <img alt="scikit-learn" src="https://img.shields.io/badge/scikit--learn-1.9-F7931E?style=for-the-badge&logo=scikitlearn&logoColor=white">
@@ -37,20 +37,20 @@ flowchart TB
 
     subgraph S1 ["1 · Preprocessing"]
         direction LR
-        P1["1 · Scanner<br/>artefact"]:::done --> P2["2 · Heartbeat<br/>artefact"]:::done --> P3["3 · Filter<br/>250 Hz"]:::done --> P4A["4a · OBS<br/>tested, not used"]:::rejected --> P4B["4b · Notch<br/>33.3 / 38.5 Hz"]:::done --> P5["5 · Bad<br/>channels"]:::done --> P6["6 · Re-<br/>reference"]:::wip --> P7["7 · Movement<br/>Autoreject"]:::done
+        P1["1 · Scanner<br/>artefact"]:::done --> P2["2 · Heartbeat<br/>artefact"]:::done --> P3["3 · Filter<br/>250 Hz"]:::done --> P4A["4a · OBS<br/>tested, not used"]:::rejected --> P4B["4b · Notch<br/>33.3 / 38.5 Hz"]:::done --> P5["5 · Bad<br/>channels"]:::done --> P6["6 · Re-reference<br/>linked mastoids"]:::done --> P7["7 · Movement<br/>Autoreject"]:::done
     end
     subgraph S2 ["2 · Features"]
         direction LR
-        F1["Band power · spectra"]:::done ~~~ F2["Spindles · slow waves<br/>alpha peak"]:::wip
+        F1["Band power · spectra"]:::done ~~~ F2["Spindles · slow waves<br/>alpha peak"]:::done
     end
     subgraph S3 ["3 · Research methods"]
         direction LR
-        M1["Sleep-stage classifier"]:::wip ~~~ M2["Alpha analysis"]:::todo
+        M1["Sleep-stage classifier"]:::done ~~~ M2["Alpha analysis"]:::todo
     end
     LAB["📋 Expert sleep labels<br/>every 30 seconds"]:::data
     subgraph S4 ["4 · Post-processing"]
         direction LR
-        Q1["Figures"]:::done ~~~ Q2["Statistics"]:::wip
+        Q1["Figures"]:::done ~~~ Q2["Statistics"]:::done
     end
 
     RAW --> S1 --> S2 --> S3 --> S4
@@ -76,20 +76,25 @@ flowchart TB
 
 | Stage | Folder | What it does | Status |
 |---|---|---|---|
-| 🧹 **1. Preprocessing** | [`src/preprocessing`](src/preprocessing) | Scanner and heartbeat artefact removal, filtering, notch, bad-channel repair, re-reference, movement exclusion; quality checks at every level | ![](https://img.shields.io/badge/7%20of%207%20steps-addressed-059669?style=flat-square) ![](https://img.shields.io/badge/reference-chosen%20at%2033%20people-d97706?style=flat-square) |
-| 📊 **2. Features** | [`src/features`](src/features) | Turns each 30-second epoch into band power, spectral shape and eye-movement numbers, plus sleep events (spindles, slow waves, alpha peak) as a second feature set | ![](https://img.shields.io/badge/spectral-done-059669?style=flat-square) ![](https://img.shields.io/badge/sleep%20events-built%2C%20runs%20after%20build-d97706?style=flat-square) |
-| 🔬 **3. Research methods** | [`src/methods`](src/methods) | The analyses that answer each question: sleep-stage classification, alpha rhythms | ![](https://img.shields.io/badge/classifier-in%20progress-d97706?style=flat-square) |
-| 📈 **4. Post-processing** | [`src/postprocessing`](src/postprocessing) | Statistics, figures and reports | ![](https://img.shields.io/badge/figures-done-059669?style=flat-square) ![](https://img.shields.io/badge/statistics-in%20progress-d97706?style=flat-square) |
+| 🧹 **1. Preprocessing** | [`src/preprocessing`](src/preprocessing) | Scanner and heartbeat artefact removal, filtering, notch, bad-channel repair, re-reference, movement exclusion; quality checks at every level | ![](https://img.shields.io/badge/7%20of%207%20steps-addressed-059669?style=flat-square) ![](https://img.shields.io/badge/reference-linked%20mastoids-059669?style=flat-square) |
+| 📊 **2. Features** | [`src/features`](src/features) | Turns each 30-second epoch into band power, spectral shape and eye-movement numbers, plus sleep events (spindles, slow waves, alpha peak) as a second feature set | ![](https://img.shields.io/badge/spectral-done-059669?style=flat-square) ![](https://img.shields.io/badge/sleep%20events-done-059669?style=flat-square) |
+| 🔬 **3. Research methods** | [`src/methods`](src/methods) | The analyses that answer each question: sleep-stage classification, alpha rhythms | ![](https://img.shields.io/badge/classifier-done-059669?style=flat-square) ![](https://img.shields.io/badge/alpha%20analysis-planned-94a3b8?style=flat-square) |
+| 📈 **4. Post-processing** | [`src/postprocessing`](src/postprocessing) | Statistics, figures and reports | ![](https://img.shields.io/badge/figures-done-059669?style=flat-square) ![](https://img.shields.io/badge/statistics-done%2C%20audited-059669?style=flat-square) |
 
 ## 🔬 Studies
 
 | # | Question | Status |
 |:---:|---|---|
-| [**01**](studies/01-preprocessing-ablation) | **Does preprocessing matter?** The same sleep-staging classifier on raw, filtered-only and fully cleaned EEG, tested on people it never saw | ![](https://img.shields.io/badge/running-33%20people-d97706?style=flat-square) |
+| [**01**](studies/01-preprocessing-ablation) | **Does preprocessing matter?** The same sleep-staging classifier on raw, filtered-only and fully cleaned EEG, tested on people it never saw | [![](https://img.shields.io/badge/complete-results-059669?style=flat-square)](studies/01-preprocessing-ablation#-results) |
 | **02** | **Alpha before and after learning:** does a person's alpha-rhythm frequency change after a visual-motor task? | ![](https://img.shields.io/badge/-planned-94a3b8?style=flat-square) |
 
 > [!IMPORTANT]
-> Study 01's classifier results across all 33 people are being computed now and will be added here when complete, whatever they show.
+> **Study 01 findings** (29 participants analysed; [full results](studies/01-preprocessing-ablation#-results)):
+> - **Primary hypothesis inconclusive.** Artefact correction did not significantly improve per-participant agreement with expert staging (Δκ = 0.056, 95% CI [−0.020, 0.137], p = 0.33). Filtering alone conferred no benefit, and the choice of heartbeat detector made no difference.
+> - **Correction removes a cardiac confound** (exploratory). On uncorrected data, classifier predictions covaried with heart rate within expert stages (p = 0.0007); after correction the association was weak and non-significant.
+> - **Correction enables valid sleep-event detection** (exploratory). A standard slow-wave detector found almost no events in uncorrected data and frequent events in wake in filtered data; after correction it retained the expected N2 > wake gradient with a threefold lower wake detection rate.
+> - **Benefit concentrated in participants who slept** (post hoc, n = 14): Δκ = 0.10–0.18, improved in 10–12 of 14; a hypothesis for a prospective study.
+> - Pre-registered with 9 dated amendments; all statistics independently recomputed by an audit script.
 
 ## 🗂️ Data
 
