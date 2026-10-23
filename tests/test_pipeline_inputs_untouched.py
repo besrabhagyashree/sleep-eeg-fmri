@@ -79,3 +79,24 @@ def test_label_line_with_space_instead_of_tab(tmp_path, monkeypatch):
     assert d.t.tolist() == [780.0, 810.0, 840.0]
     assert d.stage_raw.tolist() == ["1", "W", "W (uncertain)"]
     assert d.stage.tolist()[:2] == ["N1", "W"] and d.stage.isna().tolist()[2]
+
+
+def test_download_retries_after_a_stalled_connection(tmp_path, monkeypatch):
+    import io
+    import build_dataset
+    calls = {"n": 0}
+
+    class Fake(io.BytesIO):
+        def __enter__(self): return self
+        def __exit__(self, *a): return False
+
+    def fake_urlopen(url, timeout):
+        calls["n"] += 1
+        if calls["n"] == 1:
+            raise TimeoutError("read timed out")
+        return Fake(b"eeg-bytes")
+    monkeypatch.setattr(build_dataset, "RAW_DIR", tmp_path)
+    monkeypatch.setattr(build_dataset.urllib.request, "urlopen", fake_urlopen)
+    monkeypatch.setattr(build_dataset.time, "sleep", lambda s: None)
+    out = build_dataset.download("ds003768/sub-99/eeg/x.eeg")
+    assert out.read_bytes() == b"eeg-bytes" and calls["n"] == 2 and not out.with_suffix(".eeg.part").exists()

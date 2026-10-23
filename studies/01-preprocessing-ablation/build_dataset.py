@@ -22,6 +22,7 @@ import json
 import re
 import sys
 import time
+import urllib.error
 import urllib.parse
 import urllib.request
 import xml.etree.ElementTree as ET
@@ -62,13 +63,26 @@ def s3_list(prefix: str) -> list[str]:
         token = root.find("s:NextContinuationToken", ns).text
 
 
-def download(key: str) -> Path:
+def download(key: str, timeout: float = 60, tries: int = 5) -> Path:
+    """Download one dataset file. A stalled connection times out and is retried (it once hung for hours)."""
     dest = RAW_DIR / key.removeprefix(f"{DS}/")
-    if not dest.exists():
-        dest.parent.mkdir(parents=True, exist_ok=True)
-        tmp = dest.with_suffix(dest.suffix + ".part")
-        urllib.request.urlretrieve(f"{S3}/{key}", tmp)
-        tmp.replace(dest)
+    if dest.exists():
+        return dest
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    tmp = dest.with_suffix(dest.suffix + ".part")
+    for attempt in range(1, tries + 1):
+        try:
+            with urllib.request.urlopen(f"{S3}/{key}", timeout=timeout) as r, open(tmp, "wb") as f:
+                while chunk := r.read(1 << 20):
+                    f.write(chunk)
+            tmp.replace(dest)
+            return dest
+        except (OSError, urllib.error.URLError) as e:            # timeouts and dropped connections
+            tmp.unlink(missing_ok=True)
+            if attempt == tries:
+                raise
+            print(f"download retry {attempt}/{tries - 1} for {dest.name}: {e}", flush=True)
+            time.sleep(10 * attempt)
     return dest
 
 
