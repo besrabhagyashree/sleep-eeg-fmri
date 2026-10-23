@@ -9,3 +9,5 @@ pyprep==0.9.0
 scikit-learn==1.9.1
 scipy==1.17.1
 yasa==0.8.0
+fooof==1.1.1
+philistine==0.2.0
