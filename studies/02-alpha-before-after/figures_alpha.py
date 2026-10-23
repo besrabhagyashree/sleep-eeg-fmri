@@ -57,22 +57,8 @@ def design(ax):
     box(ax, 7.3, 0.6, 2.6, 1.1, "Rest run 2 · after", "10 min, then sleep runs", COL["after"])
     for a, b in ((2.75, 3.65), (6.35, 7.25)):
         ax.add_patch(FancyArrowPatch((a, 1.15), (b, 1.15), arrowstyle="-|>", mutation_scale=16, lw=2, color=INK2))
-    ax.text(5, 0.18, "Used: expert-scored wake epochs not rejected by Autoreject, posterior electrodes (O1, O2, Oz, P3, P4, Pz, P7, P8). "
-            "No control condition.", ha="center", fontsize=9.5, color=INK2)
-
-
-def inclusion(ax, d):
-    w = d.pivot(index="subject", columns="run", values="n_wake_epochs")
-    both = int((w.min(axis=1) >= MIN_EPOCHS).sum())
-    paf = int(d.pivot(index="subject", columns="run", values="paf").dropna().shape[0])
-    stages = [("Analysed in study 01", 29), ("≥ 3 min awake in both rest runs", both), ("Alpha peak found in both runs", paf)]
-    ax.set_title("B · Who could be included", loc="left", fontsize=12, fontweight="bold", color=INK)
-    y = np.arange(len(stages))[::-1]
-    ax.barh(y, [n for _, n in stages], color=[GRID, "#9ec5f4", COL["before"]], height=0.6)
-    for yi, (lab, n) in zip(y, stages):
-        ax.text(n + 0.5, yi, f"{n}", va="center", fontsize=11, fontweight="bold", color=INK)
-    ax.set_xlim(0, 33); ax.set_yticks(y, [lab for lab, _ in stages], fontsize=9)
-    ax.set_xlabel("participants (many dozed off during rest)", fontsize=9, color=INK2)
+    ax.text(5, 0.18, "Qualified participants only: 13 with at least 3 min of usable wake in both rest runs (12 with a measurable "
+            "alpha peak in both). Posterior electrodes; no control condition.", ha="center", fontsize=9.5, color=INK2)
 
 
 def spectra(ax, f, s):
@@ -113,14 +99,16 @@ def slopes(ax, d, col, title, ylabel, fmt, note):
 
 def wake_share(ax, d):
     w = d.pivot(index="subject", columns="run", values="wake_share")[["before", "after"]]
+    n = d.pivot(index="subject", columns="run", values="n_wake_epochs")
+    w = w.loc[n.index[n.min(axis=1) >= MIN_EPOCHS]]                 # qualified participants only
     x = np.arange(len(w))
     order = w.mean(axis=1).sort_values().index
     w = w.loc[order]
     ax.bar(x - 0.2, w.before, 0.4, color=COL["before"], label="before")
     ax.bar(x + 0.2, w.after, 0.4, color=COL["after"], label="after")
-    ax.set_xticks(x, w.index, fontsize=7.5); ax.set_ylim(0, 1.05)
+    ax.set_xticks(x, w.index, fontsize=8.5); ax.set_ylim(0, 1.12); ax.set_xlabel("participant", fontsize=9, color=INK2)
     ax.set_ylabel("share of rest run scored wake", fontsize=9, color=INK2)
-    ax.set_title("F · How awake each participant stayed during rest (all 29)", loc="left", fontsize=12, fontweight="bold", color=INK)
+    ax.set_title("B · Share of each rest run scored wake", loc="left", fontsize=12, fontweight="bold", color=INK)
     ax.legend(frameon=False, fontsize=9, ncol=2, loc="upper left"); ax.grid(axis="y", color=GRID); ax.set_axisbelow(True)
 
 
@@ -133,14 +121,14 @@ def main():
     plt.rcParams.update({"font.family": "DejaVu Sans", "figure.facecolor": SURFACE, "axes.facecolor": SURFACE,
                          "axes.edgecolor": GRID, "axes.spines.top": False, "axes.spines.right": False,
                          "xtick.color": INK2, "ytick.color": INK2})
-    fig = plt.figure(figsize=(16, 19))
-    gs = fig.add_gridspec(4, 3, height_ratios=[0.38, 1, 1.15, 0.8], hspace=0.36, wspace=0.45, top=0.945, bottom=0.04)
+    fig = plt.figure(figsize=(16, 15.5))
+    gs = fig.add_gridspec(3, 3, height_ratios=[0.42, 1, 1.15], hspace=0.36, wspace=0.45, top=0.935, bottom=0.05)
     fig.suptitle("Study 02 · Alpha rhythm before and after a visual-motor task", x=0.06, ha="left", y=0.99, fontsize=19,
                  fontweight="bold", color=INK)
-    fig.text(0.06, 0.966, "Peak alpha frequency did not change (primary, inconclusive); alpha power was higher after the task "
+    fig.text(0.06, 0.958, "Peak alpha frequency did not change (primary, inconclusive); alpha power was higher after the task "
              "(exploratory). No control condition, so the cause cannot be attributed to the task.", fontsize=10.5, color=INK2)
     design(fig.add_subplot(gs[0, :]))
-    inclusion(fig.add_subplot(gs[1, 0]), d)
+    wake_share(fig.add_subplot(gs[1, 0]), d)
     spectra(fig.add_subplot(gs[1, 1:]), f, spec)
     p, pw = s["paf"], s["alpha_log_power"]
     slopes(fig.add_subplot(gs[2, 0]), d, "paf", "D · Peak alpha frequency (primary)", "Hz",
@@ -149,7 +137,6 @@ def main():
            f"p = {pw['wilcoxon_p']:.4f}")
     slopes(fig.add_subplot(gs[2, 2]), d, "fooof_power", "E2 · Alpha peak above 1/f (FOOOF)", "aperiodic-adjusted power",
            None, f"p = {s['fooof_power']['wilcoxon_p']:.3f}")
-    wake_share(fig.add_subplot(gs[3, :]), d)
     out = OUT / "alpha_overview.png"
     fig.savefig(out, dpi=115, facecolor=SURFACE, bbox_inches="tight")
     print("saved", out.relative_to(ROOT))

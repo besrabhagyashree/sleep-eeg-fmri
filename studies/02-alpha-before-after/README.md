@@ -9,11 +9,11 @@
 > [!IMPORTANT]
 > **Primary hypothesis inconclusive.** Peak alpha frequency did not differ between the rest runs (median change 0.0 Hz, 4 higher / 4 lower / 4 unchanged, p = 1.0, n = 12). In exploratory analyses, **alpha power was higher after the task** (12 of 13 participants, p < 0.001; aperiodic-adjusted peak power 11 of 13, p = 0.010). Because the design has no control condition, this increase cannot be attributed to the task rather than to time spent in the scanner or changes in vigilance.
 
-![Study 02 overview: design, inclusion, mean spectra, per-participant alpha frequency and power, wake share](results/alpha_overview.png)
+![Study 02 overview: design, wake share, mean spectra, per-participant alpha frequency and power](results/alpha_overview.png)
 
-The mean spectra (panel C) show the alpha increase after the task as a raised peak between 8 and 12 Hz; the narrow peaks above 20 Hz are residual scanner artefact, identical in both runs. Each line in panels D–E is one participant (green higher, red lower, grey unchanged; black the median).
+All results and every panel use only the **qualified participants**: the 13 with at least 3 minutes of usable wake in both rest runs (02, 04, 05, 08, 10, 19, 20, 21, 22, 26, 28, 30, 33), of whom 12 had a measurable alpha peak in both runs. The mean spectra (panel C) show the alpha increase after the task as a raised peak between 8 and 12 Hz; the narrow peaks above 20 Hz are residual scanner artefact, identical in both runs. Each line in panels D–E2 is one participant (green higher, red lower, grey unchanged; black the median).
 
-**Sample.** Only 13 of 29 participants had at least 3 minutes of usable wake in both runs: many participants were drowsy or asleep during the rest runs, especially the second (median wake share 0.50 in run 1, 0.75 in run 2; paired difference not significant, p = 0.42). A peak alpha frequency could be estimated in both runs for 12.
+**Sample.** Of the 29 participants analysed in study 01, 16 did not qualify because they were drowsy or asleep for most of at least one rest run.
 
 ### Primary (pre-registered)
 
@@ -32,8 +32,10 @@ The positive mean reflects one participant (21: 8.0 → 12.0 Hz, estimated from 
 | **Alpha power, log10 µV², 8–12 Hz** | 13 | 2.12 | 2.29 | **+0.15 [0.09, 0.22]** | **12 / 1** | **< 0.001** |
 | **FOOOF aperiodic-adjusted alpha peak power** | 13 | 1.27 | 1.30 | **+0.11 [0.04, 0.19]** | **11 / 2** | **0.010** |
 | FOOOF aperiodic exponent | 13 | 1.90 | 1.93 | −0.02 [−0.12, 0.07] | 9 / 4 | 0.68 |
-| Share of rest run scored wake | 29 | 0.50 | 0.75 | +0.07 [−0.12, 0.24] | 14 / 9 | 0.42 |
+| Share of rest run scored wake, qualified participants† | 13 | 0.95 | 1.00 | +0.16 [0.02, 0.32] | 6 / 2 | 0.078 |
 | Peak alpha frequency, equal epochs per run (sensitivity) | 12 | 9.75 Hz | 10.13 Hz | +0.50 Hz [−0.13, 1.33] | 4 / 5 | 0.84 |
+
+†Deviation from the plan, which did not restrict this measure: it is reported here for the qualified participants only. Across all 29 analysed participants, as originally computed, the median wake share was 0.50 before and 0.75 after (+0.07 [−0.12, 0.24], 14 / 9, p = 0.42).
 
 Alpha power rose by 0.15 log units (about 1.4-fold) after the task, consistently across participants; the increase in alpha power above the aperiodic background indicates that it was not a broadband shift. The power result (p < 0.001) would survive Bonferroni correction across the eight secondary tests (adjusted p ≈ 0.004); the aperiodic-adjusted result would not (≈ 0.08). Alpha frequency measures showed no consistent change.
 
