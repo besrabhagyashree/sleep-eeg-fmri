@@ -182,7 +182,15 @@ Although event features did not improve classification, the arms differed marked
 
 Artefact correction had two effects on event detection. Relative to uncorrected data, it made detection possible: on raw recordings the detector returned almost no events, because gradient-artefact amplitude exceeded its plausibility limits. Relative to filtering alone, it improved specificity: the expected N2 > wake gradient was present in both filtered and corrected data, but filtered data yielded detections in 74% of wake epochs, and a median wake rate about three times that after correction (5.7 vs 2.1 events/min), consistent with residual scanner and ballistocardiogram activity being counted as slow waves. Detection was not fully specific after correction: 47–52% of wake epochs still contained at least one event, plausibly reflecting eye movements or residual cardiac activity at the frontal derivation. Thus, beyond its effect on staging accuracy, correction is a precondition for valid application of standard sleep-event detectors to in-scanner EEG.
 
-Spindle detection did not show a physiological pattern in any arm: no events were detected in raw or filtered data, and after correction spindle rates were higher in wake than in N2 (mean 0.97 vs 0.57 events/min; N2 > W in 8 of 25 participants). Because detection was run on the full recording without the hypnogram (to prevent label leakage), events in wake are likely false positives, possibly high-frequency alpha activity; this interpretation was not verified by inspecting the detected events.
+Spindle detection did not show a physiological pattern in any arm: no events were detected in raw or filtered data, and after correction spindle rates were higher in wake than in N2 (mean 0.97 vs 0.57 events/min; N2 > W in 8 of 25 participants). Because detection was run on the full recording without the hypnogram (to prevent label leakage), events in wake are likely false positives. Three exploratory checks (AAS-MNE arm) argue against misdetected alpha as their source and point to broadband fast activity:
+
+| Check | Result |
+|---|---|
+| Frequency of detected events | wake median 13.2 Hz (IQR 12.9–13.5) vs N2 13.1 Hz (12.8–13.5), Mann–Whitney p = 0.16; 6% of wake events below 12.5 Hz |
+| Wake epochs with vs without an event | posterior relative alpha lower (0.265 vs 0.293); central relative beta (16–30 Hz) higher (0.075 vs 0.062), within-participant in 19 of 23, Wilcoxon p = 0.006 |
+| Individual alpha frequency (strong-alpha wake epochs) | median 9.5 Hz (range 7.0–11.5); weak association with wake event rate, Spearman ρ = 0.37, p = 0.045, n = 29 |
+
+Wake events thus fall in the centre of the spindle band rather than at its lower edge, and co-occur with elevated beta rather than alpha power, consistent with muscle or arousal-related fast activity contributing energy in the 12–15 Hz range. This cannot be confirmed without an EMG channel, which the dataset does not include. Spindle features were therefore not valid markers of N2 in this analysis; descriptive spindle analyses in in-scanner EEG should restrict detection to scored N2, as the detector is intended to be used, rather than applying it to whole recordings.
 
 <details>
 <summary><b>📈 Per-participant κ by arm, and confusion matrices</b></summary>
