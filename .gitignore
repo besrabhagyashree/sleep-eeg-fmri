@@ -45,3 +45,5 @@ studies/*/results/*/*
 !studies/*/results/alpha_per_participant.csv
 !studies/*/results/threshold_*
 !studies/*/results/screening.csv
+!studies/*/results/per_run.csv
+!studies/*/results/*/per_run.csv
