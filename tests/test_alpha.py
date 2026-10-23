@@ -36,7 +36,8 @@ def test_concat_keeps_only_full_segments_in_time_order():
     assert out.shape[1] == 2 * 750 and out[0, 0] == 0 and out[0, 750] == 60 * 25
 
 
-def test_no_alpha_rhythm_is_missing_not_an_error():
+def test_spectrum_without_alpha_does_not_raise():
     rng = np.random.default_rng(3)
-    x = rng.normal(0, 1e-5, (4, int(180 * SF)))                   # flat spectrum: no alpha peak at all
-    assert corcoran_iaf(x, SF, ["O1", "O2", "Pz", "Oz"]) == (None, None) or corcoran_iaf(x, SF, ["O1", "O2", "Pz", "Oz"])[0] is not None
+    x = rng.normal(0, 1e-5, (4, int(180 * SF)))                   # flat spectrum: no alpha rhythm
+    paf, cog = corcoran_iaf(x, SF, ["O1", "O2", "Pz", "Oz"])      # missing (None) or a value, never an exception
+    assert paf is None or 7 <= paf <= 14
