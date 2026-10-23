@@ -95,6 +95,7 @@ flowchart TB
 | # | Question | Status |
 |:---:|---|---|
 | [**01**](studies/01-preprocessing-ablation) | **Does preprocessing matter?** The same sleep-staging classifier on raw, filtered-only and fully cleaned EEG, tested on people it never saw | [![](https://img.shields.io/badge/complete-results-059669?style=flat-square)](studies/01-preprocessing-ablation#-results) |
+| [**01b**](studies/01b-n1-classification) | **Improving N1:** do AASM-based features (alpha occupancy, eye movements) or sequence decoding improve classification of the hardest stage? | [![](https://img.shields.io/badge/complete-no%20significant%20gain-059669?style=flat-square)](studies/01b-n1-classification#results) |
 | **02** | **Alpha before and after learning:** does a person's alpha-rhythm frequency change after a visual-motor task? | ![](https://img.shields.io/badge/-planned-94a3b8?style=flat-square) |
 
 > [!IMPORTANT]

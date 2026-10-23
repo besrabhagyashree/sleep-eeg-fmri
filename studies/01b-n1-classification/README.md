@@ -38,7 +38,7 @@ Pooled F1 over all epochs, and the median per-participant κ (eligible participa
 | C | gradient boosting | 0.713 | 0.518 | 0.533 | 0.17 |
 | A + B + C | gradient boosting | 0.728 | 0.538 | 0.565 | 0.17 |
 | Baseline | logistic regression | 0.661 | 0.410 | 0.438 | 0.14 |
-| A | logistic regression | 0.734 | 0.458 | 0.493 | 0.22 |
+| A | logistic regression | 0.734 | 0.458 | 0.493 | 0.21 |
 | B | logistic regression | 0.656 | 0.448 | 0.455 | 0.13 |
 | A + B | logistic regression | 0.733 | 0.496 | 0.530 | 0.25 |
 | C | logistic regression | 0.643 | 0.372 | 0.447 | 0.08 |
