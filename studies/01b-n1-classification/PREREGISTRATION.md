@@ -36,3 +36,13 @@ The 29 participants analysed in study 01; the AAS-MNE arm (scanner and heartbeat
 - **Secondary (exploratory, uncorrected):** D vs baseline on N1 F1; for every method, per-participant Cohen's κ (three classes), macro F1 and the F1 of W and N2, to check that any N1 gain is not bought at the cost of other stages; the logistic-regression versions of A, B and C; the combination A + B + C.
 
 Results are reported whatever they show.
+
+## Amendment 1: N1 decision threshold chosen by Youden's J (23 October 2026, post hoc, before this analysis was run)
+
+**Post hoc.** Added after the study 01b results were seen: the two-class ROC analysis showed that the classifiers rank N1 epochs above chance in every participant, whereas the argmax decision rule produced small and inconsistent per-participant N1 F1 changes. This analysis asks whether a decision threshold chosen without the test participant's labels improves N1 classification. It is reported as exploratory and does not change the primary results above.
+
+- **Threshold.** For N1 vs all other epochs, the threshold maximising Youden's J (sensitivity + specificity − 1; Youden, 1950) on the ROC curve, searched over 0.05 to 0.95 in steps of 0.01.
+- **Chosen on training participants only (nested).** In each leave-one-participant-out fold, the 28 training participants are split into 4 participant-wise groups; models fitted on three groups predict the fourth, giving out-of-fold N1 probabilities for all training participants; the threshold is chosen on these. The model refitted on all 28 training participants is then applied to the held-out participant with that threshold. The held-out participant's labels are never used to set it.
+- **Decision rule.** An epoch is classified N1 if its N1 probability is at or above the threshold; otherwise it is assigned the more probable of W and N2.
+- **Analyses.** Gradient boosting with the baseline and A feature sets (primary); logistic regression with the baseline, A and A + B sets (secondary).
+- **Outcome and tests.** Per-participant N1 F1 (same 28 eligible participants), tuned threshold vs argmax for the same model and features; two-sided Wilcoxon signed-rank; Holm correction across the two gradient-boosting comparisons; bootstrap 95% CIs. Also reported: F1 of W and N2, macro F1, κ, and the chosen thresholds, so that any N1 gain bought at the cost of other stages is visible.
