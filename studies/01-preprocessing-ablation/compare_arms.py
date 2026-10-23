@@ -156,9 +156,17 @@ def main():
                     help="also write results/predictions.csv (input to the amendment-5 heart-rate check)")
     ap.add_argument("--feature-set", choices=["spectral", "events"], default="spectral",
                     help="events = spectral + sleep-event features (amendment 6); writes to results/events/")
+    ap.add_argument("--subjects", nargs="*", help="restrict to these participants (post-hoc subsets, amendment 8)")
+    ap.add_argument("--out", help="results sub-folder for a subset run, e.g. posthoc_sleepers")
     args = ap.parse_args()
     d, excl = load(events=args.feature_set == "events")
     out = OUT / "events" if args.feature_set == "events" else OUT
+    if args.subjects:                                            # same exclusions first, then the subset
+        d = d[d.subject.isin([s.zfill(2) for s in args.subjects])]
+        if not args.out:
+            ap.error("--subjects needs --out so subset results never overwrite the main results")
+    if args.out:
+        out = out / args.out
     feats = [c for c in d.columns if c not in META]
     out.mkdir(parents=True, exist_ok=True)
     excl.to_csv(out / "exclusions.csv", index=False)

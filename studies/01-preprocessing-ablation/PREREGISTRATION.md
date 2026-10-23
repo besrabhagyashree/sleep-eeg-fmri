@@ -141,3 +141,12 @@ Detection runs on each continuous recording without the expert's stages, so labe
 ## Amendment 7: event channels follow the AASM recommended derivations (22 October 2026, before any event-set results)
 
 Amendment 6 detected events on both hemispheres (C3–M2 and C4–M1, and so on). PREP marks the right mastoid, TP10 (M2), as bad in 40 of the first 149 recordings (10 participants), so half of those event measures were computed against a bad electrode. Events now follow the AASM manual exactly: the **recommended** derivations **F4–M1, C4–M1, O2–M1**, and the backups F3–M2, C3–M2, O1–M2 only when an electrode of the recommended derivation is marked bad by PREP. The same choice applies to every arm of a recording. The derivations used are stored with each row. Event features for all participants are recomputed with this rule before any event-set comparison is run.
+
+## Amendment 8: post-hoc sensitivity analysis on "sleepers" (23 October 2026, **after** partial main results were seen)
+
+**This analysis was not planned.** It was added at the author's request while the main comparison was running, after its partial output (pooled kappa per arm for some task and model combinations) had been printed. It is therefore **post hoc** and is reported only as a sensitivity analysis; it does not replace or qualify the main result.
+
+- **Subset:** participants who passed every quality rule **and** were awake for less than 50% of their usable epochs (expert labels): 01, 04, 07, 09, 11, 14, 15, 16, 18, 19, 23, 24, 25, 27 (n = 14). The 50% cut-off was chosen by the author before any per-arm result for this subset existed.
+- **Question:** does preprocessing matter differently for people who actually slept?
+- **Method:** identical to the main analysis (`compare_arms.py --subjects … --out posthoc_sleepers`): same features, models, tasks and tests, with leave-one-person-out among the 14. The fully cleaned arm uses the reference already chosen on all participants (amendment 1); nothing is re-chosen on the subset.
+- **Caveat:** n = 14 gives the paired tests less power than the main analysis.
