@@ -82,17 +82,32 @@ def participant(sub, table):
             "recordings": [r for r in recs if r["id"] in set(q[q.status == "ok"].index)], "staging": staging}
 
 
+def sleepers(table):
+    """Amendment-8 subset: passed every quality rule and awake for under 50% of usable epochs."""
+    wake = table.W / (table.W + table.N1 + table.N2)
+    return sorted(table.index[(table.status == "ok") & (wake < 0.5)])
+
+
 def main():
-    template = Path(sys.argv[1]) if len(sys.argv) > 1 else Path(__file__).with_name("nap_report_template.html")
-    out = Path(sys.argv[2]) if len(sys.argv) > 2 else DATA / "report" / "nap-report.html"
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--template", default=str(Path(__file__).with_name("nap_report_template.html")))
+    ap.add_argument("--out", default=str(DATA / "report" / "nap-report.html"))
+    ap.add_argument("--sleepers", action="store_true", help="only the amendment-8 sleepers (quality passed, awake < 50%)")
+    args = ap.parse_args()
+    template, out = Path(args.template), Path(args.out)
     table = pd.read_csv(STUDY / "results" / "participants_table.csv", dtype={"participant": str}).set_index("participant")
     done = sorted(p.stem.split("-")[1] for p in (DATA / "features").glob("sub-*.csv"))   # event charts only where events exist
+    if args.sleepers:
+        done = [s for s in done if s in sleepers(table)]
     people = []
     for sub in done:
         if sub in table.index and (DATA / "qc" / f"sub-{sub}.csv").exists():
             people.append(participant(sub, table))
             print(f"sub-{sub}: {sum(len(r['epochs']) for r in people[-1]['recordings'])} epochs", flush=True)
-    payload = {"people": people, "dataset": {"n_people": 33, "n3_minutes": 21.0}}
+    selection = ("Showing the 14 of 33 participants who passed every quality check and slept for at least half of "
+                 "their recorded time (the post-hoc 'sleepers' group, pre-registration amendment 8)." if args.sleepers else "")
+    payload = {"people": people, "dataset": {"n_people": 33, "n3_minutes": 21.0, "selection": selection}}
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(template.read_text(encoding="utf-8").replace("__DATA__", json.dumps(payload, separators=(",", ":"))), encoding="utf-8")
     print(f"wrote {out} ({out.stat().st_size / 1e6:.1f} MB, {len(people)} participants)")

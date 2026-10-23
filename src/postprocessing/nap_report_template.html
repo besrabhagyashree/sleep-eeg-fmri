@@ -128,6 +128,7 @@ td.k { font-weight: 500; }
 .pp.excl { border-style: dashed; }
 .pp:disabled { opacity: .35; cursor: default; }
 .pp:focus-visible { outline: 2px solid var(--n1); outline-offset: 2px; }
+.selection { flex-basis: 100%; margin: 0; font-size: 13px; color: var(--ink-2); }
 .status { display: inline-flex; gap: 6px; align-items: center; font-size: 12.5px; padding: 3px 10px; border-radius: 999px; border: 1px solid var(--line); color: var(--ink-2); width: fit-content; }
 .status.bad { border-color: var(--awake); color: #ffb48f; }
 .na { color: var(--pink-3); }
@@ -136,6 +137,7 @@ td.k { font-weight: 500; }
 <nav class="picker" aria-label="Choose a participant">
   <span class="lead">Participant</span>
   <div class="people" id="people"></div>
+  <p class="selection" id="selection" hidden></p>
 </nav>
 
 <div class="switch" role="group" aria-label="Choose a view">
@@ -293,10 +295,14 @@ const band = k => k === null ? "not scorable" : k < 0 ? "below chance" : k <= .2
 let P, recs, all, mins, total, asleep;
 
 // ---------- picker and view switch ----------
-el("people").innerHTML = Array.from({ length: DATA.dataset.n_people }, (_, i) => String(i + 1).padStart(2, "0")).map(id => {
+// a selection (e.g. the sleepers subset) lists only its participants; otherwise all 33, unprocessed ones greyed out
+const ids = DATA.dataset.selection ? DATA.people.map(p => p.participant)
+  : Array.from({ length: DATA.dataset.n_people }, (_, i) => String(i + 1).padStart(2, "0"));
+el("people").innerHTML = ids.map(id => {
   const p = DATA.people.find(x => x.participant === id);
   return `<button type="button" class="pp${p && p.status !== "ok" ? " excl" : ""}" data-id="${id}" ${p ? "" : "disabled title=\"not processed yet\""} aria-pressed="false">${id}</button>`;
 }).join("");
+if (DATA.dataset.selection) { el("selection").textContent = DATA.dataset.selection; el("selection").hidden = false; }
 el("people").addEventListener("click", e => { const b = e.target.closest(".pp"); if (b && !b.disabled) show(b.dataset.id); });
 for (const [id, view] of [["v-app", "app"], ["v-research", "research"]]) el(id).addEventListener("click", () => {
   el("layout").dataset.view = view; el("v-app").setAttribute("aria-pressed", view === "app"); el("v-research").setAttribute("aria-pressed", view === "research");
