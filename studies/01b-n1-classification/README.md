@@ -47,6 +47,20 @@ Pooled F1 over all epochs, and the median per-participant κ (eligible participa
 
 Secondary per-participant contrasts on N1 F1 (uncorrected): HMM decoding with logistic regression reduced N1 F1 (Δ = −0.076, 95% CI [−0.123, −0.035], worse in 19 of 28, p = 0.002); the YASA stager was markedly worse than the baseline (Δ = −0.343, worse in 24 of 28, p < 0.001); A with logistic regression (Δ = 0.025, p = 0.25) and A + B + C (gradient boosting Δ = −0.014, p = 0.59) did not differ significantly.
 
+### Can N1 be separated from wake and from N2? (exploratory, not pre-registered)
+
+![Study 01b overview: stage boundaries, ROC curves, per-participant AUC, N1 F1 by method, per-participant change](results/n1_overview.png)
+
+To examine each boundary separately, two-class logistic-regression models were fitted for each pair of stages (leave-one-participant-out) with the baseline, A and A + B feature sets, and scored by the area under the ROC curve (AUC; 0.5 = chance). This analysis was added after the pre-registered results were seen and has no significance tests; it is descriptive.
+
+| Boundary | Baseline | A | A + B | Participants above chance (best set) |
+|---|:---:|:---:|:---:|:---:|
+| W vs N1 | 0.74 | **0.79** | 0.79 | 26 / 26 |
+| N1 vs N2 | 0.70 | 0.73 | **0.74** | 18 / 21 |
+| W vs N2 | 0.83 | **0.90** | 0.89 | 19 / 19 |
+
+Pooled AUC; per-participant values in [`results/pairwise_auc.csv`](results/pairwise_auc.csv). N1 was separable from wake above chance in every participant, but only moderately, and alpha occupancy produced its largest improvement at this boundary, where the AASM criterion applies. The N1/N2 boundary was the hardest (3 of 21 participants at or below chance). The models therefore carry consistent information about N1; the difficulty lies in a decision rule that holds across participants, many of whom contribute few N1 epochs.
+
 ### Interpretation
 
 - **Alpha occupancy (A)** operationalises the AASM criterion that distinguishes wake from N1 and was the most consistent candidate: it raised pooled N1 and wake F1 and median κ with both classifiers. The per-participant N1 gain was small and inconsistent, partly because single 2-s periodograms flag about 15% of windows as alpha-present on a 1/f background alone (see the method's tests), which limits the measure's precision.
