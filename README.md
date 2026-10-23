@@ -54,7 +54,7 @@ flowchart TB
     end
     subgraph S3 ["3 · Research methods"]
         direction LR
-        M1["Sleep-stage classifier"]:::done ~~~ M2["Alpha analysis"]:::todo
+        M1["Sleep-stage classifier"]:::done ~~~ M2["Alpha analysis"]:::done
     end
     LAB["📋 Expert sleep labels<br/>every 30 seconds"]:::data
     subgraph S4 ["4 · Post-processing"]
@@ -87,7 +87,7 @@ flowchart TB
 |---|---|---|---|
 | 🧹 **1. Preprocessing** | [`src/preprocessing`](src/preprocessing) | Scanner and heartbeat artefact removal, filtering, notch, bad-channel repair, re-reference, movement exclusion; quality checks at every level | ![](https://img.shields.io/badge/7%20of%207%20steps-addressed-059669?style=flat-square) ![](https://img.shields.io/badge/reference-linked%20mastoids-059669?style=flat-square) |
 | 📊 **2. Features** | [`src/features`](src/features) | Turns each 30-second epoch into band power, spectral shape and eye-movement numbers, plus sleep events (spindles, slow waves, alpha peak) as a second feature set | ![](https://img.shields.io/badge/spectral-done-059669?style=flat-square) ![](https://img.shields.io/badge/sleep%20events-done-059669?style=flat-square) |
-| 🔬 **3. Research methods** | [`src/methods`](src/methods) | The analyses that answer each question: sleep-stage classification, alpha rhythms | ![](https://img.shields.io/badge/classifier-done-059669?style=flat-square) ![](https://img.shields.io/badge/alpha%20analysis-planned-94a3b8?style=flat-square) |
+| 🔬 **3. Research methods** | [`src/methods`](src/methods) | The analyses that answer each question: sleep-stage classification, alpha rhythms | ![](https://img.shields.io/badge/classifier-done-059669?style=flat-square) ![](https://img.shields.io/badge/alpha%20analysis-done-059669?style=flat-square) |
 | 📈 **4. Post-processing** | [`src/postprocessing`](src/postprocessing) | Statistics, figures and reports | ![](https://img.shields.io/badge/figures-done-059669?style=flat-square) ![](https://img.shields.io/badge/statistics-done%2C%20audited-059669?style=flat-square) |
 
 ## 🔬 Studies
@@ -96,7 +96,7 @@ flowchart TB
 |:---:|---|---|
 | [**01**](studies/01-preprocessing-ablation) | **Does preprocessing matter?** The same sleep-staging classifier on raw, filtered-only and fully cleaned EEG, tested on people it never saw | [![](https://img.shields.io/badge/complete-results-059669?style=flat-square)](studies/01-preprocessing-ablation#-results) |
 | [**01b**](studies/01b-n1-classification) | **Improving N1:** do AASM-based features (alpha occupancy, eye movements) or sequence decoding improve classification of the hardest stage? | [![](https://img.shields.io/badge/complete-no%20significant%20gain-059669?style=flat-square)](studies/01b-n1-classification#results) |
-| **02** | **Alpha before and after learning:** does a person's alpha-rhythm frequency change after a visual-motor task? | ![](https://img.shields.io/badge/-planned-94a3b8?style=flat-square) |
+| [**02**](studies/02-alpha-before-after) | **Alpha before and after learning:** does a person's alpha-rhythm frequency change after a visual-motor task? | [![](https://img.shields.io/badge/complete-frequency%20unchanged%2C%20power%20higher-059669?style=flat-square)](studies/02-alpha-before-after#results) |
 
 > [!IMPORTANT]
 > **Study 01 findings** (29 participants analysed; [full results](studies/01-preprocessing-ablation#-results)):
