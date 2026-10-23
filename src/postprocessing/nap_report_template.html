@@ -399,6 +399,11 @@ function heart() {
   } else { el("hrTitle").textContent = "Heart rate by stage"; el("hrText").textContent = "Not enough awake and sleep time (at least 2.5 minutes of each) to compare."; }
 }
 function waves() {
+  if (!all.some(e => e.sw !== null)) {                     // event features not computed yet for this person
+    el("swCompare").innerHTML = "";
+    el("swText").textContent = "Slow-wave counts for this participant are being recalculated with the corrected electrode pairs and will appear here soon.";
+    return;
+  }
   const v = {}; STAGES.forEach(s => { const x = all.filter(e => e.s === s && !e.bad && e.sw !== null).map(e => e.sw); if (x.length >= MIN_EP) v[s] = mean(x); });
   compareBars("swCompare", v, "/min", true);
   const deepest = ["N3", "N2"].find(s => v[s] !== undefined);
