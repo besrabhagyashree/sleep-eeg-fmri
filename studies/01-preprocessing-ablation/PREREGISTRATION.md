@@ -150,3 +150,12 @@ Amendment 6 detected events on both hemispheres (C3–M2 and C4–M1, and so on)
 - **Question:** does preprocessing matter differently for people who actually slept?
 - **Method:** identical to the main analysis (`compare_arms.py --subjects … --out posthoc_sleepers`): same features, models, tasks and tests, with leave-one-person-out among the 14. The fully cleaned arm uses the reference already chosen on all participants (amendment 1); nothing is re-chosen on the subset.
 - **Caveat:** n = 14 gives the paired tests less power than the main analysis.
+
+## Amendment 9: diagnosing spindle detections in wake (23 October 2026, exploratory)
+
+Event features (amendments 6 and 7) produced more spindle detections in wake than in N2, so detection without the hypnogram is not a valid marker of N2 here. Two checks drawn from the literature are added to understand this. Both are exploratory and descriptive; neither changes any feature, model or test of the study.
+
+1. **Peripheral-site check for muscle contamination** (Goncharova et al., 2003). Within wake, per participant, absolute beta power (16–30 Hz) in epochs with vs without a spindle detection, at temporal sites (T7, T8, TP9, TP10) and at central, frontal and posterior sites; muscle contamination predicts a rise that is largest temporally. **Disclosure:** this check was run before this amendment was written; its result (no rise at any site) is reported as found.
+2. **Spindle detection restricted to expert-scored N2**, as the detector is intended to be used (Lacourse et al., 2019; O'Reilly et al., 2015): YASA `spindles_detect` with default parameters on the AASM derivation (C4–M1; C3–M2 only when an electrode is PREP-bad), with the expert hypnogram passed so that only N2 and N3 epochs not rejected by Autoreject are searched. Run on the saved AAS-MNE and AAS-refined recordings of the 29 analysed participants. Reported per participant: N2 minutes searched, spindle count, density (per minute), mean frequency, duration and amplitude. Raw and filtered data are not re-run: unrestricted detection on them returned no spindles, so restricted detection cannot return any.
+
+Because hypnogram-restricted detection uses the expert labels, its output is never used as a classifier feature.
