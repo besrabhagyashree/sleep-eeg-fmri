@@ -1,7 +1,7 @@
 """Study 03 figures: every participant's hypnogram across the five runs, and the group overview.
 
-Usage: python studies/03-run-architecture/figures_architecture.py
-Writes results/hypnograms.png and results/run_overview.png
+Usage: python studies/03-run-architecture/figures_architecture.py [--group qualified|quality|all]
+Writes hypnograms.png and run_overview.png in the group's results folder
 """
 import json
 import sys
@@ -16,14 +16,19 @@ from matplotlib.patches import Patch, Rectangle
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
-from run_architecture import SHORT  # noqa: E402
+from run_architecture import GROUPS, SHORT  # noqa: E402
 
 OUT = HERE / "results"
 SURFACE, INK, INK2, GRID = "#fcfcfb", "#0b0b0b", "#52514e", "#e4e3df"
 STAGE_COL = {"W": "#f1d9a6", "1": "#8fbce6", "2": "#3a7fc4", "3": "#123f73"}     # wake warm; sleep one hue, light -> deep
 STAGE_NAME = {"W": "Wake", "1": "N1", "2": "N2", "3": "N3"}
 CLUSTER_COL = {1: "#b13b1f", 2: "#8a5cc2", 3: "#1f7a35", 4: "#eb6834"}
-CLUSTER_NAME = {1: "awake until sleep 3", 2: "dozed in rest 2 only", 3: "sleep builds across runs", 4: "sleepy throughout"}
+NAMES = {"qualified": {1: "awake in rest 1 and sleep 1", 2: "asleep in most runs"},
+         "quality": {1: "awake until sleep 3", 2: "dozed in rest 2 only", 3: "sleep builds across runs", 4: "sleepy throughout"}}
+LABEL = {"qualified": "the 14 qualified participants (passed quality, awake < 50%)",
+         "quality": "the 27 participants who passed study 01's quality rules and have all five runs",
+         "all": "all 31 participants with five runs (quality exclusions ignored)"}
+CLUSTER_NAME, GROUP = {}, "qualified"
 GAP = 3                                                              # epochs of white space between runs
 
 
@@ -37,7 +42,8 @@ def hypnograms(d):
     order = (d.groupby("subject").agg(cluster=("cluster", "first"), sleep=("sleep_share", "mean"))
              .sort_values(["cluster", "sleep"], ascending=[False, False]))
     subs = list(order.index)
-    fig, ax = plt.subplots(figsize=(16, 0.42 * len(subs) + 2.6))
+    H = 0.42 * len(subs) + 3.2
+    fig, ax = plt.subplots(figsize=(16, H))
     starts, x0 = {}, 0
     for r in SHORT:
         starts[r] = x0; x0 += (20 if "rest" in r else 30) + GAP
@@ -60,15 +66,15 @@ def hypnograms(d):
     ax.text(starts["rest 2"] - GAP / 2, len(subs) + 0.4, "task", ha="center", fontsize=8, color=INK2, style="italic")
     ax.set_xlim(-8, x0); ax.set_ylim(-1.2, len(subs) + 2.2); ax.axis("off")
     stage_h = [Patch(color=STAGE_COL[k], label=STAGE_NAME[k]) for k in STAGE_COL]
-    clus_h = [Patch(color=CLUSTER_COL[k], label=f"group {k}: {CLUSTER_NAME[k]}") for k in CLUSTER_COL]
+    clus_h = [Patch(color=CLUSTER_COL[k], label=f"group {k}: {CLUSTER_NAME.get(k, k)}") for k in sorted(d.cluster.dropna().unique().astype(int))]
     fig.legend(handles=stage_h + clus_h, loc="lower center", ncol=4, frameon=False, fontsize=9, bbox_to_anchor=(0.5, -0.01))
-    fig.suptitle("Study 03 · Every participant across rest 1, rest 2, sleep 1, sleep 2 and sleep 3", x=0.04, ha="left",
-                 fontsize=16, fontweight="bold", color=INK, y=0.995)
-    fig.text(0.04, 0.952, "One cell = one 30-s expert-scored epoch. Rows are grouped by the exploratory cluster (colour tab) "
+    fig.suptitle(f"Study 03 · Every participant across the five runs: {LABEL[GROUP]}", x=0.04, ha="left",
+                 fontsize=16, fontweight="bold", color=INK, y=1 - 0.1 / H, va="top")
+    fig.text(0.04, 1 - 0.55 / H, "One cell = one 30-s expert-scored epoch. Rows are grouped by the exploratory cluster (colour tab) "
              "and ordered by overall sleep. '+n?' = epochs the expert marked uncertain or unscorable;\n"
              "sub-23 (grey tab) has no scored epochs in rest 1 and sleep 2, so it is shown but not in the tests or clusters.",
-             fontsize=9.5, color=INK2)
-    fig.subplots_adjust(top=0.93, bottom=0.09, left=0.02, right=0.99)
+             fontsize=9.5, color=INK2, va="top")
+    fig.subplots_adjust(top=1 - 1.2 / H, bottom=0.7 / H, left=0.02, right=0.99)
     fig.savefig(OUT / "hypnograms.png", dpi=115, facecolor=SURFACE, bbox_inches="tight")
 
 
@@ -108,7 +114,7 @@ def cluster_profiles(ax, s):
         c = int(c); n = s["clusters_exploratory"]["sizes"][str(c)]
         v = [prof[r] for r in SHORT]
         ax.plot(range(5), v, color=CLUSTER_COL[c], lw=2.2, marker="o", ms=8, mec=SURFACE, mew=2)
-        ax.text(4.12, v[-1], f"{c}: {CLUSTER_NAME[c]} (n={n})", fontsize=8.5, color=INK, va="center")
+        ax.text(4.12, v[-1], f"{c}: {CLUSTER_NAME.get(c, c)} (n={n})", fontsize=8.5, color=INK, va="center")
     ax.set_xticks(range(5), SHORT, fontsize=9); ax.set_xlim(-0.2, 6.6); ax.set_ylim(-0.03, 1.03)
     ax.set_ylabel("mean sleep share", fontsize=9, color=INK2)
     k = s["clusters_exploratory"]["k"]; sil = s["clusters_exploratory"]["silhouette"][str(k)]
@@ -141,10 +147,9 @@ def overview(d, s):
     h1, h2 = s["H1_friedman_sleep_share"], s["H2_page_trend"]
     fig.suptitle("Study 03 · Sleep across the five runs of a session", x=0.05, ha="left", y=0.985, fontsize=18,
                  fontweight="bold", color=INK)
-    fig.text(0.05, 0.93, f"Sleep share differed across runs (Friedman p = {h1['p']:.3f}, n = {h1['n']}) and rose with run "
-             f"order (Page trend p = {h2['p']:.3f}); the rise is concentrated in sleep 3.\nExpert labels; "
-             f"{s['n']} participants passed study 01's quality rules and have all five runs; tests use {h1['n']} "
-             "(sub-23 has no scored epochs in two runs).", fontsize=10.5, color=INK2)
+    fig.text(0.05, 0.93, f"Expert labels; {LABEL[GROUP]}. Tests use {h1['n']} (sub-23 has no scored epochs in two runs).\n"
+             f"Sleep share across runs: Friedman p = {h1['p']:.3f} (Kendall's W = {h1['kendall_w']:.2f}); "
+             f"trend with run order: Page p = {h2['p']:.3f}.", fontsize=10.5, color=INK2)
     composition(fig.add_subplot(gs[0, 0]), d)
     spaghetti(fig.add_subplot(gs[0, 1]), d, "sleep_share", "B · Share of each run asleep", "sleep share (N1+N2+N3)",
               lambda v: f"{v:.0%}", "thin lines: one participant each · black: median")
@@ -157,6 +162,11 @@ def overview(d, s):
 
 
 def main():
+    import argparse
+    global OUT, CLUSTER_NAME, GROUP
+    ap = argparse.ArgumentParser(); ap.add_argument("--group", choices=GROUPS, default="qualified")
+    GROUP = ap.parse_args().group
+    OUT, CLUSTER_NAME = HERE / "results" / GROUPS[GROUP], NAMES.get(GROUP, {})
     style()
     d = pd.read_csv(OUT / "per_run.csv", dtype={"subject": str, "sequence": str})
     s = json.loads((OUT / "summary.json").read_text())

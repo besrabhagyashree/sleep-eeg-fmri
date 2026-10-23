@@ -4,8 +4,11 @@ Implements PREREGISTRATION.md: per-run sleep share (primary), stage shares, slee
 awakenings per hour, deepest stage; Friedman (H1) and Page trend (H2) tests, Holm-corrected secondaries, adjacent-pair
 Wilcoxon follow-ups, rest-vs-sleep trait correlation, and an exploratory Ward clustering of per-person profiles.
 
-Usage: python studies/03-run-architecture/run_architecture.py [--all]   (--all: sensitivity, quality exclusions ignored)
-Writes results/per_run.csv, results/clusters.csv and results/summary.json (results/sensitivity_all/ with --all)
+Usage: python studies/03-run-architecture/run_architecture.py [--group qualified|quality|all]
+  qualified (default, amendment 1): the 14 qualified sleepers -> results/
+  quality: the 29 who passed study 01's quality rules (the original plan) -> results/quality_passed/
+  all: quality exclusions ignored (sensitivity) -> results/sensitivity_all/
+Writes per_run.csv and summary.json in the group's folder
 """
 import argparse
 import json
@@ -29,6 +32,8 @@ LENGTH = {r: (600 if "rest" in r else 900) for r in RUNS}     # seconds (task si
 STAGES = {"W": "W", "1": "N1", "2": "N2", "3": "N3"}          # N3 kept separate here; uncertain / unscorable dropped
 DEPTH = {"W": 0, "N1": 1, "N2": 2, "N3": 3}
 EXCLUDED = {"03", "13", "17", "31"}                           # study 01, rule 5
+SLEEPERS = {"01", "04", "07", "09", "11", "14", "15", "16", "18", "19", "23", "24", "25", "27"}   # passed quality, awake < 50%
+GROUPS = {"qualified": "", "quality": "quality_passed", "all": "sensitivity_all"}
 EPOCH = 30
 
 
@@ -39,7 +44,7 @@ def run_measures(lab, run):
     s = st.dropna().to_numpy()
     hours = len(s) * EPOCH / 3600
     sleep = s != "W"
-    first = lambda m: float(t[m][0]) if m.any() else float(LENGTH[run])   # censored at the run length
+    first = lambda m: (float(t[m][0]) if m.any() else float(LENGTH[run])) if len(s) else np.nan   # censored at the run length; NaN if nothing scored
     out = {"run": SHORT[RUNS.index(run)], "n_scored": len(s), "n_uncertain": int(st.isna().sum()),
            "sleep_share": float(sleep.mean()) if len(s) else np.nan,
            **{f"{k}_share": float((s == k).mean()) if len(s) else np.nan for k in DEPTH},
@@ -91,11 +96,11 @@ def clusters(wide):
 
 
 def main():
-    ap = argparse.ArgumentParser(); ap.add_argument("--all", action="store_true"); a = ap.parse_args()
-    out = HERE / "results" / ("sensitivity_all" if a.all else ""); out.mkdir(parents=True, exist_ok=True)
+    ap = argparse.ArgumentParser(); ap.add_argument("--group", choices=GROUPS, default="qualified"); a = ap.parse_args()
+    out = HERE / "results" / GROUPS[a.group]; out.mkdir(parents=True, exist_ok=True)
     rows = []
     for sub in [f"{i:02d}" for i in range(1, 34)]:
-        if sub in EXCLUDED and not a.all:
+        if (a.group != "all" and sub in EXCLUDED) or (a.group == "qualified" and sub not in SLEEPERS):
             continue
         lab = load_labels(sub)
         if not set(RUNS) <= set(lab.session):
@@ -121,7 +126,7 @@ def main():
     rest, sleep = ss[SHORT[:2]].mean(axis=1), ss[SHORT[2:]].mean(axis=1)
     trait = spearmanr(rest, sleep)
     summary = {
-        "n": int(ss.shape[0]), "subjects": list(ss.index), "excluded_quality": [] if a.all else sorted(EXCLUDED),
+        "n": int(ss.shape[0]), "subjects": list(ss.index), "group": a.group,
         "H1_friedman_sleep_share": h1,
         "H2_page_trend": {"L": float(page.statistic), "p": float(page.pvalue), "method": page.method},
         "secondary": sec, "adjacent_pairs": follow,

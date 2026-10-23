@@ -56,3 +56,11 @@ H1 or H2 significant at α = 0.05. Secondary measures count only after Holm corr
 - Rousseeuw, P. J. (1987). Silhouettes: a graphical aid to the interpretation and validation of cluster analysis. *Journal of Computational and Applied Mathematics*, 20, 53–65. https://doi.org/10.1016/0377-0427(87)90125-7
 - Tagliazucchi, E., & Laufs, H. (2014). Decoding wakefulness levels from typical fMRI resting-state data reveals reliable drifts between wakefulness and sleep. *Neuron*, 82(3), 695–708. https://doi.org/10.1016/j.neuron.2014.03.020
 - Ward, J. H. (1963). Hierarchical grouping to optimize an objective function. *Journal of the American Statistical Association*, 58(301), 236–244. https://doi.org/10.1080/01621459.1963.10500845
+
+## Amendment 1 (post hoc) · primary group restricted to the qualified participants
+
+**Added:** 2026-10-23 17:09 IST, after the results for the 26 participants in the original plan, and a first run in the qualified group, had been seen.
+
+At the author's decision, the primary analysis uses the **14 qualified participants** used elsewhere in this project: those who passed study 01's quality rules and were awake for less than 50% of usable epochs (01, 04, 07, 09, 11, 14, 15, 16, 18, 19, 23, 24, 25, 27). Participant 23 has no scored epochs in rest 1 and sleep 2, so 13 enter the tests. Tests, measures and corrections are unchanged. The original-plan analysis (26 participants) and the sensitivity analysis (30) are kept and reported.
+
+**Caveat.** The qualification rule is defined from the share of wake across the session, which overlaps with this study's outcome (sleep share). Restricting to people who slept for most of the session limits how much their sleep can rise across runs (a ceiling) and removes people who stayed awake until the later runs. Results in this group are therefore conditional on the selection and are not an independent test of the original hypotheses.
