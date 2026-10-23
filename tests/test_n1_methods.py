@@ -61,3 +61,18 @@ def test_holm_correction_matches_hand_calculation():
     from run_n1 import holm
     # sorted 0.01, 0.03, 0.04 -> x3, x2, x1 = 0.03, 0.06, 0.04 -> monotone 0.03, 0.06, 0.06
     assert np.allclose(holm(np.array([0.01, 0.04, 0.03])), [0.03, 0.06, 0.06])
+
+
+def test_youden_threshold_finds_the_separating_cut():
+    from methods.threshold import youden_threshold
+    prob = np.r_[np.linspace(0.05, 0.30, 50), np.linspace(0.35, 0.60, 50)]   # target scores all above 0.33
+    t, j = youden_threshold(np.r_[np.zeros(50), np.ones(50)], prob)
+    assert 0.30 < t <= 0.35 and j == 1.0                                     # perfect separation, J = 1
+
+
+def test_decide_lowers_the_bar_for_the_target_class():
+    from methods.threshold import decide
+    P = np.array([[0.50, 0.30, 0.20],        # argmax W; N1 0.30 >= 0.25 -> N1
+                  [0.20, 0.10, 0.70],        # N1 below threshold -> N2
+                  [0.60, 0.20, 0.20]])       # N1 below threshold -> W
+    assert list(decide(P, ["W", "N1", "N2"], "N1", 0.25)) == ["N1", "N2", "W"]
