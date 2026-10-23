@@ -105,7 +105,7 @@ Of approximately 30 pre-specified secondary contrasts, reported without correcti
 
 \*Zero differences discarded (four participants); with Pratt or zero-split handling, p ≈ 0.07.
 
-Effects of correction diverged between classifiers: gradient boosting benefited consistently from artefact correction, whereas logistic regression did not, and in one contrast favoured the filtered arm. Only the first contrast would survive a Bonferroni-type correction.
+Effects of correction diverged between classifiers: gradient boosting benefited consistently from artefact correction, whereas logistic regression did not, and in one contrast favoured the filtered arm. None of these contrasts survives Bonferroni correction across the ~30 secondary tests (smallest adjusted p ≈ 0.08).
 
 **Signal preservation.** Posterior relative alpha power was higher in wake than in N2 in 23 of 25 participants with both stages after AAS-MNE correction (22 of 25 for AAS-refined and full), compared with 20 of 25 (raw) and 19 of 25 (filtered).
 
@@ -123,7 +123,7 @@ Within each expert stage, the Spearman correlation between epoch heart rate and 
 | AAS-refined | −0.14 (14 / 22) | 0.11 | 0.02 | 0.89 |
 | Full | −0.06 (13 / 23) | 0.54 | −0.17 | 0.12 |
 
-In uncorrected data, gradient-boosting predictions covaried with heart rate independently of the expert stage (p = 0.0007, robust to correction across the ten tests), indicating that residual ballistocardiogram activity contributed to classification. The association was weaker and non-significant after correction. Classification performance on uncorrected data therefore partly reflects a cardiac rather than a neural signal.
+In uncorrected data, gradient-boosting predictions covaried with heart rate within expert stages (p = 0.0007; Bonferroni-adjusted across the ten tests, p = 0.007), consistent with ballistocardiogram activity contributing to classification. The association was weaker and non-significant after correction. Classification performance on uncorrected data may therefore partly reflect a cardiac rather than a neural signal; because heart rate itself differs between stages, this analysis cannot fully separate the two.
 
 ### Post-hoc subset: participants who slept (amendment 8)
 
@@ -135,7 +135,7 @@ This analysis was specified after partial primary results had been inspected and
 | W vs N2, logistic regression | AAS-MNE − raw | 0.179 [0.061, 0.310] | 0.009 | 12 / 2 |
 | W vs N2, gradient boosting | AAS-MNE − raw | 0.163 [0.021, 0.314] | 0.016 | 12 / 1 |
 
-In this subset, pooled three-class κ increased from 0.09 (raw) to 0.27 (AAS-MNE). The benefit of correction was therefore concentrated in participants with substantial sleep, whereas in wake-dominant participants uncorrected data already separated the predominant class. Given its post-hoc definition, the absence of correction for multiplicity and n = 14, this result motivates a prospective test rather than qualifying the primary conclusion.
+In this subset, pooled three-class κ increased from 0.09 (raw) to 0.27 (AAS-MNE), suggesting that the benefit of correction is concentrated in participants with substantial sleep. One possible explanation, not tested here, is that in wake-dominant participants uncorrected features already suffice to identify the predominant class, diluting the average effect in the full sample. Given its post-hoc definition, the absence of correction for multiplicity and n = 14, this result motivates a prospective test rather than qualifying the primary conclusion.
 
 ### Sleep-stage transition structure (descriptive)
 
