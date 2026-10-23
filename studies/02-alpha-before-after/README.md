@@ -17,7 +17,7 @@
 |---|:---:|:---:|:---:|:---:|:---:|---|
 | Peak alpha frequency (Corcoran et al., 2018) | 9.88 Hz | 9.50 Hz | +0.31 Hz [−0.10, 1.02] | 4 / 4 | 1.0 | Inconclusive |
 
-The positive mean reflects one participant (21: 8.0 → 12.0 Hz, estimated from 9 and 13 wake epochs); the median change was 0.0 Hz and 8 of 12 participants changed by at most 0.25 Hz, the method's frequency resolution.
+The positive mean reflects one participant (21: 8.0 → 12.0 Hz, estimated from 9 and 13 wake epochs); the median change was 0.0 Hz, and the other 11 participants changed by at most 0.25 Hz, the method's frequency resolution (4 not at all).
 
 ### Secondary (exploratory, uncorrected)
 
