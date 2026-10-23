@@ -46,3 +46,12 @@ Results are reported whatever they show.
 - **Decision rule.** An epoch is classified N1 if its N1 probability is at or above the threshold; otherwise it is assigned the more probable of W and N2.
 - **Analyses.** Gradient boosting with the baseline and A feature sets (primary); logistic regression with the baseline, A and A + B sets (secondary).
 - **Outcome and tests.** Per-participant N1 F1 (same 28 eligible participants), tuned threshold vs argmax for the same model and features; two-sided Wilcoxon signed-rank; Holm correction across the two gradient-boosting comparisons; bootstrap 95% CIs. Also reported: F1 of W and N2, macro F1, κ, and the chosen thresholds, so that any N1 gain bought at the cost of other stages is visible.
+
+## Amendment 2: additional threshold rules (23 October 2026, post hoc, before the threshold analysis produced any result)
+
+The amendment-1 run was stopped after about two minutes, before any participant had finished, so that two further established threshold rules can be computed from the same training-only out-of-fold probabilities in a single run. Youden's J remains the primary rule; the additional rules are secondary.
+
+- **Closest to the top-left corner of the ROC curve:** the threshold minimising √((1 − sensitivity)² + (1 − specificity)²).
+- **F1-optimal:** the threshold maximising N1 F1 of the full decision rule (N1 if its probability ≥ threshold, else the more probable of W and N2) on the training participants' out-of-fold predictions. This targets the study's outcome measure directly, whereas Youden's J and the corner rule weight sensitivity and specificity equally regardless of N1 prevalence (32% of epochs).
+
+Each rule is compared with argmax for the same model and features (per-participant N1 F1, Wilcoxon, bootstrap CI); Holm correction remains across the two gradient-boosting Youden comparisons only; the other rules are reported uncorrected. A threshold changes the operating point on the ROC curve, not the curve: AUC is unaffected by the rule.
