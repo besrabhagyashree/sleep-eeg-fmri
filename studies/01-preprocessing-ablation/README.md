@@ -64,7 +64,7 @@ Only the EEG differs between arms. Epochs, people, quality exclusions, features,
 ## 📊 Results
 
 > [!IMPORTANT]
-> **Summary.** Artefact correction did not significantly improve the pre-registered primary outcome (Δκ = 0.056, 95% CI [−0.020, 0.137], p = 0.33; H1 inconclusive). Exploratory analyses indicate that its benefit is model-dependent (consistent for gradient boosting, absent for logistic regression), larger in participants who slept for most of the recording, and that correction attenuates a residual cardiac confound present in uncorrected data. All reported statistics were independently recomputed from the saved data by a separate audit script; features, kappas, test statistics, exclusions and epoch counts matched.
+> **Summary.** Artefact correction did not significantly improve the pre-registered primary outcome (Δκ = 0.056, 95% CI [−0.020, 0.137], p = 0.33; H1 inconclusive). Exploratory analyses indicate that its benefit is model-dependent (consistent for gradient boosting, absent for logistic regression), larger in participants who slept for most of the recording, and that correction attenuates a residual cardiac confound present in uncorrected data. Adding sleep-event features (spindles, slow waves, alpha peak) did not change these conclusions. All reported statistics were independently recomputed from the saved data by a separate audit script; features, kappas, test statistics, exclusions and epoch counts matched.
 
 Notation: κ, Cohen's kappa against the expert hypnogram; Δκ, mean paired difference in per-participant κ (second arm minus first); CI, 10,000-sample bootstrap 95% confidence interval of Δκ; W, Wilcoxon signed-rank statistic; n, participants with a non-zero difference. Arms: **raw** (5 kHz, uncorrected), **filtered** (0.3–40 Hz, 250 Hz), **AAS-MNE** and **AAS-refined** (gradient and ballistocardiogram average artefact subtraction with MNE's or the refined R-peak detector), **full** (AAS-MNE plus notch, interpolation and linked-mastoid re-reference; exploratory).
 
@@ -153,9 +153,21 @@ First-order transitions between consecutive 30-s epochs of the expert hypnograms
 
 These properties correspond to the canonical organisation of human sleep: entry into sleep through stage N1, a transitional and readily reversible state (Carskadon & Dement, 2005; Ogilvie, 2001), and stage-transition probabilities and bout durations of the type used to characterise normal and disordered sleep (Kishi et al., 2008; Bianchi et al., 2010), with distinct statistics for wake and sleep bouts (Lo et al., 2004). Their presence supports the internal validity of the expert scoring. The data departed from typical nocturnal sleep in their fragmentation (median bout duration 0.5–1 min) and scarcity of N3, as reported for sleep during fMRI acquisition (Tagliazucchi & Laufs, 2014). Part of this regularity is attributable to the scoring rules, which favour stage continuity.
 
-### Sleep-event feature set (amendment 6)
+### Sleep-event feature set (amendments 6 and 7, secondary)
 
-The secondary comparison adding spindle, slow-wave and alpha-peak features (AASM derivations, amendment 7) is in progress and will be reported here.
+The comparison was repeated with the 67 spectral features augmented by sleep-event features: YASA spindle and slow-wave detection and the posterior alpha peak, computed on AASM derivations (C4–M1, F4–M1, O2–M1; backups only for PREP-bad electrodes, used for 3% of epochs). Sample, epochs, exclusions, classifiers and tests were identical to the primary analysis (29 participants, 5,009 epochs per arm).
+
+| Task, classifier | Contrast | Δκ [95% CI] | W (n) | p | Better / worse |
+|---|---|:---:|:---:|:---:|:---:|
+| W/N1/N2, logistic regression | AAS-MNE − raw | 0.058 [−0.004, 0.124] | 142 (28) | 0.16 | 16 / 12 |
+| W/N1/N2, logistic regression | AAS-refined − raw | 0.092 [0.027, 0.165] | 105 (28) | 0.026 | 19 / 9 |
+| W/N1/N2, logistic regression | filtered − raw | 0.012 [−0.016, 0.040] | 128 (25) | 0.35 | 16 / 9 |
+| W vs N2, gradient boosting | AAS-MNE − raw | 0.079 [−0.024, 0.181] | 86 (23) | 0.11 | 15 / 8 |
+| W vs N2, gradient boosting | AAS-MNE − filtered | 0.138 [0.035, 0.245] | 68 (23) | 0.033 | 17 / 6 |
+
+The pattern replicated the spectral analysis: the contrast corresponding to H1 was again positive but not significant (Δκ = 0.058, p = 0.16), filtering alone conferred no benefit, and correction improved gradient-boosting W vs N2 classification relative to filtered data. Pooled κ was within ±0.03 of the spectral-only values in every arm (e.g. W vs N2, gradient boosting, AAS-MNE: 0.58 vs 0.56). All contrasts are exploratory and uncorrected.
+
+Adding event features did not measurably change per-participant agreement (exploratory paired comparison with the spectral-only analysis, same arm: Δκ between −0.009 and 0.031, all p > 0.37). A likely reason is that the spectral set already captures the energy of these events (sigma and delta band power), and that spindles were rare in this in-scanner dataset. Event features therefore added no detectable information for staging here, and the conclusions of the primary analysis do not depend on the feature set.
 
 <details>
 <summary><b>📈 Per-participant κ by arm, and confusion matrices</b></summary>
