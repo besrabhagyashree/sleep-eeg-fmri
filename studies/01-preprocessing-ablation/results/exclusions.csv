@@ -1,0 +1,7 @@
+subject,session,reason
+07,task-sleep_run-1,> 3 bad channels (rule 4)
+03,all,26% epochs flagged > 25% (rule 5)
+13,all,32% epochs flagged > 25% (rule 5)
+17,all,26% epochs flagged > 25% (rule 5)
+31,all,37% epochs flagged > 25% (rule 5)
+all,all,835 individual epochs flagged by Autoreject

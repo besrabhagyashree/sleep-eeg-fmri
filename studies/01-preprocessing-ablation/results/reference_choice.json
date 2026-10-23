@@ -1,0 +1,21 @@
+{
+  "rule": "pre-registration amendment 1: higher median score; ties (< 0.01) to average reference",
+  "n_participants_scored": 23,
+  "median_score": {
+    "full_average": 0.2587,
+    "full_mastoid": 0.5396
+  },
+  "median_alpha_contrast": {
+    "full_average": 1.372,
+    "full_mastoid": 1.605
+  },
+  "median_spindle_contrast": {
+    "full_average": 0.941,
+    "full_mastoid": 0.996
+  },
+  "participants_spindle_contrast_above_1": {
+    "full_average": 10,
+    "full_mastoid": 11
+  },
+  "choice": "full_mastoid"
+}

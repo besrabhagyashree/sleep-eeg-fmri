@@ -71,6 +71,17 @@ Every published method, metric, dataset, standard and software package this proj
 | Spearman, C. (1904). The proof and measurement of association between two things. *The American Journal of Psychology*, 15(1), 72–101. [doi:10.2307/1412159](https://doi.org/10.2307/1412159) | Rank correlation between heart rate and predictions in the residual-heartbeat check (`hr_check.py`) |
 | Efron, B. (1979). Bootstrap methods: another look at the jackknife. *The Annals of Statistics*, 7(1), 1–26. [doi:10.1214/aos/1176344552](https://doi.org/10.1214/aos/1176344552) | Bootstrap 95% confidence intervals (`compare_arms.py`) |
 
+## Sleep architecture and stage transitions
+
+| Reference | Used for |
+|---|---|
+| Carskadon, M. A., & Dement, W. C. (2005). Normal human sleep: an overview. In *Principles and Practice of Sleep Medicine* (4th ed., pp. 13–23). Elsevier. [doi:10.1016/B0-72-160797-7/50009-4](https://doi.org/10.1016/B0-72-160797-7/50009-4) | Sleep onset through N1; normal sleep architecture (Results: stage transitions) |
+| Ogilvie, R. D. (2001). The process of falling asleep. *Sleep Medicine Reviews*, 5(3), 247–270. [doi:10.1053/smrv.2001.0145](https://doi.org/10.1053/smrv.2001.0145) | N1 as a transitional stage (Results: stage transitions) |
+| Kishi, A., Struzik, Z. R., Natelson, B. H., Togo, F., & Yamamoto, Y. (2008). Dynamics of sleep stage transitions in healthy humans and patients with chronic fatigue syndrome. *American Journal of Physiology – Regulatory, Integrative and Comparative Physiology*, 294(6), R1980–R1987. [doi:10.1152/ajpregu.00925.2007](https://doi.org/10.1152/ajpregu.00925.2007) | Stage-transition probabilities and bout durations (Results: stage transitions) |
+| Bianchi, M. T., Cash, S. S., Mietus, J., Peng, C.-K., & Thomas, R. (2010). Obstructive sleep apnea alters sleep stage transition dynamics. *PLoS ONE*, 5(6), e11356. [doi:10.1371/journal.pone.0011356](https://doi.org/10.1371/journal.pone.0011356) | Transition dynamics as a sleep descriptor (Results: stage transitions) |
+| Lo, C.-C., Chou, T., Penzel, T., Scammell, T. E., Strecker, R. E., Stanley, H. E., & Ivanov, P. Ch. (2004). Common scale-invariant patterns of sleep–wake transitions across mammalian species. *PNAS*, 101(50), 17545–17548. [doi:10.1073/pnas.0408242101](https://doi.org/10.1073/pnas.0408242101) | Different statistics of wake and sleep bouts (Results: stage transitions) |
+| Tagliazucchi, E., & Laufs, H. (2014). Decoding wakefulness levels from typical fMRI resting-state data reveals reliable drifts between wakefulness and sleep. *Neuron*, 82(3), 695–708. [doi:10.1016/j.neuron.2014.03.020](https://doi.org/10.1016/j.neuron.2014.03.020) | Fragmented in-scanner sleep (Results: stage transitions) |
+
 ## Scientific software
 
 | Reference | Used in |

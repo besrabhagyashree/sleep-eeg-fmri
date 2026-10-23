@@ -1,0 +1,15 @@
+participant,Falls asleep through N1,Moves one step at a time (>90%),N2 steadier than N1,N1 is a crossroads (both ways),Wakes from N2 via N1
+01,True,True,True,True,True
+04,True,True,True,True,True
+07,True,True,False,True,True
+09,True,True,True,True,True
+11,True,True,False,True,True
+14,True,True,False,True,True
+15,True,True,True,True,True
+16,True,True,True,False,True
+18,True,True,False,True,False
+19,True,True,True,True,True
+23,True,True,True,True,True
+24,True,True,True,True,True
+25,True,True,True,True,True
+27,True,False,True,True,False

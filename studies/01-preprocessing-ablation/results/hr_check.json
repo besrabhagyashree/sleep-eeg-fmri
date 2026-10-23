@@ -1,0 +1,67 @@
+{
+  "heart_rate_wake_minus_n2_bpm_median": 3.2916712433726474,
+  "people_heart_slower_in_n2": 16,
+  "people_with_both_stages": 25,
+  "tests": {
+    "gbm/cleaned_mne": {
+      "n_people": 23,
+      "median_r": -0.09875108814634276,
+      "people_negative": 16,
+      "wilcoxon_p": 0.05625271797180176
+    },
+    "logreg/cleaned_mne": {
+      "n_people": 25,
+      "median_r": 0.04511631032486295,
+      "people_negative": 11,
+      "wilcoxon_p": 0.9578450322151184
+    },
+    "gbm/cleaned_refined": {
+      "n_people": 22,
+      "median_r": -0.1350360585536765,
+      "people_negative": 14,
+      "wilcoxon_p": 0.11287164688110352
+    },
+    "logreg/cleaned_refined": {
+      "n_people": 23,
+      "median_r": 0.022215048859218628,
+      "people_negative": 11,
+      "wilcoxon_p": 0.8932116031646729
+    },
+    "gbm/filtered": {
+      "n_people": 20,
+      "median_r": -0.14144129379780696,
+      "people_negative": 15,
+      "wilcoxon_p": 0.023950576782226562
+    },
+    "logreg/filtered": {
+      "n_people": 23,
+      "median_r": -0.0922915232503091,
+      "people_negative": 14,
+      "wilcoxon_p": 0.13413381576538086
+    },
+    "gbm/full_mastoid": {
+      "n_people": 23,
+      "median_r": -0.05547350108382518,
+      "people_negative": 13,
+      "wilcoxon_p": 0.5399188995361328
+    },
+    "logreg/full_mastoid": {
+      "n_people": 19,
+      "median_r": -0.17174582903526944,
+      "people_negative": 14,
+      "wilcoxon_p": 0.12318801879882812
+    },
+    "gbm/raw": {
+      "n_people": 21,
+      "median_r": -0.17325221176917857,
+      "people_negative": 17,
+      "wilcoxon_p": 0.000720977783203125
+    },
+    "logreg/raw": {
+      "n_people": 17,
+      "median_r": -0.08316721515419892,
+      "people_negative": 12,
+      "wilcoxon_p": 0.0638275146484375
+    }
+  }
+}

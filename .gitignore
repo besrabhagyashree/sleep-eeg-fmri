@@ -27,3 +27,16 @@ studies/*/results/*
 !studies/*/results/stages_validation_*.csv
 !studies/*/results/obs_validation_*.csv
 !studies/*/results/obs_staging_*.csv
+!studies/*/results/hr_check.*
+!studies/*/results/transitions_sleepers.*
+!studies/*/results/quality_report.md
+!studies/*/results/quality_by_*.csv
+!studies/*/results/exclusions.csv
+!studies/*/results/reference_choice.json
+# sub-analyses (post-hoc subset, sensitivity, event set): share their summaries and figures
+!studies/*/results/*/
+studies/*/results/*/*
+!studies/*/results/*/summary.json
+!studies/*/results/*/per_subject.csv
+!studies/*/results/*/exclusions.csv
+!studies/*/results/*/*.png

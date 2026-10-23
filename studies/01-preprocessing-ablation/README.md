@@ -64,7 +64,104 @@ Only the EEG differs between arms. Epochs, people, quality exclusions, features,
 ## 📊 Results
 
 > [!IMPORTANT]
-> The main result (each person scored by a model trained on everyone else, with significance tests across people) appears in the tables below once all 33 participants are built. Until then, only data quality and within-person previews are shown.
+> **Primary result: inconclusive.** Removing scanner and heartbeat artefacts did not significantly improve the pre-registered primary outcome (Δκ = +0.056, 95% CI −0.020 to +0.137, p = 0.33). Exploratory analyses suggest the benefit depends on the model and on how much people slept, and that cleaning removes a heart-rate confound. All numbers below were independently recomputed by an audit script (features, kappas, tests, exclusions and counts all matched).
+
+**Sample.** 33 participants built; **29 analysed**, 5,009 epochs per arm (wake 2,541, N1 1,579, N2 889). Excluded by the pre-registered rules: 4 people with more than 25% of epochs rejected by Autoreject (rule 5: participants 03, 13, 17, 31) and 1 recording with more than 3 bad channels (rule 4: participant 07, sleep run 1). Each person is scored by a model trained on the other 28 (leave-one-person-out). Reference for the fully cleaned arm, chosen by the amendment-1 rule before any comparison: **linked mastoids** (median score 0.54 vs 0.26 for the average reference, n = 23).
+
+### Pre-registered hypotheses
+
+Per-person Cohen's kappa against the expert; 3-stage task (W/N1/N2); logistic regression; two-sided Wilcoxon signed-rank; bootstrap 95% CI of the mean difference.
+
+| Hypothesis | Comparison | Mean Δκ | 95% CI | p | Improved / worse | Verdict |
+|---|---|:---:|:---:|:---:|:---:|---|
+| **H1** (primary) | cleaned (MNE) vs raw | +0.056 | −0.020 to +0.137 | 0.33 | 15 / 13 | **Inconclusive** |
+| H2 | filtered vs raw | +0.015 | −0.005 to +0.035 | 0.17 | 15 / 11 | Consistent with H2 (filtering alone does not help) |
+| H3 | cleaned (refined) vs cleaned (MNE) | +0.016 | −0.005 to +0.042 | 0.61 | 11 / 16 | No difference between heartbeat detectors |
+
+**Overall agreement** (pooled κ over all epochs; chance ≈ 0):
+
+| Task · model | Raw | Filtered | Cleaned (MNE) | Cleaned (refined) | Fully cleaned (mastoid)\* |
+|---|:---:|:---:|:---:|:---:|:---:|
+| W/N1/N2 · logistic regression | 0.27 | 0.29 | 0.28 | 0.29 | 0.34 |
+| W/N1/N2 · gradient boosting | 0.31 | 0.28 | 0.37 | 0.36 | 0.36 |
+| W vs N2 · logistic regression | 0.41 | 0.46 | 0.44 | 0.45 | 0.47 |
+| W vs N2 · gradient boosting | 0.41 | 0.31 | **0.56** | 0.55 | 0.53 |
+
+\*Exploratory arm (amendments 1 and 3).
+
+### Secondary tests (exploratory, uncorrected, as pre-registered)
+
+About 30 secondary comparisons were run without correction, so one or two values below 0.05 are expected by chance. The clearest:
+
+| Task · model | Comparison | Mean Δκ | p | Improved / worse |
+|---|---|:---:|:---:|:---:|
+| W vs N2 · gradient boosting | cleaned (MNE) vs filtered | +0.149 | **0.003** | 17 / 5 |
+| W/N1/N2 · gradient boosting | cleaned (MNE) vs filtered | +0.066 | 0.023 | 21 / 7 |
+| W vs N2 · gradient boosting | cleaned (MNE) vs raw | +0.100 | 0.050† | 13 / 8 |
+| W vs N2 · logistic regression | filtered vs raw | +0.125 | 0.048 | 12 / 8 |
+| W vs N2 · logistic regression | cleaned (MNE) vs filtered | **−0.107** | 0.017 | 6 / 16 |
+
+†The default Wilcoxon test drops the 4 people with tied scores; counting them (Pratt or zero-split handling) gives p ≈ 0.07. Not presented as significant.
+
+The two models disagree: cleaning helps gradient boosting clearly, logistic regression hardly at all.
+
+**Signal preservation** (pre-registered, descriptive): posterior alpha is higher in wake than in N2 for **23 of 25** people after cleaning (MNE), 22 of 25 with the refined detector and in the fully cleaned arm, against 20 of 25 raw and 19 of 25 filtered.
+
+**Sensitivity analysis** (pre-registered, per-person feature scaling, `--norm`): every difference shrinks. Primary comparison Δκ = +0.013, p = 0.72; W vs N2 · gradient boosting, cleaned vs raw Δκ = +0.070, p = 0.18. Scaling each person's features around their own median removes much of the between-person stage information, as anticipated in the pre-registration.
+
+### Does leftover heartbeat artefact steer the model? (amendment 5, exploratory)
+
+Within epochs that the expert gave the same stage, a negative Spearman correlation between heart rate and "predicted N2" means slower-heart epochs are called N2 more often, i.e. the model partly reads the heartbeat. Heart rate is a median 3.3 bpm lower in N2 than in wake (slower in N2 for 16 of 25 people).
+
+| Arm | Gradient boosting: median r (people negative) | p | Logistic regression: median r | p |
+|---|:---:|:---:|:---:|:---:|
+| Raw | **−0.17 (17 of 21)** | **0.0007** | −0.08 | 0.06 |
+| Filtered | −0.14 (15 of 20) | 0.024 | −0.09 | 0.13 |
+| Cleaned (MNE) | −0.10 (16 of 23) | 0.056 | +0.05 | 0.96 |
+| Cleaned (refined) | −0.14 (14 of 22) | 0.11 | +0.02 | 0.89 |
+| Fully cleaned (mastoid) | −0.06 (13 of 23) | 0.54 | −0.17 | 0.12 |
+
+On raw and filtered data, gradient boosting's sleep calls follow heart rate (raw p = 0.0007 would survive correction for the 10 tests); after cleaning the link weakens and loses significance. Cleaning removes a confound even where it adds little kappa: part of the raw arm's apparent performance comes from the heartbeat, not the brain.
+
+### Post-hoc: people who slept (amendment 8, added after partial results were seen)
+
+Restricted to the 14 participants who passed every quality rule and were awake for under half their usable epochs (01, 04, 07, 09, 11, 14, 15, 16, 18, 19, 23, 24, 25, 27); leave-one-person-out among the 14; same methods and the same reference.
+
+| Task · model | Comparison | Mean Δκ | 95% CI | p | Improved / worse |
+|---|---|:---:|:---:|:---:|:---:|
+| W/N1/N2 · logistic regression | cleaned (MNE) vs raw | +0.102 | +0.016 to +0.194 | 0.049 | 10 / 4 |
+| W vs N2 · logistic regression | cleaned (MNE) vs raw | +0.179 | +0.061 to +0.310 | 0.009 | 12 / 2 |
+| W vs N2 · gradient boosting | cleaned (MNE) vs raw | +0.163 | +0.021 to +0.314 | 0.016 | 12 / 1 |
+
+Pooled κ on the 3-stage task rises from 0.09 (raw) to 0.27 (cleaned). For people who actually slept, cleaning helped consistently. Because the subset was chosen after partial results were seen, tests are uncorrected and n = 14, this is a hypothesis for a prospective study, not a finding that replaces the primary result.
+
+### Sleep-stage transitions in the 14 sleepers (descriptive)
+
+![Stage transitions: group diagram, per-person grids and pattern check](results/transitions_sleepers.png)
+
+From the expert labels (consecutive 30-s epochs within a recording):
+
+| Pattern | Group | People following it |
+|---|---|:---:|
+| Falling asleep passes through N1 | 217 of 220 departures from wake go to N1 | 14 / 14 |
+| Changes go one step at a time | 95% of stage changes are to a neighbouring stage | 13 / 14 |
+| Deeper stages are steadier | chance of staying: W 72%, N1 75%, N2 81%, N3 90% | 10 / 14 (N2 > N1) |
+| N1 is a crossroads | from N1: back to wake 12.3%, on to N2 12.3% | 13 / 14 |
+| Waking from N2 passes through N1 | N2 → N1 112 times, N2 → wake 28 times | 12 / 14 |
+
+These are the canonical features of normal sleep onset and architecture: entry into sleep through N1, a transitional and easily reversed stage (Carskadon & Dement, 2005; Ogilvie, 2001), and stage-to-stage transition probabilities and bout durations of the kind used to characterise healthy and disordered sleep (Kishi et al., 2008; Bianchi et al., 2010), with wake and sleep bouts following different statistics (Lo et al., 2004). Their presence supports the validity of the expert labels. What is specific to this dataset is fragmentation: most stage bouts last 0.5–1 minute and deep sleep is rare, consistent with reports that people drift in and out of light sleep during fMRI (Tagliazucchi & Laufs, 2014). Note that part of this regularity reflects the scoring rules themselves, which favour continuity.
+
+### Sleep-event feature set (amendment 6)
+
+The secondary comparison with spindles, slow waves and alpha peak added (AASM derivations, amendment 7) is running and will be reported here.
+
+<details>
+<summary><b>📈 Per-person kappa by arm, and confusion matrices</b></summary>
+
+![Per-person kappa by arm](results/kappa_by_arm.png)
+
+![Confusion matrices](results/confusion_matrices.png)
+</details>
 
 **What cleaning does to the signal** (participant 1, sleep run 1; [`cleaning_effect.py`](cleaning_effect.py)):
 
