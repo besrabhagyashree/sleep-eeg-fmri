@@ -61,7 +61,15 @@ def run_participant(sub):
     print(f"sub-{sub}: all stages done", flush=True)
 
 
+def keep_awake():
+    """Ask Windows not to sleep while this process runs (released when it exits); no effect elsewhere."""
+    if sys.platform == "win32":
+        import ctypes
+        ctypes.windll.kernel32.SetThreadExecutionState(0x80000000 | 0x00000001)   # ES_CONTINUOUS | ES_SYSTEM_REQUIRED
+
+
 def main():
+    keep_awake()
     ap = argparse.ArgumentParser()
     ap.add_argument("--subjects", nargs="*", default=[f"{i:02d}" for i in range(1, 34)])
     for sub in ap.parse_args().subjects:
