@@ -29,6 +29,15 @@ Research on sleep and wakefulness using **EEG recorded simultaneously with fMRI*
 
 <sub>Participant 1, 15-minute sleep recording, mean of 30 scalp channels.</sub>
 
+**Study 01 results** (29 participants, pre-registered, independently audited; [details](studies/01-preprocessing-ablation#-results)):
+
+| Question | Answer |
+|---|---|
+| Does artefact correction improve automated sleep staging? | Not significantly on the primary outcome: Δκ = 0.056, 95% CI [−0.020, 0.137], p = 0.33 |
+| Does it change what the classifier relies on? | Yes: on uncorrected data, predictions followed heart rate within expert stages (p = 0.0007); after correction this was weak and non-significant |
+| Can standard sleep-event detectors be used without it? | No: a slow-wave detector found almost no events in uncorrected data and frequent false events in wake after filtering alone |
+| Who benefits most? | Participants who slept (post hoc, n = 14): Δκ = 0.10–0.18, improved in 10–12 of 14 |
+
 ## 🧭 Pipeline
 
 ```mermaid
