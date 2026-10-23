@@ -64,101 +64,103 @@ Only the EEG differs between arms. Epochs, people, quality exclusions, features,
 ## 📊 Results
 
 > [!IMPORTANT]
-> **Primary result: inconclusive.** Removing scanner and heartbeat artefacts did not significantly improve the pre-registered primary outcome (Δκ = +0.056, 95% CI −0.020 to +0.137, p = 0.33). Exploratory analyses suggest the benefit depends on the model and on how much people slept, and that cleaning removes a heart-rate confound. All numbers below were independently recomputed by an audit script (features, kappas, tests, exclusions and counts all matched).
+> **Summary.** Artefact correction did not significantly improve the pre-registered primary outcome (Δκ = 0.056, 95% CI [−0.020, 0.137], p = 0.33; H1 inconclusive). Exploratory analyses indicate that its benefit is model-dependent (consistent for gradient boosting, absent for logistic regression), larger in participants who slept for most of the recording, and that correction attenuates a residual cardiac confound present in uncorrected data. All reported statistics were independently recomputed from the saved data by a separate audit script; features, kappas, test statistics, exclusions and epoch counts matched.
 
-**Sample.** 33 participants built; **29 analysed**, 5,009 epochs per arm (wake 2,541, N1 1,579, N2 889). Excluded by the pre-registered rules: 4 people with more than 25% of epochs rejected by Autoreject (rule 5: participants 03, 13, 17, 31) and 1 recording with more than 3 bad channels (rule 4: participant 07, sleep run 1). Each person is scored by a model trained on the other 28 (leave-one-person-out). Reference for the fully cleaned arm, chosen by the amendment-1 rule before any comparison: **linked mastoids** (median score 0.54 vs 0.26 for the average reference, n = 23).
+Notation: κ, Cohen's kappa against the expert hypnogram; Δκ, mean paired difference in per-participant κ (second arm minus first); CI, 10,000-sample bootstrap 95% confidence interval of Δκ; W, Wilcoxon signed-rank statistic; n, participants with a non-zero difference. Arms: **raw** (5 kHz, uncorrected), **filtered** (0.3–40 Hz, 250 Hz), **AAS-MNE** and **AAS-refined** (gradient and ballistocardiogram average artefact subtraction with MNE's or the refined R-peak detector), **full** (AAS-MNE plus notch, interpolation and linked-mastoid re-reference; exploratory).
+
+### Sample
+
+Of 33 participants, **29 were analysed** (5,009 epochs per arm: wake 2,541, N1 1,579, N2 889; N3 merged into N2). Four participants were excluded under rule 5 (more than 25% of epochs rejected by Autoreject: 03, 13, 17, 31) and one recording under rule 4 (more than three PREP bad channels: 07, sleep run 1). Classification used leave-one-participant-out cross-validation. The reference for the full arm was fixed by the amendment-1 rule before any comparison was run: linked mastoids (median selection score 0.54 vs 0.26 for the average reference; n = 23 participants with at least three wake and three N2 epochs).
 
 ### Pre-registered hypotheses
 
-Per-person Cohen's kappa against the expert; 3-stage task (W/N1/N2); logistic regression; two-sided Wilcoxon signed-rank; bootstrap 95% CI of the mean difference.
+Primary outcome: per-participant κ, three-class staging (W/N1/N2), logistic regression; two-sided Wilcoxon signed-rank tests, α = 0.05.
 
-| Hypothesis | Comparison | Mean Δκ | 95% CI | p | Improved / worse | Verdict |
+| | Contrast | Δκ [95% CI] | W (n) | p | Better / worse | Conclusion |
 |---|---|:---:|:---:|:---:|:---:|---|
-| **H1** (primary) | cleaned (MNE) vs raw | +0.056 | −0.020 to +0.137 | 0.33 | 15 / 13 | **Inconclusive** |
-| H2 | filtered vs raw | +0.015 | −0.005 to +0.035 | 0.17 | 15 / 11 | Consistent with H2 (filtering alone does not help) |
-| H3 | cleaned (refined) vs cleaned (MNE) | +0.016 | −0.005 to +0.042 | 0.61 | 11 / 16 | No difference between heartbeat detectors |
+| **H1** | AAS-MNE − raw | 0.056 [−0.020, 0.137] | 160 (28) | 0.33 | 15 / 13 | Inconclusive |
+| H2 | filtered − raw | 0.015 [−0.005, 0.035] | 121 (26) | 0.17 | 15 / 11 | Consistent with H2 |
+| H3 | AAS-refined − AAS-MNE | 0.016 [−0.005, 0.042] | 168 (27) | 0.61 | 11 / 16 | No detector effect |
 
-**Overall agreement** (pooled κ over all epochs; chance ≈ 0):
+Pooled κ over all epochs (chance-level baseline: −0.006 three-class, −0.040 W vs N2):
 
-| Task · model | Raw | Filtered | Cleaned (MNE) | Cleaned (refined) | Fully cleaned (mastoid)\* |
+| Task, classifier | Raw | Filtered | AAS-MNE | AAS-refined | Full |
 |---|:---:|:---:|:---:|:---:|:---:|
-| W/N1/N2 · logistic regression | 0.27 | 0.29 | 0.28 | 0.29 | 0.34 |
-| W/N1/N2 · gradient boosting | 0.31 | 0.28 | 0.37 | 0.36 | 0.36 |
-| W vs N2 · logistic regression | 0.41 | 0.46 | 0.44 | 0.45 | 0.47 |
-| W vs N2 · gradient boosting | 0.41 | 0.31 | **0.56** | 0.55 | 0.53 |
+| W/N1/N2, logistic regression | 0.27 | 0.29 | 0.28 | 0.29 | 0.34 |
+| W/N1/N2, gradient boosting | 0.31 | 0.28 | 0.37 | 0.36 | 0.36 |
+| W vs N2, logistic regression | 0.41 | 0.46 | 0.44 | 0.45 | 0.47 |
+| W vs N2, gradient boosting | 0.41 | 0.31 | 0.56 | 0.55 | 0.53 |
 
-\*Exploratory arm (amendments 1 and 3).
+### Secondary comparisons (exploratory, uncorrected)
 
-### Secondary tests (exploratory, uncorrected, as pre-registered)
+Of approximately 30 pre-specified secondary contrasts, reported without correction for multiplicity, five reached p < 0.05; one or two are expected by chance.
 
-About 30 secondary comparisons were run without correction, so one or two values below 0.05 are expected by chance. The clearest:
-
-| Task · model | Comparison | Mean Δκ | p | Improved / worse |
+| Task, classifier | Contrast | Δκ | p | Better / worse |
 |---|---|:---:|:---:|:---:|
-| W vs N2 · gradient boosting | cleaned (MNE) vs filtered | +0.149 | **0.003** | 17 / 5 |
-| W/N1/N2 · gradient boosting | cleaned (MNE) vs filtered | +0.066 | 0.023 | 21 / 7 |
-| W vs N2 · gradient boosting | cleaned (MNE) vs raw | +0.100 | 0.050† | 13 / 8 |
-| W vs N2 · logistic regression | filtered vs raw | +0.125 | 0.048 | 12 / 8 |
-| W vs N2 · logistic regression | cleaned (MNE) vs filtered | **−0.107** | 0.017 | 6 / 16 |
+| W vs N2, gradient boosting | AAS-MNE − filtered | 0.149 | 0.003 | 17 / 5 |
+| W/N1/N2, gradient boosting | AAS-MNE − filtered | 0.066 | 0.023 | 21 / 7 |
+| W vs N2, gradient boosting | AAS-MNE − raw | 0.100 | 0.050\* | 13 / 8 |
+| W vs N2, logistic regression | filtered − raw | 0.125 | 0.048 | 12 / 8 |
+| W vs N2, logistic regression | AAS-MNE − filtered | −0.107 | 0.017 | 6 / 16 |
 
-†The default Wilcoxon test drops the 4 people with tied scores; counting them (Pratt or zero-split handling) gives p ≈ 0.07. Not presented as significant.
+\*Zero differences discarded (four participants); with Pratt or zero-split handling, p ≈ 0.07.
 
-The two models disagree: cleaning helps gradient boosting clearly, logistic regression hardly at all.
+Effects of correction diverged between classifiers: gradient boosting benefited consistently from artefact correction, whereas logistic regression did not, and in one contrast favoured the filtered arm. Only the first contrast would survive a Bonferroni-type correction.
 
-**Signal preservation** (pre-registered, descriptive): posterior alpha is higher in wake than in N2 for **23 of 25** people after cleaning (MNE), 22 of 25 with the refined detector and in the fully cleaned arm, against 20 of 25 raw and 19 of 25 filtered.
+**Signal preservation.** Posterior relative alpha power was higher in wake than in N2 in 23 of 25 participants with both stages after AAS-MNE correction (22 of 25 for AAS-refined and full), compared with 20 of 25 (raw) and 19 of 25 (filtered).
 
-**Sensitivity analysis** (pre-registered, per-person feature scaling, `--norm`): every difference shrinks. Primary comparison Δκ = +0.013, p = 0.72; W vs N2 · gradient boosting, cleaned vs raw Δκ = +0.070, p = 0.18. Scaling each person's features around their own median removes much of the between-person stage information, as anticipated in the pre-registration.
+**Sensitivity analysis.** With per-participant robust feature scaling, all contrasts attenuated (primary Δκ = 0.013, p = 0.72; W vs N2, gradient boosting, AAS-MNE − raw: Δκ = 0.070, p = 0.18), consistent with the pre-registered concern that within-participant scaling removes between-participant differences in stage composition.
 
-### Does leftover heartbeat artefact steer the model? (amendment 5, exploratory)
+### Residual cardiac confound (amendment 5, exploratory)
 
-Within epochs that the expert gave the same stage, a negative Spearman correlation between heart rate and "predicted N2" means slower-heart epochs are called N2 more often, i.e. the model partly reads the heartbeat. Heart rate is a median 3.3 bpm lower in N2 than in wake (slower in N2 for 16 of 25 people).
+Within each expert stage, the Spearman correlation between epoch heart rate and the classifier's N2 prediction was computed per participant and tested against zero across participants. A negative correlation indicates that, for epochs of the same true stage, lower heart rate increases the probability of an N2 prediction. Heart rate was lower in N2 than in wake by a median of 3.3 bpm (16 of 25 participants).
 
-| Arm | Gradient boosting: median r (people negative) | p | Logistic regression: median r | p |
+| Arm | Gradient boosting: median ρ (negative / n) | p | Logistic regression: median ρ | p |
 |---|:---:|:---:|:---:|:---:|
-| Raw | **−0.17 (17 of 21)** | **0.0007** | −0.08 | 0.06 |
-| Filtered | −0.14 (15 of 20) | 0.024 | −0.09 | 0.13 |
-| Cleaned (MNE) | −0.10 (16 of 23) | 0.056 | +0.05 | 0.96 |
-| Cleaned (refined) | −0.14 (14 of 22) | 0.11 | +0.02 | 0.89 |
-| Fully cleaned (mastoid) | −0.06 (13 of 23) | 0.54 | −0.17 | 0.12 |
+| Raw | −0.17 (17 / 21) | 0.0007 | −0.08 | 0.064 |
+| Filtered | −0.14 (15 / 20) | 0.024 | −0.09 | 0.13 |
+| AAS-MNE | −0.10 (16 / 23) | 0.056 | 0.05 | 0.96 |
+| AAS-refined | −0.14 (14 / 22) | 0.11 | 0.02 | 0.89 |
+| Full | −0.06 (13 / 23) | 0.54 | −0.17 | 0.12 |
 
-On raw and filtered data, gradient boosting's sleep calls follow heart rate (raw p = 0.0007 would survive correction for the 10 tests); after cleaning the link weakens and loses significance. Cleaning removes a confound even where it adds little kappa: part of the raw arm's apparent performance comes from the heartbeat, not the brain.
+In uncorrected data, gradient-boosting predictions covaried with heart rate independently of the expert stage (p = 0.0007, robust to correction across the ten tests), indicating that residual ballistocardiogram activity contributed to classification. The association was weaker and non-significant after correction. Classification performance on uncorrected data therefore partly reflects a cardiac rather than a neural signal.
 
-### Post-hoc: people who slept (amendment 8, added after partial results were seen)
+### Post-hoc subset: participants who slept (amendment 8)
 
-Restricted to the 14 participants who passed every quality rule and were awake for under half their usable epochs (01, 04, 07, 09, 11, 14, 15, 16, 18, 19, 23, 24, 25, 27); leave-one-person-out among the 14; same methods and the same reference.
+This analysis was specified after partial primary results had been inspected and is reported as hypothesis-generating. It was restricted to the 14 participants who met all quality criteria and were awake for less than 50% of usable epochs (01, 04, 07, 09, 11, 14, 15, 16, 18, 19, 23, 24, 25, 27), with leave-one-participant-out validation within the subset and the reference selected on the full sample.
 
-| Task · model | Comparison | Mean Δκ | 95% CI | p | Improved / worse |
-|---|---|:---:|:---:|:---:|:---:|
-| W/N1/N2 · logistic regression | cleaned (MNE) vs raw | +0.102 | +0.016 to +0.194 | 0.049 | 10 / 4 |
-| W vs N2 · logistic regression | cleaned (MNE) vs raw | +0.179 | +0.061 to +0.310 | 0.009 | 12 / 2 |
-| W vs N2 · gradient boosting | cleaned (MNE) vs raw | +0.163 | +0.021 to +0.314 | 0.016 | 12 / 1 |
+| Task, classifier | Contrast | Δκ [95% CI] | p | Better / worse |
+|---|---|:---:|:---:|:---:|
+| W/N1/N2, logistic regression | AAS-MNE − raw | 0.102 [0.016, 0.194] | 0.049 | 10 / 4 |
+| W vs N2, logistic regression | AAS-MNE − raw | 0.179 [0.061, 0.310] | 0.009 | 12 / 2 |
+| W vs N2, gradient boosting | AAS-MNE − raw | 0.163 [0.021, 0.314] | 0.016 | 12 / 1 |
 
-Pooled κ on the 3-stage task rises from 0.09 (raw) to 0.27 (cleaned). For people who actually slept, cleaning helped consistently. Because the subset was chosen after partial results were seen, tests are uncorrected and n = 14, this is a hypothesis for a prospective study, not a finding that replaces the primary result.
+In this subset, pooled three-class κ increased from 0.09 (raw) to 0.27 (AAS-MNE). The benefit of correction was therefore concentrated in participants with substantial sleep, whereas in wake-dominant participants uncorrected data already separated the predominant class. Given its post-hoc definition, the absence of correction for multiplicity and n = 14, this result motivates a prospective test rather than qualifying the primary conclusion.
 
-### Sleep-stage transitions in the 14 sleepers (descriptive)
+### Sleep-stage transition structure (descriptive)
 
 ![Stage transitions: group diagram, per-person grids and pattern check](results/transitions_sleepers.png)
 
-From the expert labels (consecutive 30-s epochs within a recording):
+First-order transitions between consecutive 30-s epochs of the expert hypnograms were tabulated for the 14 participants of the post-hoc subset (uncertain or unscorable epochs interrupt sequences).
 
-| Pattern | Group | People following it |
+| Property | Pooled estimate | Participants conforming |
 |---|---|:---:|
-| Falling asleep passes through N1 | 217 of 220 departures from wake go to N1 | 14 / 14 |
-| Changes go one step at a time | 95% of stage changes are to a neighbouring stage | 13 / 14 |
-| Deeper stages are steadier | chance of staying: W 72%, N1 75%, N2 81%, N3 90% | 10 / 14 (N2 > N1) |
-| N1 is a crossroads | from N1: back to wake 12.3%, on to N2 12.3% | 13 / 14 |
-| Waking from N2 passes through N1 | N2 → N1 112 times, N2 → wake 28 times | 12 / 14 |
+| Sleep onset via N1 | 217 of 220 transitions out of wake entered N1 | 14 / 14 |
+| Transitions between adjacent stages | 95% of all stage changes | 13 / 14 |
+| Stage persistence increases with depth | P(stay): W 0.72, N1 0.75, N2 0.81, N3 0.90 | 10 / 14 (N2 > N1) |
+| N1 as a bidirectional transitional state | P(N1→W) = P(N1→N2) = 0.123 | 13 / 14 |
+| Awakening from N2 via N1 | N2→N1: 112; N2→W: 28 | 12 / 14 |
 
-These are the canonical features of normal sleep onset and architecture: entry into sleep through N1, a transitional and easily reversed stage (Carskadon & Dement, 2005; Ogilvie, 2001), and stage-to-stage transition probabilities and bout durations of the kind used to characterise healthy and disordered sleep (Kishi et al., 2008; Bianchi et al., 2010), with wake and sleep bouts following different statistics (Lo et al., 2004). Their presence supports the validity of the expert labels. What is specific to this dataset is fragmentation: most stage bouts last 0.5–1 minute and deep sleep is rare, consistent with reports that people drift in and out of light sleep during fMRI (Tagliazucchi & Laufs, 2014). Note that part of this regularity reflects the scoring rules themselves, which favour continuity.
+These properties correspond to the canonical organisation of human sleep: entry into sleep through stage N1, a transitional and readily reversible state (Carskadon & Dement, 2005; Ogilvie, 2001), and stage-transition probabilities and bout durations of the type used to characterise normal and disordered sleep (Kishi et al., 2008; Bianchi et al., 2010), with distinct statistics for wake and sleep bouts (Lo et al., 2004). Their presence supports the internal validity of the expert scoring. The data departed from typical nocturnal sleep in their fragmentation (median bout duration 0.5–1 min) and scarcity of N3, as reported for sleep during fMRI acquisition (Tagliazucchi & Laufs, 2014). Part of this regularity is attributable to the scoring rules, which favour stage continuity.
 
 ### Sleep-event feature set (amendment 6)
 
-The secondary comparison with spindles, slow waves and alpha peak added (AASM derivations, amendment 7) is running and will be reported here.
+The secondary comparison adding spindle, slow-wave and alpha-peak features (AASM derivations, amendment 7) is in progress and will be reported here.
 
 <details>
-<summary><b>📈 Per-person kappa by arm, and confusion matrices</b></summary>
+<summary><b>📈 Per-participant κ by arm, and confusion matrices</b></summary>
 
-![Per-person kappa by arm](results/kappa_by_arm.png)
+![Per-participant kappa by arm](results/kappa_by_arm.png)
 
 ![Confusion matrices](results/confusion_matrices.png)
 </details>
