@@ -4,7 +4,7 @@
 
 **Data.** The dataset's expert 30-s stage labels; no EEG is analysed. W, N1, N2 and N3 are kept separate; epochs the expert marked uncertain or unscorable are excluded from every denominator.
 
-**Participants (amendment 1, post hoc).** The **14 qualified participants**: passed study 01's quality rules and awake for less than 50% of usable epochs (01, 04, 07, 09, 11, 14, 15, 16, 18, 19, 23, 24, 25, 27). Participant 23 has no scored epochs in rest 1 and sleep 2, so **13** enter the tests. The original plan used all 29 who passed the quality rules (26 testable); those results are reported [below](#comparison-original-plan-26-participants) for comparison.
+**Participants (amendment 1, post hoc).** The **14 qualified participants**: passed study 01's quality rules and awake for less than 50% of usable epochs (01, 04, 07, 09, 11, 14, 15, 16, 18, 19, 23, 24, 25, 27). Participant 23 has no scored epochs in rest 1 and sleep 2, so **13** enter the tests. The pre-registered plan used all 29 who passed the quality rules; amendment 1 restricts every analysis to the qualified participants.
 
 > [!WARNING]
 > **The qualification rule selects on the outcome.** It keeps people who slept for most of the session, which is close to what this study measures. In this group sleep is near ceiling in most runs, and the people who stayed awake until the later runs are excluded. Results here describe the qualified sleepers; they are not an independent test of the pre-registered hypotheses.
@@ -12,7 +12,7 @@
 ## Results
 
 > [!IMPORTANT]
-> **In the qualified participants, sleep did not change significantly across the five runs.** They were asleep for most of every run (median 60–90%), with no significant difference between runs (Friedman p = 0.34, Kendall's W = 0.09) and no trend with run order (Page p = 0.21). No secondary measure survived correction. One pattern recurred without reaching significance: **sleep 1 had the slowest sleep onset** (median 3 min, against 30 s or less in every other run; uncorrected p = 0.034, Holm p = 0.10). In the larger original-plan group (26 participants), sleep did increase across runs, carried by sleep 3; that increase comes mostly from participants the qualification rule excludes.
+> **In the qualified participants, sleep did not change significantly across the five runs.** They were asleep for most of every run (median 60–90%), with no significant difference between runs (Friedman p = 0.34, Kendall's W = 0.09) and no trend with run order (Page p = 0.21). No secondary measure survived correction. One pattern recurred without reaching significance: **sleep 1 had the slowest sleep onset** (median 3 min, against 30 s or less in every other run; uncorrected p = 0.034, Holm p = 0.10).
 
 ![Every qualified participant's hypnogram across the five runs](results/hypnograms.png)
 
@@ -36,7 +36,7 @@ Values are medians. A run without sleep is assigned its full length as the laten
 - **The "rest" runs were mostly sleep.** The median qualified participant was asleep for 85% of rest 1, the run recorded *before* the task, often reaching N2. For these participants the rest runs are not an awake baseline.
 - **Depth.** N1 was the most common sleep stage in every run (mean 41–53%). N3 appeared only in sleep 3, in participants 04, 23 and 27.
 - **Fragmentation.** Median 24–36 stage shifts per hour, with no difference between runs.
-- **Rest and sleep runs were unrelated within this group** (Spearman ρ = 0.24, p = 0.40), unlike the larger group, where the restriction of range is smaller.
+- **Rest and sleep runs were unrelated within this group** (Spearman ρ = 0.24, p = 0.40).
 
 ### Pattern of each participant (descriptive)
 
@@ -67,12 +67,6 @@ Recurring patterns across individuals:
 
 **Participant 23.** Sleep 3 is scored N3 in all 29 scored epochs, which is 29 of the 42 N3 epochs in the whole dataset. It follows a sleep 2 with no scorable epochs. This record should be checked against the EEG before any N3 analysis relies on it.
 
-### Comparison: original plan (26 participants)
-
-In the 26 testable participants who passed the quality rules, both hypotheses were supported. Sleep share differed across runs (Friedman p = 0.005, W = 0.14) and rose with run order (Page p = 0.003): medians 0.39, 0.32, 0.27, 0.52 and 0.80. The only significant adjacent step was **sleep 2 → sleep 3**: more sleep (18 of 26, Holm p = 0.011), more N2 (16 of 26, Holm p = 0.010) and faster onset (18 of 26, Holm p = 0.035). N2 share and sleep-onset latency differed across runs (both Holm p = 0.002), and stage shifts did not (p = 0.26). Sleep 1 again had the slowest onset (median 6.8 min), rising from rest 2 in 16 of 22 participants with a change (Holm p = 0.053). Sleep in the rest runs correlated with sleep in the sleep runs (ρ = 0.43, p = 0.026). Ignoring the quality exclusions (30 participants) gave the same conclusions. Figures: [`results/quality_passed/`](results/quality_passed).
-
-The two analyses agree once the selection is taken into account. The qualified participants were already asleep for most of the session, so there was little room for sleep to rise. The run-order effect in the larger group is carried by participants who stayed mostly awake until the later runs, and the qualification rule excludes them.
-
 ### Interpretation and limitations
 
 - **Selection.** The qualification rule overlaps with the outcome (see the warning above). The null result here means "no further increase among people who already slept", not "no effect of run order".
@@ -82,15 +76,14 @@ The two analyses agree once the selection is taken into account. The qualified p
 
 ### Corrections
 
-The first published version of this study counted a run with no scored epochs (participant 23, rest 1 and sleep 2) as a run without sleep, so the participant entered the sleep-onset latency tests with invented latencies (n = 27 instead of 26). Such runs are now treated as missing. In the 26-participant analysis, the latency medians changed slightly (for example, sleep 1 from 6.5 to 6.8 min); the Friedman test stayed at Holm p = 0.002, and the sleep 2 → sleep 3 latency step changed from Holm p = 0.020 to 0.035. No conclusion changed.
+- The first published version of this study analysed all 26 testable participants who passed the quality rules. At the author's decision (amendment 1), every analysis now uses the qualified participants only.
+- That version also counted a run with no scored epochs (participant 23, rest 1 and sleep 2) as a run without sleep, giving invented sleep-onset latencies. Such runs are now treated as missing, which removed participant 23 from the latency test (n = 14 to 13; Friedman p = 0.024 to 0.034, Holm p = 0.071 to 0.10). No conclusion changed.
 
 ## Reproduce
 
 ```bash
-python studies/03-run-architecture/run_architecture.py                    # qualified (primary) -> results/
-python studies/03-run-architecture/run_architecture.py --group quality    # original plan -> results/quality_passed/
-python studies/03-run-architecture/run_architecture.py --group all        # sensitivity -> results/sensitivity_all/
-python studies/03-run-architecture/figures_architecture.py [--group quality]
+python studies/03-run-architecture/run_architecture.py       # -> results/per_run.csv, summary.json
+python studies/03-run-architecture/figures_architecture.py   # -> results/hypnograms.png, run_overview.png
 ```
 
 ## References
