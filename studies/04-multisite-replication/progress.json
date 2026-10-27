@@ -2,15 +2,15 @@
   "updated_ist": "27 Oct 2026, 16:05 IST",
   "phase": "pilot",
   "pilot": {
-    "runs_done": 8.0,
+    "runs_done": 9.0,
     "runs_planned": 9,
-    "pct": 88.9,
+    "pct": 100.0,
     "now": "paused"
   },
   "replication": {
-    "participants_processed": 1,
+    "participants_processed": 2,
     "participants_total": 34,
-    "pct": 2.9
+    "pct": 5.9
   },
   "note": "Processing progress only. No results are computed until the full sample is processed (pre-registered)."
 }
