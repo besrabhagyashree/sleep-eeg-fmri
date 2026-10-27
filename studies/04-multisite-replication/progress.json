@@ -1,11 +1,11 @@
 {
-  "updated_ist": "27 Oct 2026, 15:59 IST",
+  "updated_ist": "27 Oct 2026, 16:05 IST",
   "phase": "pilot",
   "pilot": {
-    "runs_done": 7.2,
+    "runs_done": 8.0,
     "runs_planned": 9,
-    "pct": 80.6,
-    "now": "NIH participant 00002, run 1 of 2"
+    "pct": 88.9,
+    "now": "paused"
   },
   "replication": {
     "participants_processed": 1,
