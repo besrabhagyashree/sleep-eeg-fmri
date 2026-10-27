@@ -98,6 +98,7 @@ flowchart TB
 | [**01b**](studies/01b-n1-classification) | **Improving N1:** do AASM-based features (alpha occupancy, eye movements) or sequence decoding improve classification of the hardest stage? | [![](https://img.shields.io/badge/complete-no%20significant%20gain-059669?style=flat-square)](studies/01b-n1-classification#results) |
 | [**02**](studies/02-alpha-before-after) | **Alpha before and after learning:** does a person's alpha-rhythm frequency change after a visual-motor task? | [![](https://img.shields.io/badge/complete-frequency%20unchanged%2C%20power%20higher-059669?style=flat-square)](studies/02-alpha-before-after#results) |
 | [**03**](studies/03-run-architecture) | **Sleep across the session:** how do sleep amount, depth and onset change across rest 1, rest 2 and sleep runs 1–3, for the group and for each participant? | [![](https://img.shields.io/badge/complete-no%20change%20in%20qualified%20sleepers-059669?style=flat-square)](studies/03-run-architecture#results) |
+| [**04**](studies/04-multisite-replication) | **Does it replicate?** Study 01's question in independent EEG-fMRI sleep data from two more sites (NIH overnight ds005127, Geneva nap ds003574): 67 participants across three sites | [![](https://img.shields.io/badge/in%20progress-pre--registered%2C%20pilot%20running-d97706?style=flat-square)](studies/04-multisite-replication/PREREGISTRATION.md) |
 
 > [!IMPORTANT]
 > **Study 01 findings** (29 participants analysed; [full results](studies/01-preprocessing-ablation#-results)):
