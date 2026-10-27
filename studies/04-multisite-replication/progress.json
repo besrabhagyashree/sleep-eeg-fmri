@@ -1,0 +1,16 @@
+{
+  "updated_ist": "27 Oct 2026, 15:16 IST",
+  "phase": "pilot",
+  "pilot": {
+    "runs_done": 5.6,
+    "runs_planned": 9,
+    "pct": 62.0,
+    "now": "NIH participant 00067, run 5 of 7"
+  },
+  "replication": {
+    "participants_processed": 0,
+    "participants_total": 34,
+    "pct": 0.0
+  },
+  "note": "Processing progress only. No results are computed until the full sample is processed (pre-registered)."
+}
