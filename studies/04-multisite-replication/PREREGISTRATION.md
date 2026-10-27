@@ -46,3 +46,15 @@ A pilot batch of about one hour processes a few ds005127 participants end to end
 - Moehlman, T. M., de Zwart, J. A., Chappel-Farley, M. G., Liu, X., et al. (2019). All-night functional magnetic resonance imaging sleep studies. *Journal of Neuroscience Methods*, 316, 83–98. https://doi.org/10.1016/j.jneumeth.2018.09.019
 - Sterpenich, V., van Schie, M. K. M., Catsiyannis, M., et al. (2021). Reward biases spontaneous neural reactivation during sleep. *Nature Communications*, 12, 4162. https://doi.org/10.1038/s41467-021-24357-5
 - Study 01 methods and their references: [`../01-preprocessing-ablation/PREREGISTRATION.md`](../01-preprocessing-ablation/PREREGISTRATION.md).
+
+## Amendment 1 · pilot findings
+
+**Added:** 2026-10-27 16:38 IST, after the pilot and before any classifier was trained or any hypothesis tested.
+
+**Pilot participants:** ds005127 sub-00002 and sub-00067 (3 runs planned for sub-00040 were not started).
+
+**Confirmed:** each row of a scoring file is the 30-s epoch starting at row × 30 s from the start of the EEG file; R128 volume triggers every 3.0 s; channel scaling read from the file matches MNE's reader; all file checksums pass. A run whose epochs are all marked unscorable by the expert is skipped under rule 1 (sub-00002, run 2: 113 of 113 unscorable).
+
+**Processing fixes (no change to methods):** the live status file no longer blocks the pipeline when it is being read; raw files are deleted from the correct folder after each run; the next run downloads while the current one is processed; runs skipped by a rule count as handled in the progress counter.
+
+**Open issue before the full run.** Heartbeat (ballistocardiogram) removal was effective in sub-00002 (INPS 3.9 dB) but weak in sub-00067 (median 0.7 dB; run 5 −0.9 dB, with 31% of beats double-counted by MNE's detector). This will be investigated against the dataset's own physiological recordings (`derivatives/physio_prepro`) before the full run. Any change of method will be a published one, applied to every participant, and registered here as amendment 2 before the full run starts. Pilot outputs remain limited to processing quality; no staging accuracy has been computed.

@@ -5,19 +5,40 @@
 
 <p align="center">
   <a href="https://github.com/besrabhagyashree/sleep-eeg-fmri/actions/workflows/tests.yml"><img alt="Tests" src="https://img.shields.io/github/actions/workflow/status/besrabhagyashree/sleep-eeg-fmri/tests.yml?branch=main&label=tests&style=for-the-badge&logo=github"></a>
-  <a href="studies/01-preprocessing-ablation#-results"><img alt="Study 01: results available" src="https://img.shields.io/badge/study%2001-results%20available-059669?style=for-the-badge"></a>
+  <a href="#-studies"><img alt="Studies: 4 complete, 1 in progress" src="https://img.shields.io/badge/studies-4%20complete%20·%201%20in%20progress-059669?style=for-the-badge"></a>
   <img alt="Python 3.11" src="https://img.shields.io/badge/Python-3.11-3776AB?style=for-the-badge&logo=python&logoColor=white">
   <img alt="MNE-Python 1.13" src="https://img.shields.io/badge/MNE--Python-1.13-0b7285?style=for-the-badge">
   <img alt="scikit-learn" src="https://img.shields.io/badge/scikit--learn-1.9-F7931E?style=for-the-badge&logo=scikitlearn&logoColor=white">
-  <img alt="Data: OpenNeuro ds003768" src="https://img.shields.io/badge/data-OpenNeuro%20ds003768-33318a?style=for-the-badge">
-  <img alt="33 participants" src="https://img.shields.io/badge/participants-33-b53b6d?style=for-the-badge">
+  <img alt="Data: OpenNeuro, 3 sites" src="https://img.shields.io/badge/data-OpenNeuro%20·%203%20sites-33318a?style=for-the-badge">
+  <img alt="Participants: 33 analysed, 34 more in replication" src="https://img.shields.io/badge/participants-33%20analysed%20·%2034%20in%20replication-b53b6d?style=for-the-badge">
   <a href="https://orcid.org/0009-0008-6118-7602"><img alt="ORCID 0009-0008-6118-7602" src="https://img.shields.io/badge/ORCID-0009--0008--6118--7602-A6CE39?style=for-the-badge&logo=orcid&logoColor=white"></a>
   <a href="LICENSE"><img alt="MIT licence" src="https://img.shields.io/badge/licence-MIT-0f766e?style=for-the-badge"></a>
 </p>
 
 Research on sleep and wakefulness using **EEG recorded simultaneously with fMRI**. Inside a working MRI scanner, the EEG is buried under artefacts hundreds of times larger than brain activity (top trace above). This project builds a pipeline that cleans it, measures it and models it, then uses that pipeline to answer research questions as separate studies.
 
-**Author:** Bhagyashree Besra · [ORCID 0009-0008-6118-7602](https://orcid.org/0009-0008-6118-7602) · [portfolio](https://besrabhagyashree.github.io) · started October 2026
+**Author:** Bhagyashree Besra · ORCID [https://orcid.org/0009-0008-6118-7602](https://orcid.org/0009-0008-6118-7602) · [portfolio](https://besrabhagyashree.github.io) · started October 2026
+
+## 👋 The project in 60 seconds
+
+**Question.** EEG recorded inside an MRI scanner is buried under scanner and heartbeat artefacts. Does cleaning it matter for reading sleep from it, and what goes wrong if you skip it?
+
+**What was built.** A tested, end-to-end pipeline (artefact removal, quality control with standard tools, spectral and sleep-event features, leave-one-person-out classifiers) and five pre-registered studies on public data.
+
+**Key findings**
+- **Cleaning did not significantly improve automated sleep staging overall** (Δκ = 0.056, 95% CI [−0.020, 0.137]); reported as an inconclusive result, not hidden.
+- **Without cleaning, the classifier partly read the heartbeat instead of the brain** (predictions followed heart rate within expert stages, p = 0.0007).
+- **Standard slow-wave detection worked only after cleaning**: almost no events in raw data, and events in 74% of wake epochs after filtering alone.
+- **A widely used correction method (OBS) removed 75% of slow-wave (delta) power** in participant 1, even away from heartbeats, so it was not used: a caution for sleep EEG-fMRI.
+- **Next:** testing whether these hold in independent data from NIH and Geneva ([study 04](studies/04-multisite-replication), pre-registered).
+
+**How.** Plans pre-registered before results, dated amendments, corrections logs, an independent audit script, 55 automated tests in continuous integration, and every reference verified against Crossref.
+
+**Skills shown.** Python · MNE-Python · EEG signal processing and artefact removal · machine-learning evaluation · non-parametric statistics · reproducible research.
+
+### My role and tools
+
+I set the research questions and the rules the work follows: pre-registration before results, only published methods, and reporting null results as they are. I chose the datasets, and I reviewed and approved each pre-registration, analysis decision and correction. The code, analyses and write-ups were produced with an AI coding assistant (Claude Code, Anthropic) working under my direction. Every decision and change is recorded in the dated pre-registrations and corrections logs.
 
 ## ✨ At a glance
 
@@ -110,11 +131,13 @@ flowchart TB
 
 ## 🗂️ Data
 
-[OpenNeuro ds003768](https://openneuro.org/datasets/ds003768/versions/1.0.13): simultaneous EEG and fMRI from 33 healthy adults resting and napping in a 3T scanner, with expert sleep-stage labels for every 30 seconds (Gu et al., 2022, *NeuroImage*; Penn State; CC0 licence).
+[OpenNeuro ds003768](https://openneuro.org/datasets/ds003768/versions/1.0.13): simultaneous EEG and fMRI from 33 healthy adults resting and napping in a 3T scanner, with expert sleep-stage labels for every 30 seconds (Gu et al., 2022, *NeuroImage*; Penn State; CC0 licence). Used in studies 01–03.
 
 | Wake | N1 (drowsy) | N2 (light sleep) | N3 (deep sleep) |
 |:---:|:---:|:---:|:---:|
 | 3,343 epochs | 2,148 epochs | 1,325 epochs | 42 epochs |
+
+Study 04 adds two independent EEG-fMRI sleep datasets: **[ds005127](https://openneuro.org/datasets/ds005127)**, NIH overnight sleep, 16 participants (Moehlman et al., 2019), and **[ds003574](https://openneuro.org/datasets/ds003574)**, Geneva naps, 18 participants (Sterpenich et al., 2021).
 
 > [!NOTE]
 > No data is stored in this repository. The scripts download it directly from OpenNeuro, one recording at a time.
@@ -134,7 +157,11 @@ src/
 ├── methods/          stage 3: research methods
 └── postprocessing/   stage 4: statistics, figures, this README's banner
 studies/
-└── 01-preprocessing-ablation/   question, scripts, results
+├── 01-preprocessing-ablation/   does cleaning matter for sleep staging?
+├── 01b-n1-classification/       can N1 be classified better?
+├── 02-alpha-before-after/       alpha rhythm before and after a task
+├── 03-run-architecture/         sleep across the runs of a session
+└── 04-multisite-replication/    replication in NIH and Geneva data (in progress)
 figures/              figures shared across studies
 assets/               README banner (drawn from real data by src/postprocessing/readme_banner.py)
 ```
