@@ -10,7 +10,7 @@
 
 ## Status
 
-**Pilot complete; one processing fault found and fixed ([amendment 2](PREREGISTRATION.md#amendment-2--scanner-artefact-template-length)); sub-00067 is being re-processed before the full run.** No classifier has been trained and no hypothesis tested yet: that happens only when the full sample is processed.
+**Pilot complete; one processing fault found, fixed ([amendment 2](PREREGISTRATION.md#amendment-2--scanner-artefact-template-length)) and verified by re-processing sub-00067.** Next: the full run, one participant at a time. No classifier has been trained and no hypothesis tested yet: that happens only when the full sample is processed.
 
 ### Pilot (processing quality only)
 
@@ -18,15 +18,24 @@
 |---|:---:|:---:|
 | Runs usable | 1 of 2 (run 2: all epochs unscorable, skipped by rule 1) | 7 of 7 |
 | Epochs analysed (W / N1 / N2) | 49 (17 / 26 / 6) | 366 (57 / 150 / 159) |
-| Epochs rejected (Autoreject) | 6.1% | 16.9% |
-| Bad channels, median (max) | 4 (4) | 0 (2) |
-| Heart rate, median | 59 bpm | 68 bpm |
-| Heartbeat removal, INPS (MNE detector) | **3.9 dB** | **0.7 dB** (run 5: −0.9 dB) |
+| Epochs rejected (Autoreject) | 6.1% | 19.4% |
+| Bad channels, median (max) | 4 (4) | 0 (1) |
+| Heart rate, median | 59 bpm | 57 bpm |
+| Heartbeat removal, INPS (MNE detector) | 3.9 dB | 0.7 dB (runs 0.4–2.1) |
 | Exclusion rules 4 and 5 | pass | pass |
 
-Heartbeat removal looked weak in sub-00067. The cause was upstream: two of its runs contain a few irregular scanner triggers, and the scanner-artefact template was set to the shortest trigger interval (2 s instead of the 3-s TR), leaving the last second of every volume uncorrected; the beat detectors then locked onto those bursts. The template is now one TR long, as the method defines ([amendment 2](PREREGISTRATION.md#amendment-2--scanner-artefact-template-length)); ds003768 has no irregular triggers, so studies 01–03 are unaffected.
+Heartbeat removal looked weak in sub-00067. The cause was upstream: two of its runs contain a few irregular scanner triggers, and the scanner-artefact template was set to the shortest trigger interval (2 s instead of the 3-s TR), leaving the last second of every volume uncorrected; the beat detectors then locked onto those bursts. The template is now one TR long, as the method defines ([amendment 2](PREREGISTRATION.md#amendment-2--scanner-artefact-template-length)); ds003768 has no irregular triggers, so studies 01–03 are unaffected. sub-00067 was then re-processed (the table above shows the re-processed values):
 
-![Pilot heartbeat check: clean ECG in a good run, and residual scanner bursts every 3 s in sub-00067 run 5](results/pilot_heartbeat_check.png)
+| sub-00067, runs with irregular triggers | Run 5, before | Run 5, after | Run 7, before | Run 7, after |
+|---|:---:|:---:|:---:|:---:|
+| Heartbeat-locked residual in cleaned EEG | 954 µV | 6.2 µV | 256 µV | 4.2 µV |
+| … relative to random-locked average | ×28 | ×2.2 | ×12 | ×2.7 |
+| Double-counted beats (MNE detector) | 31% | 0.3% | 14% | 0.3% |
+| Heart rate (MNE detector) | 68 bpm | 57 bpm | 91 bpm | 52 bpm |
+
+After the fix both runs look like the participant's other runs (residual ×0.8–2.4 random). INPS stays modest (0.4–2.1 dB) in every sub-00067 run, including runs that never had the fault: its pulse artefact is small to begin with (residual 2.6 µV in run 3), so there is little to remove.
+
+![Pilot heartbeat check after the fix: clean ECG, single-counted beats and a few µV of residual in sub-00002 and sub-00067 runs 3 and 5](results/pilot_heartbeat_check.png)
 
 ## Code
 
