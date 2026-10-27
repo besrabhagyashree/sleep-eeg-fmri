@@ -52,9 +52,15 @@ def volume_onsets(raw: mne.io.BaseRaw) -> np.ndarray:
 
 
 def remove_gradient(data: np.ndarray, onsets: np.ndarray, window: int = GRAD_WINDOW):
-    """AAS gradient correction, in place, channel by channel. Returns segment length."""
-    seg_len = int(np.min(np.diff(onsets)))          # one TR, never overlapping
-    onsets = onsets[onsets + seg_len <= data.shape[1]]
+    """AAS gradient correction, in place, channel by channel. Returns segment length.
+
+    The template is one TR long (the median trigger interval; Allen et al., 2000). A trigger followed by a shorter
+    interval (a spurious or duplicated marker) is skipped, so segments never overlap. With regular triggers, as in
+    every ds003768 recording, this is identical to using the shortest interval.
+    """
+    seg_len = int(np.median(np.diff(onsets)))       # one TR
+    nxt = np.append(onsets[1:], np.iinfo(np.int64).max)
+    onsets = onsets[(nxt - onsets >= seg_len) & (onsets + seg_len <= data.shape[1])]
     take = onsets[:, None] + np.arange(seg_len)[None, :]
     for ch in range(data.shape[0]):
         segs = data[ch, take]

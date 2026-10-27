@@ -58,3 +58,13 @@ A pilot batch of about one hour processes a few ds005127 participants end to end
 **Processing fixes (no change to methods):** the live status file no longer blocks the pipeline when it is being read; raw files are deleted from the correct folder after each run; the next run downloads while the current one is processed; runs skipped by a rule count as handled in the progress counter.
 
 **Open issue before the full run.** Heartbeat (ballistocardiogram) removal was effective in sub-00002 (INPS 3.9 dB) but weak in sub-00067 (median 0.7 dB; run 5 −0.9 dB, with 31% of beats double-counted by MNE's detector). This will be investigated against the dataset's own physiological recordings (`derivatives/physio_prepro`) before the full run. Any change of method will be a published one, applied to every participant, and registered here as amendment 2 before the full run starts. Pilot outputs remain limited to processing quality; no staging accuracy has been computed.
+
+## Amendment 2 · scanner-artefact template length
+
+**Added:** 2026-10-27 16:45 IST, after the pilot heartbeat check and before the full run. No classifier has been trained and no hypothesis tested.
+
+**Finding.** The weak heartbeat removal in sub-00067 was caused upstream, by incomplete scanner-artefact removal. Runs 5 and 7 contain a few irregular volume triggers (three and two 2-s intervals among about 1,300–2,700 regular 3-s intervals). The gradient template length was set to the *shortest* trigger interval, so in those runs it covered only 2 s of each 3-s volume and the last second of every volume was left uncorrected; the beat detectors then locked onto these residual bursts ([`pilot_heartbeat_check.py`](pilot_heartbeat_check.py), [figure](results/pilot_heartbeat_check.png)).
+
+**Change (applies to every participant).** The template is one TR long (the median trigger interval), as defined for average artefact subtraction (Allen et al., 2000); a trigger followed by a shorter interval is skipped so that segments never overlap, and the number of irregular triggers is recorded per run. All 255 ds003768 recordings have perfectly regular triggers, for which the median and the shortest interval are identical, so studies 01–03 are unaffected. sub-00067 is re-processed with the change before the full run, and the heartbeat check is repeated.
+
+- Allen, P. J., Josephs, O., & Turner, R. (2000). A method for removing imaging artifact from continuous EEG recorded during functional MRI. *NeuroImage*, 12(2), 230–239. https://doi.org/10.1006/nimg.2000.0599

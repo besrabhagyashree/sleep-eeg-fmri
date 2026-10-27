@@ -168,7 +168,8 @@ def process_run(base: str, sub: str, st: Status):
     counts = lab.stage_full.fillna("unscorable").value_counts().to_dict()
     if len(onsets) < 50:
         qc["status"] = "skipped: too few scanner triggers"; return [], qc, counts
-    seg = int(np.min(np.diff(onsets)))
+    seg = int(np.median(np.diff(onsets)))                                        # one TR (see remove_gradient)
+    qc["triggers_irregular"] = int(np.sum(np.diff(onsets) != seg))
     span = slice(int(onsets[0]), int(onsets[-1] + seg))
     on = onsets - span.start
     inside = (lab.t_file * sf >= span.start) & ((lab.t_file + EPOCH_S) * sf <= span.stop)

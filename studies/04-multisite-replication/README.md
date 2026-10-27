@@ -10,7 +10,7 @@
 
 ## Status
 
-**Pilot complete; full run waiting on one quality check.** No classifier has been trained and no hypothesis tested yet: that happens only when the full sample is processed.
+**Pilot complete; one processing fault found and fixed ([amendment 2](PREREGISTRATION.md#amendment-2--scanner-artefact-template-length)); sub-00067 is being re-processed before the full run.** No classifier has been trained and no hypothesis tested yet: that happens only when the full sample is processed.
 
 ### Pilot (processing quality only)
 
@@ -24,7 +24,9 @@
 | Heartbeat removal, INPS (MNE detector) | **3.9 dB** | **0.7 dB** (run 5: −0.9 dB) |
 | Exclusion rules 4 and 5 | pass | pass |
 
-Heartbeat removal was weak in sub-00067, where MNE's beat detector double-counted 31% of beats in its longest run. This is being checked against the dataset's own physiological recordings before the full run ([amendment 1](PREREGISTRATION.md#amendment-1--pilot-findings)).
+Heartbeat removal looked weak in sub-00067. The cause was upstream: two of its runs contain a few irregular scanner triggers, and the scanner-artefact template was set to the shortest trigger interval (2 s instead of the 3-s TR), leaving the last second of every volume uncorrected; the beat detectors then locked onto those bursts. The template is now one TR long, as the method defines ([amendment 2](PREREGISTRATION.md#amendment-2--scanner-artefact-template-length)); ds003768 has no irregular triggers, so studies 01–03 are unaffected.
+
+![Pilot heartbeat check: clean ECG in a good run, and residual scanner bursts every 3 s in sub-00067 run 5](results/pilot_heartbeat_check.png)
 
 ## Code
 

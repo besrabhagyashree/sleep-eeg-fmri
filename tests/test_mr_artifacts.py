@@ -27,6 +27,19 @@ def test_gradient_subtraction_removes_a_repeating_artefact(rng):
     assert corr > 0.9                                          # brain signal kept
 
 
+def test_gradient_template_spans_a_full_tr_despite_a_spurious_trigger(rng):
+    # ds005127 has runs with a few early or duplicated R128 markers; the template must still cover the whole TR
+    tr, n_vol = 500, 60
+    brain = rng.standard_normal((1, tr * n_vol)) * 10e-6
+    shape = np.sin(np.linspace(0, 40 * np.pi, tr)) * 2e-3
+    data = brain + np.tile(shape, n_vol)[None, :]
+    onsets = np.sort(np.append(np.arange(n_vol) * tr, [20 * tr + 7]))   # one extra marker 7 samples into volume 20
+    seg_len, used = remove_gradient(data, onsets)
+    assert seg_len == tr and 20 * tr + 7 not in used
+    clean = np.r_[0:19 * tr, 22 * tr:59 * tr]                           # away from the skipped volume
+    assert np.abs((data - brain)[0, clean]).max() < 0.05 * np.abs(shape).max()
+
+
 def test_heartbeat_subtraction_removes_a_pulse_artefact(rng):
     sf, rr, n = 250, 200, 120
     peaks = np.arange(20, rr * n, rr)
