@@ -10,7 +10,7 @@
   <img alt="MNE-Python 1.13" src="https://img.shields.io/badge/MNE--Python-1.13-0b7285?style=for-the-badge">
   <img alt="scikit-learn" src="https://img.shields.io/badge/scikit--learn-1.9-F7931E?style=for-the-badge&logo=scikitlearn&logoColor=white">
   <img alt="Data: OpenNeuro, 3 sites" src="https://img.shields.io/badge/data-OpenNeuro%20·%203%20sites-33318a?style=for-the-badge">
-  <img alt="Participants: 33 analysed, 34 more in replication" src="https://img.shields.io/badge/participants-33%20analysed%20·%2034%20in%20replication-b53b6d?style=for-the-badge">
+  <img alt="Participants: 29 analysed, 34 more in replication" src="https://img.shields.io/badge/participants-29%20analysed%20·%2034%20in%20replication-b53b6d?style=for-the-badge">
   <a href="https://orcid.org/0009-0008-6118-7602"><img alt="ORCID 0009-0008-6118-7602" src="https://img.shields.io/badge/ORCID-0009--0008--6118--7602-A6CE39?style=for-the-badge&logo=orcid&logoColor=white"></a>
   <a href="LICENSE"><img alt="MIT licence" src="https://img.shields.io/badge/licence-MIT-0f766e?style=for-the-badge"></a>
 </p>
@@ -27,12 +27,12 @@ Research on sleep and wakefulness using **EEG recorded simultaneously with fMRI*
 
 **Key findings**
 - **Cleaning did not significantly improve automated sleep staging overall** (Δκ = 0.056, 95% CI [−0.020, 0.137]); reported as an inconclusive result, not hidden.
-- **Without cleaning, the classifier partly read the heartbeat instead of the brain** (predictions followed heart rate within expert stages, p = 0.0007).
-- **Standard slow-wave detection worked only after cleaning**: almost no events in raw data, and events in 74% of wake epochs after filtering alone.
+- **Without cleaning, the classifier's predictions followed heart rate** within expert stages (exploratory, gradient boosting: p = 0.0007, Bonferroni-adjusted p = 0.007; logistic regression p = 0.064), consistent with it partly reading the heartbeat rather than the brain.
+- **Slow-wave detection needed cleaning to be usable** (exploratory): almost no events in raw data, and events in 74% of wake epochs after filtering alone. After cleaning it was better but not fully specific (47–52% of wake epochs).
 - **A widely used correction method (OBS) removed 75% of slow-wave (delta) power** in participant 1, even away from heartbeats, so it was not used: a caution for sleep EEG-fMRI.
-- **Next:** testing whether these hold in independent data from NIH and Geneva ([study 04](studies/04-multisite-replication), pre-registered).
+- **Now running:** [study 04](studies/04-multisite-replication), a pre-registered replication of the cleaning, heartbeat and slow-wave findings in independent NIH data (raw, 16 people), with Geneva data (cleaned only, 18 people) for slow-wave validity.
 
-**How.** Plans pre-registered before results, dated amendments, corrections logs, an independent audit script, 55 automated tests in continuous integration, and every reference verified against Crossref.
+**How.** Plans pre-registered before results, dated amendments, corrections logs, an independent audit script, 56 automated tests in continuous integration, and every reference verified against Crossref.
 
 **Skills shown.** Python · MNE-Python · EEG signal processing and artefact removal · machine-learning evaluation · non-parametric statistics · reproducible research.
 
@@ -48,7 +48,7 @@ I set the research questions and the rules the work follows: pre-registration be
 | 🌙 Sleep-spindle band power (12–16 Hz) | 23.5 µV²/Hz | **7.1 µV²/Hz** · 3.3× lower |
 | 📡 Beta band power, mostly scanner noise (16–30 Hz) | 81.6 µV²/Hz | **1.3 µV²/Hz** · 62× lower |
 
-<sub>Participant 1, 15-minute sleep recording, mean of 30 scalp channels.</sub>
+<sub>Participant 1, 15-minute sleep recording. Heartbeat row: channel O1; band-power rows: mean of 30 scalp channels.</sub>
 
 **Study 01 results** (29 participants, pre-registered, independently audited; [details](studies/01-preprocessing-ablation#-results)):
 
@@ -56,7 +56,7 @@ I set the research questions and the rules the work follows: pre-registration be
 |---|---|
 | Does artefact correction improve automated sleep staging? | Not significantly on the primary outcome: Δκ = 0.056, 95% CI [−0.020, 0.137], p = 0.33 |
 | Does it change what the classifier relies on? | Yes: on uncorrected data, predictions followed heart rate within expert stages (p = 0.0007); after correction this was weak and non-significant |
-| Can standard sleep-event detectors be used without it? | No: a slow-wave detector found almost no events in uncorrected data and frequent false events in wake after filtering alone |
+| Can standard sleep-event detectors be used without it? | No: a slow-wave detector found almost no events in uncorrected data and frequent false events in wake after filtering alone. After correction it was better but not fully specific, and spindle detection without the hypnogram showed no physiological pattern in any arm |
 | Who benefits most? | Participants who slept (post hoc, n = 14): Δκ = 0.10–0.18, improved in 10–12 of 14 |
 
 ## 🧭 Pipeline
@@ -119,25 +119,25 @@ flowchart TB
 | [**01b**](studies/01b-n1-classification) | **Improving N1:** do AASM-based features (alpha occupancy, eye movements) or sequence decoding improve classification of the hardest stage? | [![](https://img.shields.io/badge/complete-no%20significant%20gain-059669?style=flat-square)](studies/01b-n1-classification#results) |
 | [**02**](studies/02-alpha-before-after) | **Alpha before and after learning:** does a person's alpha-rhythm frequency change after a visual-motor task? | [![](https://img.shields.io/badge/complete-frequency%20unchanged%2C%20power%20higher-059669?style=flat-square)](studies/02-alpha-before-after#results) |
 | [**03**](studies/03-run-architecture) | **Sleep across the session:** how do sleep amount, depth and onset change across rest 1, rest 2 and sleep runs 1–3, for the group and for each participant? | [![](https://img.shields.io/badge/complete-no%20change%20in%20qualified%20sleepers-059669?style=flat-square)](studies/03-run-architecture#results) |
-| [**04**](studies/04-multisite-replication) | **Does it replicate?** Study 01's question in independent EEG-fMRI sleep data from two more sites (NIH overnight ds005127, Geneva nap ds003574): 67 participants across three sites | [![](https://img.shields.io/badge/in%20progress-pilot%20done%2C%20fault%20fixed-d97706?style=flat-square)](studies/04-multisite-replication/PREREGISTRATION.md) |
+| [**04**](studies/04-multisite-replication) | **Does it replicate?** Study 01's question in independent raw EEG-fMRI sleep data from NIH (overnight, 16 people), pooled with study 01's 29; Geneva naps (18 people, cleaned only) test slow-wave validity | [![](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2Fbesrabhagyashree%2Fsleep-eeg-fmri%2Fmain%2Fstudies%2F04-multisite-replication%2Fprogress.json&query=%24.replication.pct&prefix=full%20run%20%C2%B7%20&suffix=%25%20processed&label=in%20progress&color=d97706&style=flat-square&cacheSeconds=600)](studies/04-multisite-replication#-progress) |
 
 > [!IMPORTANT]
 > **Study 01 findings** (29 participants analysed; [full results](studies/01-preprocessing-ablation#-results)):
 > - **Primary hypothesis inconclusive.** Artefact correction did not significantly improve per-participant agreement with expert staging (Δκ = 0.056, 95% CI [−0.020, 0.137], p = 0.33). Filtering alone conferred no benefit, and the choice of heartbeat detector made no difference.
 > - **Correction removes a cardiac confound** (exploratory). On uncorrected data, classifier predictions covaried with heart rate within expert stages (p = 0.0007); after correction the association was weak and non-significant.
-> - **Correction enables valid sleep-event detection** (exploratory). A standard slow-wave detector found almost no events in uncorrected data and frequent events in wake in filtered data; after correction it retained the expected N2 > wake gradient with a threefold lower wake detection rate.
+> - **Correction enables valid sleep-event detection** (exploratory). A standard slow-wave detector found almost no events in uncorrected data and frequent events in wake in filtered data; after correction it retained the expected N2 > wake gradient with a threefold lower median wake rate (5.7 vs 2.1 events/min), though 47–52% of wake epochs still had a detection.
 > - **Benefit concentrated in participants who slept** (post hoc, n = 14): Δκ = 0.10–0.18, improved in 10–12 of 14; a hypothesis for a prospective study.
 > - Pre-registered with 9 dated amendments; all statistics independently recomputed by an audit script.
 
 ## 🗂️ Data
 
-[OpenNeuro ds003768](https://openneuro.org/datasets/ds003768/versions/1.0.13): simultaneous EEG and fMRI from 33 healthy adults resting and napping in a 3T scanner, with expert sleep-stage labels for every 30 seconds (Gu et al., 2022, *NeuroImage*; Penn State; CC0 licence). Used in studies 01–03.
+[OpenNeuro ds003768](https://openneuro.org/datasets/ds003768/versions/1.0.13): simultaneous EEG and fMRI from 33 healthy adults resting and napping in a 3T scanner, with expert sleep-stage labels for every 30 seconds (Gu et al., 2022, *NeuroImage*; Penn State; CC0 licence). Used in studies 01–03, and pooled with NIH data in study 04 (H2).
 
 | Wake | N1 (drowsy) | N2 (light sleep) | N3 (deep sleep) |
 |:---:|:---:|:---:|:---:|
 | 3,343 epochs | 2,148 epochs | 1,325 epochs | 42 epochs |
 
-Study 04 adds two independent EEG-fMRI sleep datasets: **[ds005127](https://openneuro.org/datasets/ds005127)**, NIH overnight sleep, 16 participants (Moehlman et al., 2019), and **[ds003574](https://openneuro.org/datasets/ds003574)**, Geneva naps, 18 participants (Sterpenich et al., 2021).
+Study 04 adds two independent EEG-fMRI sleep datasets: **[ds005127](https://openneuro.org/datasets/ds005127)**, NIH overnight sleep, 16 participants (Moehlman et al., 2019), and **[ds003574](https://openneuro.org/datasets/ds003574)**, Geneva naps, 18 participants (Sterpenich et al., 2021). Geneva's EEG is available only after the authors' own cleaning, so it is used for slow-wave validity, not for raw-vs-cleaned comparisons.
 
 > [!NOTE]
 > No data is stored in this repository. The scripts download it directly from OpenNeuro, one recording at a time.

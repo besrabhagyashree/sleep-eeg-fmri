@@ -4,7 +4,7 @@
 </picture>
 
 <p align="center">
-  <img alt="Status: running" src="https://img.shields.io/badge/status-running-d97706?style=for-the-badge">
+  <img alt="Status: complete" src="https://img.shields.io/badge/status-complete-059669?style=for-the-badge">
   <img alt="4 arms" src="https://img.shields.io/badge/arms-4-33318a?style=for-the-badge">
   <img alt="2 tasks" src="https://img.shields.io/badge/tasks-W%2FN1%2FN2%20%C2%B7%20W%20vs%20N2-b53b6d?style=for-the-badge">
   <img alt="Leave one person out" src="https://img.shields.io/badge/testing-leave--one--person--out-059669?style=for-the-badge">
