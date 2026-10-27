@@ -25,7 +25,7 @@
 
 ## ❓ The question
 
-[Study 01](../01-preprocessing-ablation) found that removing scanner and heartbeat artefacts from in-scanner EEG **did not significantly improve automated sleep staging** (Δκ = 0.056, 95% CI [−0.020, 0.137]), but that **without it, the classifier partly read the heartbeat instead of the brain** (p = 0.0007). Both findings come from one site, one scanner and one team of scorers.
+[Study 01](../01-preprocessing-ablation) found that removing scanner and heartbeat artefacts from in-scanner EEG **did not significantly improve automated sleep staging** (Δκ = 0.056, 95% CI [−0.020, 0.137]), but that **without it, the classifier partly read the heartbeat instead of the brain** (exploratory, gradient boosting; p = 0.0007, Bonferroni-adjusted p = 0.007). Both findings come from one site, one scanner and one team of scorers.
 
 **Do they hold in independent data, and if cleaning does not help, is its effect small enough to call negligible?**
 
@@ -36,8 +36,8 @@
 
 | | Dataset | Site | People | Recording | EEG available | Expert labels | Role |
 |:---:|---|---|:---:|---|---|---|---|
-| 🟪 | [ds003768](https://openneuro.org/datasets/ds003768) | Penn State | 29 analysed | rest + sleep runs, 32 ch, 5 kHz | raw | 30-s epochs | study 01, already reported |
-| 🟥 | [ds005127](https://openneuro.org/datasets/ds005127) · Moehlman et al., 2019 | NIH (NINDS) | 16 | **overnight**, 63 EEG + ECG + EMG, 5 kHz, TR 3 s | raw | AASM, 30-s epochs, W/N1/N2/N3/REM | independent replication (H1, H3, H4) |
+| 🟪 | [ds003768](https://openneuro.org/datasets/ds003768) | Penn State | 29 analysed | rest + sleep runs, 32 ch, 5 kHz | raw | 30-s epochs | study 01 values; pooled test (H2) |
+| 🟥 | [ds005127](https://openneuro.org/datasets/ds005127) · Moehlman et al., 2019 | NIH (NINDS) | 16 | **overnight**, 63 EEG + ECG + EMG, 5 kHz, TR 3 s | raw | AASM, 30-s epochs, W/N1/N2/N3/REM | independent replication (H1, H3, H4) and pooled test (H2) |
 | 🟩 | [ds003574](https://openneuro.org/datasets/ds003574) · Sterpenich et al., 2021 | Geneva | 18 | nap of 1–2 h, 64 ch, 500 Hz, TR 2.1 s | cleaned only | per fMRI volume, rebuilt into 30-s epochs | slow-wave validity (H4) |
 
 The banner shows one NIH night as the expert scored it: seven scanner runs between 22:55 and 04:50, the gaps being breaks between scans.
@@ -65,7 +65,7 @@ flowchart LR
     classDef stat fill:#fef3c7,stroke:#d97706,color:#78350f
 ```
 
-Methods are identical to study 01 unless the [pre-registration](PREREGISTRATION.md#methods-identical-to-study-01-unless-stated) says otherwise. The differences are practical: NIH recordings are processed one channel and one run at a time (a run is 30 min to 2.5 h of 65 channels at 5 kHz), and only epochs scored with the scanner running for the whole 30 s are used.
+Methods are identical to study 01 unless the [pre-registration](PREREGISTRATION.md#methods-identical-to-study-01-unless-stated) says otherwise. The differences are practical: NIH recordings are processed one channel and one run at a time (a run lasts from a few minutes to over 2 h, with 65 channels at 5 kHz), and only epochs scored with the scanner running for the whole 30 s are used.
 
 ## 🎯 Hypotheses
 
@@ -93,13 +93,13 @@ Registered on **27 Oct 2026, 13:45 IST**, before any EEG from the new datasets w
 | 1 · Pre-registration | ✅ 27 Oct 2026, 13:45 IST |
 | 2 · Pilot (2 NIH participants, processing quality only) | ✅ done |
 | 3 · Fault found by the pilot: fixed and verified | ✅ [amendment 2](PREREGISTRATION.md#amendment-2--scanner-artefact-template-length) |
-| 4 · NIH processing, one participant at a time | 🟠 running (the badges above update as participants finish) |
+| 4 · NIH processing, one participant at a time | 🟠 running (the badges above update when progress is published) |
 | 5 · Geneva processing (loader for the authors' cleaned EEG) | ⚪ not started |
 | 6 · Classifiers and hypothesis tests | 🔒 locked until stages 4 and 5 are complete |
 
 ## 🧪 Pilot
 
-The pilot ran two NIH participants end to end to check trigger and label alignment, memory, disk use and cleaning quality. **Only processing outputs were looked at.** Both participants stay in the final sample.
+The pilot ran two NIH participants end to end to check trigger and label alignment, memory, disk use and cleaning quality. **Only processing outputs were looked at.** Both participants stay in the final sample. The table shows sub-00067 after the fix described below.
 
 | | sub-00002 | sub-00067 |
 |---|:---:|:---:|
@@ -114,7 +114,7 @@ The pilot ran two NIH participants end to end to check trigger and label alignme
 ### A fault the pilot caught
 
 > [!IMPORTANT]
-> **Heartbeat removal looked weak in sub-00067, but the cause was upstream.** Two of its runs contain a few irregular scanner triggers (2-s gaps among thousands of 3-s ones). The scanner-artefact template was set to the *shortest* gap, so it covered only 2 s of each 3-s volume. The last second of every volume stayed uncorrected, and the heartbeat detectors locked onto those bursts.
+> **Heartbeat removal looked weak in sub-00067, but the cause was upstream.** Two of its runs contain a few irregular scanner triggers (two or three 2-s gaps among about 1,300–2,700 regular 3-s ones). The scanner-artefact template was set to the *shortest* gap, so it covered only 2 s of each 3-s volume. The last second of every volume stayed uncorrected, and the heartbeat detectors locked onto those bursts.
 >
 > **Fix:** the template is now one full TR (the median gap), as average artefact subtraction defines it (Allen et al., 2000), backed by a regression test. All 255 Penn State recordings have perfectly regular triggers, so **studies 01–03 are unaffected**.
 
@@ -122,12 +122,12 @@ sub-00067 was re-processed with the fix:
 
 | sub-00067, runs with irregular triggers | Run 5 before | Run 5 after | Run 7 before | Run 7 after |
 |---|:---:|:---:|:---:|:---:|
-| Heartbeat-locked residual in cleaned EEG | 954 µV | **6.2 µV** | 256 µV | **4.2 µV** |
-| … relative to a random-locked average | ×28 | **×2.2** | ×12 | **×2.7** |
+| Heartbeat-locked residual in cleaned EEG (refined detector beats) | 954 µV | **6.2 µV** | 256 µV | **4.2 µV** |
+| … relative to a random-locked average (refined) | ×28 | **×2.2** | ×12 | **×2.7** |
 | Beats double-counted (MNE detector) | 31% | **0.3%** | 14% | **0.3%** |
 | Heart rate (MNE detector) | 68 bpm | **57 bpm** | 91 bpm | **52 bpm** |
 
-Both runs now look like the participant's other runs (residual ×0.8–2.4 random). INPS stays modest in every sub-00067 run, including runs that never had the fault: this person's pulse artefact is small to begin with (2.6 µV in run 3), so there is little to remove.
+Both runs are now close to the participant's other runs (residual ×0.8–2.4 random). INPS stays modest (0.4–2.1 dB) in every sub-00067 run, including runs that never had the fault, while the residual left after cleaning is a few µV. Why INPS is low for this participant is not established; it is recorded here and will be compared across all participants once processing is complete.
 
 ![Pilot heartbeat check after the fix: clean ECG, single-counted beats and a few µV of residual in sub-00002 and sub-00067 runs 3 and 5](results/pilot_heartbeat_check.png)
 
@@ -156,11 +156,14 @@ Both amendments were registered before any classifier was trained or any hypothe
 <summary><b>Commands</b></summary>
 
 ```bash
-python studies/04-multisite-replication/build_nih.py --subjects 00002 00067 --budget-min 60   # download, 4 arms, QC, features; deletes raw after each run
+python studies/04-multisite-replication/build_nih.py --subjects 00002 00067 --budget-min 60   # pilot: download, 4 arms, QC, features; deletes raw after each run
+python studies/04-multisite-replication/build_nih.py --subjects 00003 00006 00014 00029 00040 00047 00053 00056 00060 00063 00065 00078 00086 00105 --budget-min 10000   # full NIH run (run here one participant at a time)
 python studies/04-multisite-replication/pilot_heartbeat_check.py                              # heartbeat check -> results/
 python studies/04-multisite-replication/make_banner.py                                        # this page's banner, from the expert labels
 ```
 </details>
+
+The Geneva loader (stage 5) will be added here when it is built.
 
 [`build_nih.py`](build_nih.py) applies study 01's arms, cleaning, features and quality rules to ds005127. It downloads each run, processes it one channel at a time and deletes it afterwards, so only one or two runs are on disk at any time.
 
