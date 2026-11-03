@@ -108,6 +108,7 @@ Processing quality only, added as each participant finishes. Rejected = epochs d
 | 00002 (pilot) | 1 of 2 (1 skipped) | 49 | 6.1% | 4 (4) | 59 | 0.4% | 0.0% | 3.9 (3.9–3.9) | 0 | 0 | ✅ included |
 | 00003 | 15 of 15 | 1,126 | 13.1% | 1 (2) | 50 | 2.7% | 0.0% | 1.2 (0.5–2.5) | 15 | 0 | ✅ included |
 | 00006 | 16 of 17 (1 skipped) | 1,208 | 19.0% | 1 (2) | 53 | 2.9% | 0.0% | 1.0 (0.1–1.6) | 42 | 0 | ✅ included |
+| 00014 | 17 of 17 | 1,157 | 16.9% | 0 (2) | 68 | 2.7% | 0.0% | 0.6 (0.1–3.5) | 0 | 0 | ✅ included |
 | 00067 (pilot) | 7 of 7 | 366 | 19.4% | 0 (1) | 57 | 0.3% | 0.0% | 0.7 (0.4–2.1) | 7 | 0 | ✅ included |
 <!-- qc:end -->
 
